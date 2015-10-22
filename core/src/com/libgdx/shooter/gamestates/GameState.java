@@ -5,13 +5,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.libgdx.shooter.entities.Player;
+import com.libgdx.shooter.game.ShooterGame;
 import com.libgdx.shooter.managers.GameStateManager;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 
@@ -32,6 +35,12 @@ public class GameState extends State{
     private Drawable touchKnob;
     private float px,py;
 
+    private Vector3 camPos;
+    private float lerp = 0.5f;
+    private Texture bg1;
+    private int srcY = 0,srcX = 0;
+//    private Sprite sprite1;
+
     public GameState(GameStateManager gsm){
         super(gsm);
         //sets the game state and calls init
@@ -40,6 +49,14 @@ public class GameState extends State{
     @Override
     public void init() {
         spriteBatch = new SpriteBatch();
+
+        bg1 = new Texture(Gdx.files.internal("data/BackgroundElements/cactibackground.jpg"));
+//        bg1 = new Texture(Gdx.files.internal("data/BackgroundElements/bgLayer1.png"));
+
+
+//        sprite1 = new Sprite(bg1);
+//        sprite1.setOrigin(0,0);
+//        sprite1.setPosition(-sprite1.getWidth()/2, -sprite1.getHeight()/2);
 
         player = new Player();
 
@@ -59,12 +76,23 @@ public class GameState extends State{
         handleInput();
 
         player.update(dt);
+
+        updateCamera(dt);
+
     }
 
     @Override
     public void render() {
+        spriteBatch.setProjectionMatrix(ShooterGame.cam.combined);
+
         spriteBatch.begin();
+
+        bg1.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        spriteBatch.draw(bg1, 0, 0, srcX, srcY, bg1.getWidth(), bg1.getHeight());
+//        srcX+=1;
+
         player.render(spriteBatch, Gdx.graphics.getDeltaTime());
+
         spriteBatch.end();
 
         stage.act(Gdx.graphics.getDeltaTime());
@@ -118,5 +146,19 @@ public class GameState extends State{
         touchpadStyle.knob = touchKnob;
         touchpad = new Touchpad(10f, touchpadStyle);
         touchpad.setBounds(240f,60f,300f,300f);
+    }
+
+    private void updateCamera(float dt){
+
+        //update the camera position based on player position
+        camPos = ShooterGame.cam.position;
+//        if(player.getX()-camPos.x > 100)
+        camPos.x += (player.getX() - camPos.x) * lerp * dt;
+//        if(player.getY()-camPos.y > 100)
+        camPos.y += (player.getY() - camPos.y) * lerp * dt;
+        ShooterGame.cam.position.set(camPos);
+
+        ShooterGame.cam.update();
+
     }
 }
