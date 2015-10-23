@@ -3,11 +3,15 @@ package com.libgdx.shooter.managers;
 import com.libgdx.shooter.gamestates.GameState;
 import com.libgdx.shooter.gamestates.State;
 
+import java.util.Stack;
+
 /**
  * Created by Conal on 30/09/2015.
  */
 public class GameStateManager {
     public State currentState;
+
+//    private Stack<State> states;
 
     public static final int menu = 0;
     public static final int game = 1;
