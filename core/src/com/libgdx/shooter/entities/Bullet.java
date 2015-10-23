@@ -3,7 +3,9 @@ package com.libgdx.shooter.entities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
+
 
 /**
  * Created by Conal on 22/10/2015.
@@ -12,17 +14,6 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
 
     private float xSpeed, ySpeed;
     private float lifeTimer, lifeTime;
-    private Texture texture;
-
-    public boolean isAlive() {
-        return alive;
-    }
-
-    public void setAlive(boolean alive) {
-        this.alive = alive;
-    }
-
-    private boolean alive;
 
     public Bullet(){
         this.alive = false;
@@ -31,6 +22,9 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
         texture = new Texture(Gdx.files.internal("data/laser.png"));
         xSpeed = 0;
         ySpeed = 0;
+        width = texture.getWidth();
+        height = texture.getHeight();
+        bounds = new Rectangle(x,y,width,height);
     }
 
     public void init(float startXPosition, float startYPosition, float xSpeed, float ySpeed){
@@ -44,6 +38,9 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
     public void update(float dt){
         x += xSpeed * dt;
         y += ySpeed * dt;
+
+        bounds.x = x;
+        bounds.y = y;
 
         if(x>2000)
             alive = false;
@@ -61,4 +58,5 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
         xSpeed = 0;
         ySpeed = 0;
     }
+
 }

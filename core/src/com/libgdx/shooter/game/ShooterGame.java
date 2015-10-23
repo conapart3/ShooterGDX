@@ -17,6 +17,7 @@ public class ShooterGame extends ApplicationAdapter{
 	public static int HEIGHT;
 	public static int WORLD_WIDTH = 1920, WORLD_HEIGHT = 1080;
 	public static float aspectRatio;
+	public static float SCALE_RATIO_X, SCALE_RATIO_Y;
 
 //	public static OrthographicCamera cam;
 //	public Viewport viewport;
@@ -33,6 +34,8 @@ public class ShooterGame extends ApplicationAdapter{
 		WIDTH = Gdx.graphics.getWidth();
 		HEIGHT = Gdx.graphics.getHeight();
 		aspectRatio = (float)HEIGHT / (float)WIDTH;
+		SCALE_RATIO_X = WIDTH/1920f;
+		SCALE_RATIO_Y = HEIGHT/1080f;
 
 //		cam = new OrthographicCamera(108*aspectRatio, 108);
 //		viewport = new FillViewport(1920, 1080, cam);

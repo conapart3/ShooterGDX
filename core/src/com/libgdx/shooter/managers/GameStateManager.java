@@ -1,5 +1,6 @@
 package com.libgdx.shooter.managers;
 
+import com.libgdx.shooter.gamestates.GameOverState;
 import com.libgdx.shooter.gamestates.GameState;
 import com.libgdx.shooter.gamestates.State;
 
@@ -13,20 +14,23 @@ public class GameStateManager {
 
 //    private Stack<State> states;
 
-    public static final int menu = 0;
-    public static final int game = 1;
-    public static final int gameOver = 2;
+    public static final int MENU = 0;
+    public static final int GAME = 1;
+    public static final int GAME_OVER = 2;
 
     public GameStateManager(){
-        setState(game);
+        setState(GAME);
     }
 
     public void setState(int state){
         if(currentState != null)
             currentState.dispose();
 
-        if(state==1)
+        if(state==GAME)
             currentState = new GameState(this);
+
+        if(state==GAME_OVER)
+            currentState = new GameOverState(this);
     }
 
     public void update(float dt) {
