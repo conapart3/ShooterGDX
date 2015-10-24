@@ -15,6 +15,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
 
     private float xSpeed, ySpeed;
     private Random rand;
+    private int points = 100;
 
     public ParachuteBomber(){
         this.alive = false;

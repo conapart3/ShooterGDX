@@ -2,21 +2,23 @@ package com.libgdx.shooter.gamestates;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.libgdx.shooter.entities.Bullet;
 import com.libgdx.shooter.entities.ParachuteBomber;
 import com.libgdx.shooter.entities.Player;
@@ -24,17 +26,17 @@ import com.libgdx.shooter.game.ShooterGame;
 import com.libgdx.shooter.managers.GameStateManager;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 
-import java.util.ArrayList;
-
 /**
  * Created by Conal on 30/09/2015.
  */
 public class GameState extends State {
 
+    private Viewport viewport;
+
     private SpriteBatch spriteBatch;
     private Player player;
     private int level;
-    private float betweenLevelTimer;
+    private float nextLevelTimer;
     private float rateOfFire, timeSinceLastFire;
     private float dt;
     private float ratioX, ratioY;
@@ -47,9 +49,6 @@ public class GameState extends State {
             return new Bullet();
         }
     };
-    private Bullet bItem;
-    private int bLen;
-    private Bullet b;
 
     //array containing active parachute bombers, pool
     private final Array<ParachuteBomber> activeParachuteBombers = new Array<ParachuteBomber>();
@@ -59,23 +58,17 @@ public class GameState extends State {
             return new ParachuteBomber();
         }
     };
-    private ParachuteBomber pbItem;
-    private int pbLen;
-    private ParachuteBomber pb;
 
     //touchpad and stage declaration
     private Stage stage;
     private Touchpad touchpad;
-    private Skin touchpadSkin;
-    private Touchpad.TouchpadStyle touchpadStyle;
-    private Drawable touchBackground;
-    private Drawable touchKnob;
+    private TextureRegion shootBtnUpTextureRegion, shootBtnDownTextureRegion;
+    private Texture shootBtnUpTexture, shootBtnDownTexture;
 
     private BitmapFont font;
+    private Label labelA, labelB, labelC;
 
-    private Texture shootBtnUpTexture, shootBtnDownTexture;
     private ImageButton shootBtn;
-    private ImageButton.ImageButtonStyle shootBtnStyle;
 
 //    button to enable touch screen user to shoot?
 //    private TextButton shootButton;
@@ -85,7 +78,6 @@ public class GameState extends State {
 //    TextureAtlas buttonAtlas;
 
     //camera and background
-    private Vector3 camPos;
     private float lerp = 0.5f;
     private Texture bg1;
     private int srcY = 0,srcX = 0;
@@ -95,7 +87,7 @@ public class GameState extends State {
         super(gsm);
 
         //sets the game state and calls init
-        cam.setToOrtho(false, 1920, 1080);
+//        cam.setToOrtho(false, ShooterGame.WORLD_WIDTH, ShooterGame.WORLD_HEIGHT);
 //        cam.setToOrtho(false, 1920, 1080);
     }
 
@@ -104,17 +96,21 @@ public class GameState extends State {
         ratioX = ShooterGame.SCALE_RATIO_X;
         ratioY = ShooterGame.SCALE_RATIO_Y;
 
+//        cam = new OrthographicCamera(ShooterGame.WORLD_WIDTH, ShooterGame.WORLD_WIDTH * ShooterGame.ASPECT_RATIO);
+        cam = new OrthographicCamera();
+//        viewport = new FitViewport(ShooterGame.WORLD_WIDTH, ShooterGame.WORLD_HEIGHT, cam);
+        viewport = new FitViewport(ShooterGame.WORLD_WIDTH, ShooterGame.WORLD_WIDTH * ShooterGame.ASPECT_RATIO, cam);
+        viewport.apply();
+        cam.position.set(ShooterGame.WORLD_WIDTH/2, ShooterGame.WORLD_HEIGHT/2, 0);
+//        cam.translate(cam.viewportWidth/2, cam.viewportHeight/2);
+
         spriteBatch = new SpriteBatch();
 
         bg1 = new Texture(Gdx.files.internal("data/BackgroundElements/starsbg.png"));
 
-        initTouchpad();
+        initStage();
 
-        initShootBtn();
-
-        font = new BitmapFont();
-
-        stage = new Stage();
+        stage = new Stage(viewport);
         stage.addActor(touchpad);
         stage.addActor(shootBtn);
         Gdx.input.setInputProcessor(stage);
@@ -131,6 +127,7 @@ public class GameState extends State {
         if(player.isAlive()) {
             this.dt = dt;
             handleInput();
+
             player.update(dt);
 
             timeSinceLastFire+=dt;
@@ -138,9 +135,9 @@ public class GameState extends State {
                 timeSinceLastFire = rateOfFire;
 
             //update the active parachute bombers
-            pbLen = activeParachuteBombers.size;
+            int pbLen = activeParachuteBombers.size;
             for (int i = pbLen; --i >= 0; ) {
-                pbItem = activeParachuteBombers.get(i);
+                ParachuteBomber pbItem = activeParachuteBombers.get(i);
                 if (!pbItem.isAlive()) {
                     activeParachuteBombers.removeIndex(i);
                     parachuteBomberPool.free(pbItem);
@@ -149,9 +146,9 @@ public class GameState extends State {
             }
 
             //update the active bullets
-            bLen = activeBullets.size;
+            int bLen = activeBullets.size;
             for (int i = bLen; --i >= 0; ) {
-                bItem = activeBullets.get(i);
+                Bullet bItem = activeBullets.get(i);
                 if (!bItem.isAlive()) {
                     activeBullets.removeIndex(i);
                     bulletPool.free(bItem);
@@ -163,12 +160,12 @@ public class GameState extends State {
 
             //spawns enemies based on level.
             if (activeParachuteBombers.size == 0) {
-                betweenLevelTimer += dt;
-                if (betweenLevelTimer > 4) {
-                    betweenLevelTimer -= 4;
+                nextLevelTimer += dt;
+                if (nextLevelTimer > 4) {
+                    nextLevelTimer -= 4;
                     level++;
-                    System.out.println("LEVEL " + level);
                     spawnParachuteBombers();
+                    player.addPoints(100 * (level-1));
                 }
             }
 
@@ -185,6 +182,7 @@ public class GameState extends State {
     public void render() {
         spriteBatch.setProjectionMatrix(cam.combined);
 
+        spriteBatch.enableBlending();
         spriteBatch.begin();
 
 //        spriteBatch.draw(bg1, cam.position.x-(cam.viewportWidth/2), 0);
@@ -202,18 +200,26 @@ public class GameState extends State {
             activeBullets.get(i).render(spriteBatch);
         }
 
-        font.draw(spriteBatch, "Level: "+level +". Lives Left: "+(int)player.getLives(), 30, 30);
+//        font.draw(spriteBatch, "Level: "+level +". Lives Left: "+player.getLives(), 30, 30);
+        labelA.setText("Level: " + level);
+        labelA.draw(spriteBatch, 1);
+
+        labelB.setText("Score: " + player.getScore());
+        labelB.draw(spriteBatch, 1);
+
+        labelC.setText("Lives: " + player.getLives());
+        labelC.draw(spriteBatch, 1);
 
         spriteBatch.end();
 
         stage.draw();
     }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void handleInput() {
         player.setKnobPosition(touchpad.getKnobPercentX(), touchpad.getKnobPercentY());
 
-        if(shootBtn.isPressed()){
+        if (shootBtn.isPressed()){
             shoot();
         }
 
@@ -231,6 +237,8 @@ public class GameState extends State {
         font.dispose();
         shootBtnUpTexture.dispose();
         shootBtnDownTexture.dispose();
+        shootBtnUpTextureRegion.getTexture().dispose();
+        shootBtnDownTextureRegion.getTexture().dispose();
         player.dispose();
         for(Bullet b : activeBullets)
             b.dispose();
@@ -241,19 +249,20 @@ public class GameState extends State {
     private void checkCollisions(){
         //check bullets with parachutebomber collisions
         for(int i=0; i<activeBullets.size; i++){
-            b = activeBullets.get(i);
+            Bullet b = activeBullets.get(i);
             for(int j=0; j<activeParachuteBombers.size; j++){
-                pb = activeParachuteBombers.get(j);
+                ParachuteBomber pb = activeParachuteBombers.get(j);
                 if(pb.collides(b.getBounds()) || b.collides(pb.getBounds())){
                     b.setAlive(false);
                     pb.setAlive(false);
+                    player.addPoints(50);
                 }
             }
         }
 
         //check player with parachutebomber collisions
         for(int i=0; i<activeParachuteBombers.size; i++){
-            pb=activeParachuteBombers.get(i);
+            ParachuteBomber pb=activeParachuteBombers.get(i);
             if(player.collides(pb.getBounds()) || pb.collides(player.getBounds())){
                 player.removeLife();
                 pb.setAlive(false);
@@ -261,12 +270,33 @@ public class GameState extends State {
         }
     }
 
+    private void initStage(){
+        //init labels
+        font = new BitmapFont();
+        Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
+
+        labelA = new Label("Level: ", labelStyle);
+        labelA.setFontScale(3);
+        labelA.setPosition(100, 1000);
+
+        labelB = new Label("Score: ", labelStyle);
+        labelB.setFontScale(3);
+        labelB.setPosition(1500, 1000);
+
+        labelC = new Label("Lives: ", labelStyle);
+        labelC.setFontScale(3);
+        labelC.setPosition(600, 1000);
+
+        initTouchpad();
+        initShootBtn();
+    }
+
     private void initTouchpad(){
         //touchpad and stage initialising
-        touchpadSkin = new Skin();
+        Skin touchpadSkin = new Skin();
         touchpadSkin.add("touchBackground", new Texture("data/touchBackground.png"));
         touchpadSkin.add("touchKnob", new Texture("data/touchKnob.png"));
-        touchpadStyle = new Touchpad.TouchpadStyle();
+        Touchpad.TouchpadStyle touchpadStyle = new Touchpad.TouchpadStyle();
 
         //pixmap background instead of png background? allows transparency
         Pixmap bg = new Pixmap(200, 200, Pixmap.Format.RGBA8888);
@@ -275,33 +305,35 @@ public class GameState extends State {
         bg.fillCircle(100, 100, 100);
         touchpadStyle.background = new TextureRegionDrawable(new TextureRegion(new Texture(bg)));
 
-        touchBackground = touchpadSkin.getDrawable("touchBackground");
-        touchKnob = touchpadSkin.getDrawable("touchKnob");
+//        Drawable touchBackground = touchpadSkin.getDrawable("touchBackground");
+        Drawable touchKnob = touchpadSkin.getDrawable("touchKnob");
 //        touchpadStyle.background = touchBackground;
         touchpadStyle.knob = touchKnob;
 
         touchpad = new Touchpad(2f, touchpadStyle);
-        touchpad.setBounds(150f*ratioX,60f*ratioY,300f*ratioX,300f*ratioY);
+//        touchpad.setBounds(150f*ratioX,60f*ratioY,300f*ratioX,300f*ratioY);
+        touchpad.setBounds(150f,60f,300f,300f);
     }
 
     private void initShootBtn(){
         shootBtnUpTexture = new Texture(Gdx.files.internal("data/Buttons/btnDefault.png"));
         shootBtnDownTexture = new Texture(Gdx.files.internal("data/Buttons/btnPressed.png"));
 
-        TextureRegion shootBtnUpTextureRegion = new TextureRegion(shootBtnUpTexture);
-        TextureRegion shootBtnDownTextureRegion = new TextureRegion(shootBtnDownTexture);
+        shootBtnUpTextureRegion = new TextureRegion(shootBtnUpTexture);
+        shootBtnDownTextureRegion = new TextureRegion(shootBtnDownTexture);
 
-        shootBtnStyle = new ImageButton.ImageButtonStyle();
+        ImageButton.ImageButtonStyle shootBtnStyle = new ImageButton.ImageButtonStyle();
         shootBtnStyle.imageUp = new TextureRegionDrawable(shootBtnUpTextureRegion);
         shootBtnStyle.imageDown = new TextureRegionDrawable(shootBtnDownTextureRegion);
 
         shootBtn = new ImageButton(shootBtnStyle);
-        shootBtn.setBounds(1400f*ratioX,50*ratioY,500*ratioX,500*ratioY);
+//        shootBtn.setBounds(1400f*ratioX,50*ratioY,500*ratioX,500*ratioY);
+        shootBtn.setBounds(1400f,50,500,500);
     }
 
     private void spawnParachuteBombers() {
         for(int i = 0; i<3+(5*level/2); i++) {
-            pbItem = parachuteBomberPool.obtain();
+            ParachuteBomber pbItem = parachuteBomberPool.obtain();
             pbItem.init();
             activeParachuteBombers.add(pbItem);
         }
@@ -310,7 +342,7 @@ public class GameState extends State {
     private void shoot(){
         if(timeSinceLastFire >= rateOfFire){
             timeSinceLastFire -= rateOfFire;
-            bItem = bulletPool.obtain();
+            Bullet bItem = bulletPool.obtain();
             bItem.init(player.getX()+75, player.getY()+25, 700f, 0f);
             activeBullets.add(bItem);
         }
@@ -335,4 +367,9 @@ public class GameState extends State {
 //
 //    }
 
+    public void resize(int width, int height){
+        viewport.update(width, height);
+        cam.position.set(ShooterGame.WORLD_WIDTH / 2, ShooterGame.WORLD_HEIGHT / 2, 0);
+        stage.getViewport().update(ShooterGame.WORLD_WIDTH, (int)(ShooterGame.WORLD_WIDTH * ShooterGame.ASPECT_RATIO), false);
+    }
 }

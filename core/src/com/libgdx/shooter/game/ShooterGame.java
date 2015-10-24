@@ -3,21 +3,16 @@ package com.libgdx.shooter.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.viewport.FillViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.libgdx.shooter.managers.GameStateManager;
 
 
 public class ShooterGame extends ApplicationAdapter{
 
-	public static int WIDTH;
-	public static int HEIGHT;
-	public static int WORLD_WIDTH = 1920, WORLD_HEIGHT = 1080;
-	public static float aspectRatio;
+	public static int SCREEN_WIDTH;
+	public static int SCREEN_HEIGHT;
+	public static int WORLD_WIDTH, WORLD_HEIGHT;
 	public static float SCALE_RATIO_X, SCALE_RATIO_Y;
+	public static float ASPECT_RATIO;
 
 //	public static OrthographicCamera cam;
 //	public Viewport viewport;
@@ -31,19 +26,30 @@ public class ShooterGame extends ApplicationAdapter{
 		//put all images your going to render in a spritebatch.
 		//this batches up all images and renders at once. WAY MORE EFFICIENT
 
-		WIDTH = Gdx.graphics.getWidth();
-		HEIGHT = Gdx.graphics.getHeight();
-		aspectRatio = (float)HEIGHT / (float)WIDTH;
-		SCALE_RATIO_X = WIDTH/1920f;
-		SCALE_RATIO_Y = HEIGHT/1080f;
+		//this sets the size of the world. Changing this will change how much fits in the screen and
+		// will enlarge size of objects. This should be set to 1920 x 1080 which is the maximum
+		// resolution, it will be scaled down on smaller screens
+		WORLD_WIDTH = 1920;
+		WORLD_HEIGHT = 1080;
+
+		//this is the actual screen width.
+		SCREEN_WIDTH = Gdx.graphics.getWidth();
+		SCREEN_HEIGHT = Gdx.graphics.getHeight();
+
+		//this calculates the ratio between actual screen and world width/height. Use as a multiplier
+		//for onscreen displays to show in the correct positions?
+		SCALE_RATIO_X = (float)SCREEN_WIDTH /(float)WORLD_WIDTH;
+		SCALE_RATIO_Y = (float)SCREEN_HEIGHT /(float)WORLD_HEIGHT;
+
+		ASPECT_RATIO = (float)SCREEN_HEIGHT/(float)SCREEN_WIDTH;
 
 //		cam = new OrthographicCamera(108*aspectRatio, 108);
 //		viewport = new FillViewport(1920, 1080, cam);
 //		viewport = new StretchViewport(1920, 1080, cam);
-//		viewport = new FitViewport(WIDTH/2, HEIGHT/2, cam);
+//		viewport = new FitViewport(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, cam);
 //		viewport.apply();
-//		cam.translate(WIDTH/2, HEIGHT/2);
-//		cam.translate(WIDTH, HEIGHT);
+//		cam.translate(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+//		cam.translate(SCREEN_WIDTH, SCREEN_HEIGHT);
 //		cam.translate(0,0);
 //		cam.position.set(WORLD_WIDTH/2,WORLD_HEIGHT/2,0);
 //		cam.update();

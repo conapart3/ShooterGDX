@@ -14,6 +14,7 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
 
     private float xSpeed, ySpeed;
     private float lifeTimer, lifeTime;
+    private float damage;
 
     public Bullet(){
         this.alive = false;
@@ -25,6 +26,7 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
         width = texture.getWidth();
         height = texture.getHeight();
         bounds = new Rectangle(x,y,width,height);
+        damage = 50;
     }
 
     public void init(float startXPosition, float startYPosition, float xSpeed, float ySpeed){

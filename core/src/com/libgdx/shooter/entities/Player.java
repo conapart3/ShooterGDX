@@ -13,13 +13,15 @@ import com.libgdx.shooter.game.ShooterGame;
  */
 public class Player extends SpaceObject {
 
+
     private TextureRegion[] playerFrames;
     private TextureRegion currentFrame;
     private Animation playerAnimation;
     private float knobPercentX, knobPercentY;
     private float stateTime;
     private float maxSpeed;
-    private float lives;
+    private int lives;
+    private int score;
 
     public Player() {
         init();
@@ -84,6 +86,15 @@ public class Player extends SpaceObject {
         spriteBatch.draw(currentFrame, x, y);
     }
 
+    @Override
+    public void dispose(){
+        super.dispose();
+        currentFrame.getTexture().dispose();
+        for(int i=0; i<playerFrames.length; i++){
+            playerFrames[i].getTexture().dispose();
+        }
+    }
+
     public void setKnobPosition(float percentX, float percentY) {
         knobPercentX = percentX;
         knobPercentY = percentY;
@@ -97,11 +108,11 @@ public class Player extends SpaceObject {
         this.maxSpeed = maxSpeed;
     }
 
-    public float getLives() {
+    public int getLives() {
         return lives;
     }
 
-    public void setLives(float lives) {
+    public void setLives(int lives) {
         this.lives = lives;
     }
 
@@ -112,4 +123,17 @@ public class Player extends SpaceObject {
     public void addLife(){
         lives++;
     }
+
+    public int getScore() {
+        return (int)score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void addPoints(float points){
+        this.score += points;
+    }
+
 }
