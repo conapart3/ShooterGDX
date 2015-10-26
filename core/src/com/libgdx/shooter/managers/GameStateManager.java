@@ -2,6 +2,7 @@ package com.libgdx.shooter.managers;
 
 import com.libgdx.shooter.gamestates.GameOverState;
 import com.libgdx.shooter.gamestates.GameState;
+import com.libgdx.shooter.gamestates.MenuState;
 import com.libgdx.shooter.gamestates.State;
 
 import java.util.Stack;
@@ -19,18 +20,28 @@ public class GameStateManager {
     public static final int GAME_OVER = 2;
 
     public GameStateManager(){
-        setState(GAME);
+        setState(MENU);
     }
 
     public void setState(int state){
         if(currentState != null)
             currentState.dispose();
 
+        if(state==MENU)
+            currentState = new MenuState(this);
+
         if(state==GAME)
             currentState = new GameState(this);
 
         if(state==GAME_OVER)
             currentState = new GameOverState(this);
+
+        currentState.create();
+        currentState.update(0f);
+    }
+
+    public void create(){
+        currentState.create();
     }
 
     public void update(float dt) {
@@ -39,5 +50,17 @@ public class GameStateManager {
 
     public void render(){
         currentState.render();
+    }
+
+    public void resize(int width, int height){
+        currentState.resize(width, height);
+    }
+
+    public void pause () {
+        currentState.pause();
+    }
+
+    public void resume () {
+        currentState.resume();
     }
 }

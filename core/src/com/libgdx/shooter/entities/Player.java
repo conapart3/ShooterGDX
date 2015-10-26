@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.libgdx.shooter.game.ShooterGame;
 
+import static com.libgdx.shooter.game.ShooterGame.*;
+
 /**
  * Created by Conal on 26/09/2015.
  */
@@ -48,8 +50,8 @@ public class Player extends SpaceObject {
         bounds = new Rectangle(x, y, width, height);
 
         //starting position
-        x = 100 * ShooterGame.SCALE_RATIO_X;
-        y = 800 * ShooterGame.SCALE_RATIO_Y;
+        x = 100 * SCALE_RATIO_X;
+        y = 800 * SCALE_RATIO_Y;
 
         maxSpeed = 600f;
         knobPercentX = 0;

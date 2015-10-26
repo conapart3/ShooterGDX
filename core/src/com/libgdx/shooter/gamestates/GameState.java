@@ -2,6 +2,8 @@ package com.libgdx.shooter.gamestates;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -17,7 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.libgdx.shooter.entities.Bullet;
 import com.libgdx.shooter.entities.ParachuteBomber;
@@ -26,20 +30,18 @@ import com.libgdx.shooter.game.ShooterGame;
 import com.libgdx.shooter.managers.GameStateManager;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 
+import static com.libgdx.shooter.game.ShooterGame.*;
+
 /**
  * Created by Conal on 30/09/2015.
  */
 public class GameState extends State {
-
-    private Viewport viewport;
 
     private SpriteBatch spriteBatch;
     private Player player;
     private int level;
     private float nextLevelTimer;
     private float rateOfFire, timeSinceLastFire;
-    private float dt;
-    private float ratioX, ratioY;
 
     //array containing the active bullets, pool
     private final Array<Bullet> activeBullets = new Array<Bullet>();
@@ -82,6 +84,9 @@ public class GameState extends State {
     private Texture bg1;
     private int srcY = 0,srcX = 0;
 
+    private Sound shootSound, hitSound, explosionSound;
+    private Music bgMusic;
+
 
     public GameState(GameStateManager gsm){
         super(gsm);
@@ -92,16 +97,8 @@ public class GameState extends State {
     }
 
     @Override
-    public void init() {
-        ratioX = ShooterGame.SCALE_RATIO_X;
-        ratioY = ShooterGame.SCALE_RATIO_Y;
-
-//        cam = new OrthographicCamera(ShooterGame.WORLD_WIDTH, ShooterGame.WORLD_WIDTH * ShooterGame.ASPECT_RATIO);
-        cam = new OrthographicCamera();
-//        viewport = new FitViewport(ShooterGame.WORLD_WIDTH, ShooterGame.WORLD_HEIGHT, cam);
-        viewport = new FitViewport(ShooterGame.WORLD_WIDTH, ShooterGame.WORLD_WIDTH * ShooterGame.ASPECT_RATIO, cam);
-        viewport.apply();
-        cam.position.set(ShooterGame.WORLD_WIDTH/2, ShooterGame.WORLD_HEIGHT/2, 0);
+    public void create() {
+        cam.position.set(WORLD_WIDTH/2, WORLD_HEIGHT/2, 0);
 //        cam.translate(cam.viewportWidth/2, cam.viewportHeight/2);
 
         spriteBatch = new SpriteBatch();
@@ -115,9 +112,15 @@ public class GameState extends State {
         stage.addActor(shootBtn);
         Gdx.input.setInputProcessor(stage);
 
+        shootSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/laserFire.wav"));
+        hitSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/mflop.mp3"));
+        explosionSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/explosion.wav"));
+//        bgMusic = Gdx.audio.newMusic(Gdx.files.internal("data/Sound/menuMusic.mp3"));
+//        bgMusic.setLooping(true);
+//        bgMusic.play();
+
         player = new Player();
         level = 0;
-        dt = 0;
         rateOfFire = 0.3f;
         timeSinceLastFire = 0f;
     }
@@ -125,7 +128,6 @@ public class GameState extends State {
     @Override
     public void update(float dt) {
         if(player.isAlive()) {
-            this.dt = dt;
             handleInput();
 
             player.update(dt);
@@ -244,6 +246,10 @@ public class GameState extends State {
             b.dispose();
         for(ParachuteBomber pb : activeParachuteBombers)
             pb.dispose();
+//        bgMusic.dispose();
+        hitSound.dispose();
+        shootSound.dispose();
+        explosionSound.dispose();
     }
 
     private void checkCollisions(){
@@ -256,6 +262,7 @@ public class GameState extends State {
                     b.setAlive(false);
                     pb.setAlive(false);
                     player.addPoints(50);
+                    hitSound.play();
                 }
             }
         }
@@ -266,6 +273,7 @@ public class GameState extends State {
             if(player.collides(pb.getBounds()) || pb.collides(player.getBounds())){
                 player.removeLife();
                 pb.setAlive(false);
+                explosionSound.play();
             }
         }
     }
@@ -345,6 +353,7 @@ public class GameState extends State {
             Bullet bItem = bulletPool.obtain();
             bItem.init(player.getX()+75, player.getY()+25, 700f, 0f);
             activeBullets.add(bItem);
+            shootSound.play();
         }
     }
 //
@@ -367,9 +376,20 @@ public class GameState extends State {
 //
 //    }
 
+    @Override
     public void resize(int width, int height){
         viewport.update(width, height);
-        cam.position.set(ShooterGame.WORLD_WIDTH / 2, ShooterGame.WORLD_HEIGHT / 2, 0);
-        stage.getViewport().update(ShooterGame.WORLD_WIDTH, (int)(ShooterGame.WORLD_WIDTH * ShooterGame.ASPECT_RATIO), false);
+        cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
+        stage.getViewport().update(WORLD_WIDTH, (int)(WORLD_WIDTH * ASPECT_RATIO), false);
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
     }
 }

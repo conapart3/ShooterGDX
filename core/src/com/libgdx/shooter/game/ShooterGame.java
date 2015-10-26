@@ -1,12 +1,13 @@
 package com.libgdx.shooter.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.libgdx.shooter.managers.GameStateManager;
 
 
-public class ShooterGame extends ApplicationAdapter{
+public class ShooterGame extends ApplicationAdapter {
 
 	public static int SCREEN_WIDTH;
 	public static int SCREEN_HEIGHT;
@@ -55,6 +56,7 @@ public class ShooterGame extends ApplicationAdapter{
 //		cam.update();
 
 		gsm = new GameStateManager();
+//		gsm.create();
 
 	}
 
@@ -75,5 +77,17 @@ public class ShooterGame extends ApplicationAdapter{
 	public void resize(int width, int height){
 //		viewport.update(width,height);
 //		cam.position.set(cam.viewportWidth/2,cam.viewportHeight/2,0);
+		gsm.resize(width, height);
 	}
+
+	@Override
+	public void pause () {
+		gsm.pause();
+	}
+
+	@Override
+	public void resume () {
+		gsm.resume();
+	}
+
 }

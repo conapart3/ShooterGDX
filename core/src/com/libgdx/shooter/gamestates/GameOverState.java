@@ -4,6 +4,9 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.libgdx.shooter.managers.GameStateManager;
 
+import static com.libgdx.shooter.game.ShooterGame.WORLD_HEIGHT;
+import static com.libgdx.shooter.game.ShooterGame.WORLD_WIDTH;
+
 /**
  * Created by Conal on 23/10/2015.
  */
@@ -18,10 +21,8 @@ public class GameOverState extends State{
     }
 
     @Override
-    public void init() {
+    public void create() {
         spriteBatch = new SpriteBatch();
-
-
     }
 
     @Override
@@ -48,4 +49,19 @@ public class GameOverState extends State{
         spriteBatch.dispose();
     }
 
+    @Override
+    public void resize(int width, int height){
+        viewport.update(width, height);
+        cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
 }
