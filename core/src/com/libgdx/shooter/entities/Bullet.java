@@ -20,7 +20,8 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
         this.alive = false;
         lifeTimer = 0f;
         lifeTime = 4f;
-        texture = new Texture(Gdx.files.internal("data/laser.png"));
+//        texture = new Texture(Gdx.files.internal("data/laser.png"));
+        texture = new Texture(Gdx.files.internal("data/laserRed.png"));
         xSpeed = 0;
         ySpeed = 0;
         width = texture.getWidth();

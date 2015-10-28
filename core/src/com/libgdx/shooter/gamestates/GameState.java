@@ -2,15 +2,14 @@ package com.libgdx.shooter.gamestates;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -19,14 +18,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.utils.viewport.FillViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.libgdx.shooter.entities.Bullet;
 import com.libgdx.shooter.entities.ParachuteBomber;
 import com.libgdx.shooter.entities.Player;
-import com.libgdx.shooter.game.ShooterGame;
 import com.libgdx.shooter.managers.GameStateManager;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 
@@ -40,7 +34,7 @@ public class GameState extends State {
     private SpriteBatch spriteBatch;
     private Player player;
     private int level;
-    private float nextLevelTimer;
+    private float nextLevelTimer, gameOverTimer;
     private float rateOfFire, timeSinceLastFire;
 
     //array containing the active bullets, pool
@@ -72,20 +66,14 @@ public class GameState extends State {
 
     private ImageButton shootBtn;
 
-//    button to enable touch screen user to shoot?
-//    private TextButton shootButton;
-//    private TextButton.TextButtonStyle textButtonStyle;
-//    BitmapFont font;
-//    Skin skin;
-//    TextureAtlas buttonAtlas;
-
     //camera and background
     private float lerp = 0.5f;
-    private Texture bg1;
-    private int srcY = 0,srcX = 0;
+    private Texture bgGround, bgMountains, bgCity;
+    private float srcY = 0,srcX = 0;
+    private float groundX, mountainsX, cityX;
 
     private Sound shootSound, hitSound, explosionSound;
-    private Music bgMusic;
+//    private Music bgMusic;
 
 
     public GameState(GameStateManager gsm){
@@ -103,7 +91,10 @@ public class GameState extends State {
 
         spriteBatch = new SpriteBatch();
 
-        bg1 = new Texture(Gdx.files.internal("data/BackgroundElements/starsbg.png"));
+//        bgGround = new Texture(Gdx.files.internal("data/BackgroundElements/starsbg.png"));
+        bgGround = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayer1.png"));
+        bgMountains = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerBack.png"));
+        bgCity = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerCity.png"));
 
         initStage();
 
@@ -121,8 +112,9 @@ public class GameState extends State {
 
         player = new Player();
         level = 0;
-        rateOfFire = 0.3f;
+        rateOfFire = 0.2f;
         timeSinceLastFire = 0f;
+        gameOverTimer = 0f;
     }
 
     @Override
@@ -141,10 +133,11 @@ public class GameState extends State {
             for (int i = pbLen; --i >= 0; ) {
                 ParachuteBomber pbItem = activeParachuteBombers.get(i);
                 if (!pbItem.isAlive()) {
+//                    explosionSound.play();
                     activeParachuteBombers.removeIndex(i);
                     parachuteBomberPool.free(pbItem);
                 }
-                pbItem.update(dt);
+                pbItem.update(dt, player.getX(), player.getY());
             }
 
             //update the active bullets
@@ -175,8 +168,14 @@ public class GameState extends State {
 
 //            updateCamera(dt);
             cam.update();
+            srcX+=1;
         } else {
-            gameStateManager.setState(GameStateManager.GAME_OVER);
+
+            gameOverTimer += dt;
+            if (gameOverTimer > 1) {
+                gameOverTimer -= 1;
+                gameStateManager.setState(GameStateManager.GAME_OVER, player.getScore());
+            }
         }
     }
 
@@ -187,10 +186,14 @@ public class GameState extends State {
         spriteBatch.enableBlending();
         spriteBatch.begin();
 
-//        spriteBatch.draw(bg1, cam.position.x-(cam.viewportWidth/2), 0);
-        bg1.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-        spriteBatch.draw(bg1, 0, 0, srcX, srcY, bg1.getWidth(), bg1.getHeight());
-//        srcX+=0.1;
+        bgMountains.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        spriteBatch.draw(bgMountains, 0, 0, (int) (srcX / 3), (int) srcY, bgMountains.getWidth(), bgMountains.getHeight());
+        bgCity.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        spriteBatch.draw(bgCity, 0, 0, (int) (srcX), (int) srcY, bgCity.getWidth(), bgCity.getHeight());
+        bgGround.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        spriteBatch.draw(bgGround, 0, 0, (int) (srcX * 4), (int) srcY, bgGround.getWidth(), bgGround.getHeight());
+//        srcX+=1;
+
 
         player.render(spriteBatch);
 
@@ -221,19 +224,32 @@ public class GameState extends State {
     public void handleInput() {
         player.setKnobPosition(touchpad.getKnobPercentX(), touchpad.getKnobPercentY());
 
-        if (shootBtn.isPressed()){
-            shoot();
-        }
+        //toggle shoot button if space pressed
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE))
+            shootBtn.toggle();
 
-        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+        if (shootBtn.isPressed())
+            shootBtn.toggle();
+
+        if(shootBtn.isChecked())
             shoot();
-        }
+
+//        if(Gdx.input.isKeyJustPressed(Input.Keys.UP)){
+//            player.setUpPressed(true);
+//        if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN))
+//            player.setDownPressed(true);
+//        if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT))
+//            player.setLeftPressed(true);
+//        if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT))
+//            player.setRightPressed(true);
 
     }
 
     @Override
     public void dispose() {
-        bg1.dispose();
+        bgGround.dispose();
+        bgMountains.dispose();
+        bgCity.dispose();
         stage.dispose();
         spriteBatch.dispose();
         font.dispose();
@@ -262,7 +278,7 @@ public class GameState extends State {
                     b.setAlive(false);
                     pb.setAlive(false);
                     player.addPoints(50);
-                    hitSound.play();
+                    explosionSound.play();
                 }
             }
         }
@@ -279,8 +295,17 @@ public class GameState extends State {
     }
 
     private void initStage(){
+        //init font
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/Fonts/Montserrat-Regular.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.minFilter = Texture.TextureFilter.Nearest;
+        parameter.magFilter = Texture.TextureFilter.MipMapLinearNearest;
+        parameter.size = 14;
+        font = generator.generateFont(parameter);
+        generator.dispose();
+
         //init labels
-        font = new BitmapFont();
+//        font = new BitmapFont();
         Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
 
         labelA = new Label("Level: ", labelStyle);
@@ -333,10 +358,11 @@ public class GameState extends State {
         ImageButton.ImageButtonStyle shootBtnStyle = new ImageButton.ImageButtonStyle();
         shootBtnStyle.imageUp = new TextureRegionDrawable(shootBtnUpTextureRegion);
         shootBtnStyle.imageDown = new TextureRegionDrawable(shootBtnDownTextureRegion);
+        shootBtnStyle.imageChecked = shootBtnStyle.imageDown;
 
         shootBtn = new ImageButton(shootBtnStyle);
 //        shootBtn.setBounds(1400f*ratioX,50*ratioY,500*ratioX,500*ratioY);
-        shootBtn.setBounds(1400f,50,500,500);
+        shootBtn.setBounds(1400f,-350,500,1000);
     }
 
     private void spawnParachuteBombers() {
@@ -356,31 +382,12 @@ public class GameState extends State {
             shootSound.play();
         }
     }
-//
-//    private void updateCamera(float dt){
-//
-//        //update the camera position based on player position
-//        camPos = cam.position;
-////        if(player.getX()-camPos.x > 100)
-////        camPos.x += (player.getX() - camPos.x) * lerp * dt;
-////        if(player.getY()-camPos.y > 100)
-////        camPos.y += (player.getY() - camPos.y) * lerp * dt;
-////        cam.position.set(camPos);
-//
-////        if(player.getX() > 50)
-////            srcX += (player.getX() - srcX) * lerp * dt;
-//
-////        srcX += lerp* dt * srcX;
-//
-//        cam.update();
-//
-//    }
 
     @Override
     public void resize(int width, int height){
         viewport.update(width, height);
         cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
-        stage.getViewport().update(WORLD_WIDTH, (int)(WORLD_WIDTH * ASPECT_RATIO), false);
+        stage.getViewport().update(WORLD_WIDTH, (int)(WORLD_WIDTH * SCREEN_ASPECT_RATIO), false);
     }
 
     @Override

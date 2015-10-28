@@ -3,11 +3,11 @@ package com.libgdx.shooter.gamestates;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.libgdx.shooter.managers.GameStateManager;
 
-import static com.libgdx.shooter.game.ShooterGame.ASPECT_RATIO;
 import static com.libgdx.shooter.game.ShooterGame.WORLD_HEIGHT;
 import static com.libgdx.shooter.game.ShooterGame.WORLD_WIDTH;
 
@@ -33,7 +33,11 @@ public class MenuState extends State {
 
         sb = new SpriteBatch();
 
-        font = new BitmapFont();
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/Fonts/Montserrat-Regular.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 72;
+        font = generator.generateFont(parameter);
+        generator.dispose();
         textButtonStyle = new TextButton.TextButtonStyle();
         textButtonStyle.font = font;
 
@@ -41,6 +45,7 @@ public class MenuState extends State {
         textButton2 = new TextButton("High Scores", textButtonStyle);
         textButton3 = new TextButton("Quit", textButtonStyle);
 
+//        textButton1.setBounds(500f, 500f, 300, 300);
         textButton1.setPosition(500f,500f);
         textButton2.setPosition(500f,400f);
         textButton3.setPosition(500f,300f);
@@ -77,7 +82,7 @@ public class MenuState extends State {
     @Override
     public void handleInput() {
         if (textButton1.isPressed()){
-            gameStateManager.setState(GameStateManager.GAME);
+            gameStateManager.setState(GameStateManager.GAME, 0);
         }
     }
 
@@ -92,7 +97,7 @@ public class MenuState extends State {
     public void resize(int width, int height){
         viewport.update(width, height);
         cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
-//        stage.getViewport().update(WORLD_WIDTH, (int)(WORLD_WIDTH * ASPECT_RATIO), false);
+//        stage.getViewport().update(WORLD_WIDTH, (int)(WORLD_WIDTH * SCREEN_ASPECT_RATIO), false);
     }
 
     @Override

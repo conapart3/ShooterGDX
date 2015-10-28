@@ -24,6 +24,7 @@ public class Player extends SpaceObject {
     private float maxSpeed;
     private int lives;
     private int score;
+//    private boolean left,right,up,down;
 
     public Player() {
         init();
@@ -50,7 +51,7 @@ public class Player extends SpaceObject {
         bounds = new Rectangle(x, y, width, height);
 
         //starting position
-        x = 100 * SCALE_RATIO_X;
+        x = 800 * SCALE_RATIO_X;
         y = 800 * SCALE_RATIO_Y;
 
         maxSpeed = 600f;
@@ -59,17 +60,50 @@ public class Player extends SpaceObject {
         health = 100;
         lives = 3;
         alive = true;
+//        left=right=up=down=false;
     }
 
     public void update(float dt) {
         if(lives==0)
             alive = false;
 
+//        dx = knobPercentX * maxSpeed;
+//        dy = knobPercentY * maxSpeed;
+
         x += knobPercentX * maxSpeed * dt;
         y += knobPercentY * maxSpeed * dt;
 
-        if (y < 0)
-            y = 0;
+//        xSpeed = maxSpeed* knobPercentX;
+//        ySpeed = maxSpeed* knobPercentY;
+
+//        if(up)
+//            ySpeed += 100f;
+//        if(down)
+//            ySpeed -= 100f;
+//        if(left)
+//            xSpeed -= 100f;
+//        if(right)
+//            xSpeed += 100f;
+
+//        x += xSpeed * dt;
+//        y += ySpeed * dt;
+
+//        xSpeed*=0.5;
+//        ySpeed*=0.5;
+
+//        xSpeed += knobPercentX * maxSpeed * dt;
+//        ySpeed += knobPercentY * maxSpeed * dt;
+
+        //apply acceleration to speed (dy and dx are acceleration)
+//        xSpeed += dx*dt;
+//        ySpeed += dy*dt;
+
+        //position differs by the velocity
+//        x += xSpeed * dt;
+//        y += ySpeed * dt;
+
+        if (y < 220)
+            y = 220;
         if (x < 0)
             x = 0;
         if (x > 1850)
@@ -102,14 +136,6 @@ public class Player extends SpaceObject {
         knobPercentY = percentY;
     }
 
-    public float getMaxSpeed() {
-        return maxSpeed;
-    }
-
-    public void setMaxSpeed(float maxSpeed) {
-        this.maxSpeed = maxSpeed;
-    }
-
     public int getLives() {
         return lives;
     }
@@ -120,6 +146,8 @@ public class Player extends SpaceObject {
 
     public void removeLife(){
         lives--;
+//        x = 800 * SCALE_RATIO_X;
+//        y = 800 * SCALE_RATIO_Y;
     }
 
     public void addLife(){
@@ -127,7 +155,7 @@ public class Player extends SpaceObject {
     }
 
     public int getScore() {
-        return (int)score;
+        return score;
     }
 
     public void setScore(int score) {
@@ -137,5 +165,21 @@ public class Player extends SpaceObject {
     public void addPoints(float points){
         this.score += points;
     }
+
+//    public void setUpPressed(boolean up){
+//        this.up = up;
+//    }
+//
+//    public void setDownPressed(boolean down){
+//        this.down = down;
+//    }
+//
+//    public void setLeftPressed(boolean left){
+//        this.left = left;
+//    }
+//
+//    public void setRightPressed(boolean right){
+//        this.right = right;
+//    }
 
 }

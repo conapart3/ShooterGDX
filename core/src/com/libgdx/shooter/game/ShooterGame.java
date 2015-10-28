@@ -1,7 +1,6 @@
 package com.libgdx.shooter.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.libgdx.shooter.managers.GameStateManager;
@@ -13,7 +12,8 @@ public class ShooterGame extends ApplicationAdapter {
 	public static int SCREEN_HEIGHT;
 	public static int WORLD_WIDTH, WORLD_HEIGHT;
 	public static float SCALE_RATIO_X, SCALE_RATIO_Y;
-	public static float ASPECT_RATIO;
+	public static float SCREEN_ASPECT_RATIO;
+	public static float WORLD_ASPECT_RATIO;
 
 //	public static OrthographicCamera cam;
 //	public Viewport viewport;
@@ -42,7 +42,8 @@ public class ShooterGame extends ApplicationAdapter {
 		SCALE_RATIO_X = (float)SCREEN_WIDTH /(float)WORLD_WIDTH;
 		SCALE_RATIO_Y = (float)SCREEN_HEIGHT /(float)WORLD_HEIGHT;
 
-		ASPECT_RATIO = (float)SCREEN_HEIGHT/(float)SCREEN_WIDTH;
+		SCREEN_ASPECT_RATIO = (float)SCREEN_HEIGHT/(float)SCREEN_WIDTH;
+		WORLD_ASPECT_RATIO = (float)WORLD_HEIGHT/(float)WORLD_WIDTH;
 
 //		cam = new OrthographicCamera(108*aspectRatio, 108);
 //		viewport = new FillViewport(1920, 1080, cam);

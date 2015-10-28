@@ -20,10 +20,10 @@ public class GameStateManager {
     public static final int GAME_OVER = 2;
 
     public GameStateManager(){
-        setState(MENU);
+        setState(MENU,0);
     }
 
-    public void setState(int state){
+    public void setState(int state, int score){
         if(currentState != null)
             currentState.dispose();
 
@@ -34,7 +34,7 @@ public class GameStateManager {
             currentState = new GameState(this);
 
         if(state==GAME_OVER)
-            currentState = new GameOverState(this);
+            currentState = new GameOverState(this, score);
 
         currentState.create();
         currentState.update(0f);

@@ -13,7 +13,6 @@ import java.util.Random;
  */
 public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
 
-    private float xSpeed, ySpeed;
     private Random rand;
     private int points = 100;
 
@@ -28,30 +27,46 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
     }
 
     public void init(){
+        //((max - min) + 1) + min
         x = rand.nextInt(3000-2000+1)+2000;
-        y = rand.nextInt(1000-0+1)+0;
+        y = rand.nextInt(1000-250+1)+250;
         xSpeed = (rand.nextInt(500-100+1)+100)*-1;
         ySpeed = rand.nextInt(100)-50;
         alive = true;
+        dy = 0;
+        dx = 0;
     }
 
-    public void update(float dt){
+    public void update(float dt, float targetX, float targetY){
+        if(Math.sqrt(Math.pow(Math.abs(targetY-y),2) + Math.pow(Math.abs(targetX-x),2)) < 400){
+//            dx = (targetX - x);
+            dy = (targetY - y);
+        }else{
+//            dx=0;
+            dy=0;
+        }
+
+        //apply acceleration to speed (dy and dx are acceleration)
+        xSpeed += dx*dt;
+        ySpeed += dy*dt;
+
+        //position differs by the velocity
         x += xSpeed * dt;
         y += ySpeed * dt;
 
         bounds.x = x;
         bounds.y = y;
 
-        if(x<-100)
+        if(x<-50)
             alive = false;
-        if(y>1100 || y< -50)
+        if(y==1100 || y<220)
             alive = false;
+
     }
 
     public void render(SpriteBatch sb){
         sb.draw(texture, x, y);
     }
-
 
     @Override
     public void reset() {
