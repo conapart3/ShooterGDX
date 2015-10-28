@@ -14,6 +14,8 @@ public class ShooterGame extends ApplicationAdapter {
 	public static float SCALE_RATIO_X, SCALE_RATIO_Y;
 	public static float SCREEN_ASPECT_RATIO;
 	public static float WORLD_ASPECT_RATIO;
+	public static int GROUND_OFFSET;
+	public static int CEILING_OFFSET;
 
 //	public static OrthographicCamera cam;
 //	public Viewport viewport;
@@ -44,6 +46,10 @@ public class ShooterGame extends ApplicationAdapter {
 
 		SCREEN_ASPECT_RATIO = (float)SCREEN_HEIGHT/(float)SCREEN_WIDTH;
 		WORLD_ASPECT_RATIO = (float)WORLD_HEIGHT/(float)WORLD_WIDTH;
+
+		GROUND_OFFSET = 145;
+		CEILING_OFFSET = 1030;
+
 
 //		cam = new OrthographicCamera(108*aspectRatio, 108);
 //		viewport = new FillViewport(1920, 1080, cam);

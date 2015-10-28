@@ -5,8 +5,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
+import com.libgdx.shooter.game.ShooterGame;
 
 import java.util.Random;
+
+import static com.libgdx.shooter.game.ShooterGame.CEILING_OFFSET;
+import static com.libgdx.shooter.game.ShooterGame.GROUND_OFFSET;
 
 /**
  * Created by Conal on 22/10/2015.
@@ -59,7 +63,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
 
         if(x<-50)
             alive = false;
-        if(y==1100 || y<220)
+        if(y== CEILING_OFFSET || y< GROUND_OFFSET)
             alive = false;
 
     }

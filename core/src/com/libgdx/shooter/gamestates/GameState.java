@@ -94,7 +94,7 @@ public class GameState extends State {
 //        bgGround = new Texture(Gdx.files.internal("data/BackgroundElements/starsbg.png"));
         bgGround = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayer1.png"));
         bgMountains = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerBack.png"));
-        bgCity = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerCity.png"));
+        bgCity = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerCity2.png"));
 
         initStage();
 
@@ -189,9 +189,9 @@ public class GameState extends State {
         bgMountains.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         spriteBatch.draw(bgMountains, 0, 0, (int) (srcX / 3), (int) srcY, bgMountains.getWidth(), bgMountains.getHeight());
         bgCity.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-        spriteBatch.draw(bgCity, 0, 0, (int) (srcX), (int) srcY, bgCity.getWidth(), bgCity.getHeight());
+        spriteBatch.draw(bgCity, 0, -50, (int) (srcX), (int) srcY, bgCity.getWidth(), bgCity.getHeight());
         bgGround.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-        spriteBatch.draw(bgGround, 0, 0, (int) (srcX * 4), (int) srcY, bgGround.getWidth(), bgGround.getHeight());
+        spriteBatch.draw(bgGround, 0, -75, (int) (srcX * 4), (int) srcY, bgGround.getWidth(), bgGround.getHeight());
 //        srcX+=1;
 
 

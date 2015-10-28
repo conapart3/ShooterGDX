@@ -102,14 +102,14 @@ public class Player extends SpaceObject {
 //        x += xSpeed * dt;
 //        y += ySpeed * dt;
 
-        if (y < 220)
-            y = 220;
+        if (y < GROUND_OFFSET)
+            y = GROUND_OFFSET;
         if (x < 0)
             x = 0;
         if (x > 1850)
             x = 1850;
-        if (y > 1020)
-            y = 1020;
+        if (y > CEILING_OFFSET)
+            y = CEILING_OFFSET;
 
         bounds.x = x;
         bounds.y = y;
