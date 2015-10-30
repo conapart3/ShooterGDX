@@ -19,6 +19,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
 
     private Random rand;
     private int points = 100;
+    private int damage;
 
     public ParachuteBomber(){
         this.alive = false;
@@ -27,22 +28,29 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         health = 50;
         width = texture.getWidth();
         height = texture.getHeight();
-        bounds = new Rectangle(x,y,texture.getWidth(),texture.getHeight());
+        bounds = new Rectangle(x,y,width,height);
+        damage = 200;
     }
 
-    public void init(){
+    public void init(int level){
         //((max - min) + 1) + min
         x = rand.nextInt(3000-2000+1)+2000;
         y = rand.nextInt(1000-250+1)+250;
-        xSpeed = (rand.nextInt(500-100+1)+100)*-1;
+        xSpeed = (rand.nextInt(800-400+1)+400)*-1;
         ySpeed = rand.nextInt(100)-50;
         alive = true;
         dy = 0;
         dx = 0;
+        health = 25 + (25*level/2);
+        damage = 200 + (200*level/5);
     }
 
     public void update(float dt, float targetX, float targetY){
-        if(Math.sqrt(Math.pow(Math.abs(targetY-y),2) + Math.pow(Math.abs(targetX-x),2)) < 400){
+        if(health<1)
+            alive = false;
+
+//        if(Math.sqrt(Math.pow((targetY-y),2) + Math.pow((targetX-x),2)) < 600){
+        if(x-targetX < 600){
 //            dx = (targetX - x);
             dy = (targetY - y);
         }else{
@@ -61,10 +69,10 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         bounds.x = x;
         bounds.y = y;
 
-        if(x<-50)
+        if(x<-200)
             alive = false;
         if(y== CEILING_OFFSET || y< GROUND_OFFSET)
-            alive = false;
+            ySpeed *= -1;
 
     }
 
@@ -79,5 +87,16 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         alive = false;
         xSpeed = 0;
         ySpeed = 0;
+        dx = 0;
+        dy = 0;
+        health = 0;
+    }
+
+    public int getDamage() {
+        return damage;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
     }
 }

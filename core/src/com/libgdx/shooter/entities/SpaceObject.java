@@ -16,13 +16,11 @@ public class SpaceObject {
     protected Texture texture;
     protected boolean alive;
     protected int health;
+    protected float dirX, dirY;//for movement, and rotation, the directional vector for where it should point/move/shoot
+    protected double rotation;
+    protected float xOffset,yOffset;
 
     protected int width, height;
-
-    public void setPosition(float x, float y){
-        this.x = x;
-        this.y = y;
-    }
 
     public boolean collides(Rectangle a){
         return a.overlaps(bounds);
@@ -30,6 +28,11 @@ public class SpaceObject {
 
     public void dispose(){
         texture.dispose();
+    }
+
+    public void setPosition(float x, float y){
+        this.x = x;
+        this.y = y;
     }
 
     public int getHealth() {
@@ -70,5 +73,37 @@ public class SpaceObject {
 
     public void takeDamage(int i) {
         this.health -= i;
+    }
+
+    public float getxOffset() {
+        return xOffset;
+    }
+
+    public void setxOffset(float xOffset) {
+        this.xOffset = xOffset;
+    }
+
+    public float getyOffset() {
+        return yOffset;
+    }
+
+    public void setyOffset(float yOffset) {
+        this.yOffset = yOffset;
+  }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 }

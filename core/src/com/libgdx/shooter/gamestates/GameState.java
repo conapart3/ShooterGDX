@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.libgdx.shooter.entities.Bullet;
 import com.libgdx.shooter.entities.ParachuteBomber;
 import com.libgdx.shooter.entities.Player;
+import com.libgdx.shooter.entities.ShooterEnemy;
 import com.libgdx.shooter.managers.GameStateManager;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 
@@ -55,6 +56,14 @@ public class GameState extends State {
         }
     };
 
+    private final Array<ShooterEnemy> activeShooterEnemies = new Array<ShooterEnemy>();
+    private final Pool<ShooterEnemy> shooterEnemyPool = new Pool<ShooterEnemy>(){
+        @Override
+        protected ShooterEnemy newObject(){
+            return new ShooterEnemy();
+        }
+    };
+
     //touchpad and stage declaration
     private Stage stage;
     private Touchpad touchpad;
@@ -72,7 +81,7 @@ public class GameState extends State {
     private float srcY = 0,srcX = 0;
     private float groundX, mountainsX, cityX;
 
-    private Sound shootSound, hitSound, explosionSound;
+    private Sound shootSound, hitSound, explosionSound, laserSound;
 //    private Music bgMusic;
 
 
@@ -86,7 +95,7 @@ public class GameState extends State {
 
     @Override
     public void create() {
-        cam.position.set(WORLD_WIDTH/2, WORLD_HEIGHT/2, 0);
+        cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
 //        cam.translate(cam.viewportWidth/2, cam.viewportHeight/2);
 
         spriteBatch = new SpriteBatch();
@@ -104,6 +113,7 @@ public class GameState extends State {
         Gdx.input.setInputProcessor(stage);
 
         shootSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/laserFire.wav"));
+//        laserSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/laserFire.wav"));
         hitSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/mflop.mp3"));
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/explosion.wav"));
 //        bgMusic = Gdx.audio.newMusic(Gdx.files.internal("data/Sound/menuMusic.mp3"));
@@ -137,7 +147,23 @@ public class GameState extends State {
                     activeParachuteBombers.removeIndex(i);
                     parachuteBomberPool.free(pbItem);
                 }
-                pbItem.update(dt, player.getX(), player.getY());
+                pbItem.update(dt, player.getX()+player.getWidth()/2, player.getY()+player.getHeight()/2);
+            }
+
+            //update active shooter enemies
+            int seLen = activeShooterEnemies.size;
+            for (int i = seLen; --i >= 0; ) {
+                ShooterEnemy seItem = activeShooterEnemies.get(i);
+                if (!seItem.isAlive()) {
+                    activeShooterEnemies.removeIndex(i);
+                    shooterEnemyPool.free(seItem);
+                }
+                seItem.update(dt, player.getX()+player.getWidth()/2, player.getY()+player.getHeight()/2);
+                if(seItem.isShooting()){
+                    shoot(seItem.getX()+seItem.getxOffset(), seItem.getY()+seItem.getyOffset(),
+                            seItem.getDirX(), seItem.getDirY(), true);
+                    shootSound.play();
+                }
             }
 
             //update the active bullets
@@ -154,12 +180,13 @@ public class GameState extends State {
             checkCollisions();
 
             //spawns enemies based on level.
-            if (activeParachuteBombers.size == 0) {
+            if (activeParachuteBombers.size == 0 && activeShooterEnemies.size == 0) {
                 nextLevelTimer += dt;
                 if (nextLevelTimer > 4) {
                     nextLevelTimer -= 4;
                     level++;
                     spawnParachuteBombers();
+                    spawnShooterEnemies();
                     player.addPoints(100 * (level-1));
                 }
             }
@@ -170,7 +197,6 @@ public class GameState extends State {
             cam.update();
             srcX+=1;
         } else {
-
             gameOverTimer += dt;
             if (gameOverTimer > 1) {
                 gameOverTimer -= 1;
@@ -201,6 +227,10 @@ public class GameState extends State {
             activeParachuteBombers.get(i).render(spriteBatch);
         }
 
+        for(int i=0; i<activeShooterEnemies.size; i++) {
+            activeShooterEnemies.get(i).render(spriteBatch);
+        }
+
         for(int i = activeBullets.size; --i >= 0; ){
             activeBullets.get(i).render(spriteBatch);
         }
@@ -212,7 +242,7 @@ public class GameState extends State {
         labelB.setText("Score: " + player.getScore());
         labelB.draw(spriteBatch, 1);
 
-        labelC.setText("Lives: " + player.getLives());
+        labelC.setText("Health: " + player.getHealth());
         labelC.draw(spriteBatch, 1);
 
         spriteBatch.end();
@@ -224,6 +254,8 @@ public class GameState extends State {
     public void handleInput() {
         player.setKnobPosition(touchpad.getKnobPercentX(), touchpad.getKnobPercentY());
 
+//        if(Gdx.input.)
+
         //toggle shoot button if space pressed
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE))
             shootBtn.toggle();
@@ -231,8 +263,13 @@ public class GameState extends State {
         if (shootBtn.isPressed())
             shootBtn.toggle();
 
-        if(shootBtn.isChecked())
-            shoot();
+        if(shootBtn.isChecked()){
+            if(timeSinceLastFire >= rateOfFire){
+                timeSinceLastFire -= rateOfFire;
+                shoot(player.getX()+player.getxOffset(), player.getY()+player.getyOffset(), 1f, 0f, false);//x and y offset, x and y normalised direction
+                shootSound.play();
+            }
+        }
 
 //        if(Gdx.input.isKeyJustPressed(Input.Keys.UP)){
 //            player.setUpPressed(true);
@@ -262,6 +299,8 @@ public class GameState extends State {
             b.dispose();
         for(ParachuteBomber pb : activeParachuteBombers)
             pb.dispose();
+        for(ShooterEnemy se : activeShooterEnemies)
+                se.dispose();
 //        bgMusic.dispose();
         hitSound.dispose();
         shootSound.dispose();
@@ -269,15 +308,32 @@ public class GameState extends State {
     }
 
     private void checkCollisions(){
-        //check bullets with parachutebomber collisions
+        //check bullets collisions with parachute bombers and shooter enemies
         for(int i=0; i<activeBullets.size; i++){
             Bullet b = activeBullets.get(i);
-            for(int j=0; j<activeParachuteBombers.size; j++){
-                ParachuteBomber pb = activeParachuteBombers.get(j);
-                if(pb.collides(b.getBounds()) || b.collides(pb.getBounds())){
+            if(!b.isShotFromEnemy()) {
+                for (int j = 0; j < activeParachuteBombers.size; j++) {
+                    ParachuteBomber pb = activeParachuteBombers.get(j);
+                    if (pb.collides(b.getBounds()) || b.collides(pb.getBounds())) {
+                        b.setAlive(false);
+                        pb.takeDamage(b.getDamage());
+                        player.addPoints(b.getDamage());
+                        explosionSound.play();
+                    }
+                }
+                for (int k = 0; k < activeShooterEnemies.size; k++) {
+                    ShooterEnemy se = activeShooterEnemies.get(k);
+                    if (se.collides(b.getBounds()) || b.collides(se.getBounds())) {
+                        b.setAlive(false);
+                        se.takeDamage(b.getDamage());
+                        player.addPoints(b.getDamage());
+                        explosionSound.play();
+                    }
+                }
+            } else {
+                if (player.collides(b.getBounds()) || b.collides(player.getBounds())) {
                     b.setAlive(false);
-                    pb.setAlive(false);
-                    player.addPoints(50);
+                    player.takeDamage(b.getDamage());
                     explosionSound.play();
                 }
             }
@@ -287,7 +343,7 @@ public class GameState extends State {
         for(int i=0; i<activeParachuteBombers.size; i++){
             ParachuteBomber pb=activeParachuteBombers.get(i);
             if(player.collides(pb.getBounds()) || pb.collides(player.getBounds())){
-                player.removeLife();
+                player.takeDamage(pb.getDamage());
                 pb.setAlive(false);
                 explosionSound.play();
             }
@@ -345,7 +401,7 @@ public class GameState extends State {
 
         touchpad = new Touchpad(2f, touchpadStyle);
 //        touchpad.setBounds(150f*ratioX,60f*ratioY,300f*ratioX,300f*ratioY);
-        touchpad.setBounds(150f,60f,300f,300f);
+        touchpad.setBounds(1400f, 60f, 300f, 300f);
     }
 
     private void initShootBtn(){
@@ -362,25 +418,30 @@ public class GameState extends State {
 
         shootBtn = new ImageButton(shootBtnStyle);
 //        shootBtn.setBounds(1400f*ratioX,50*ratioY,500*ratioX,500*ratioY);
-        shootBtn.setBounds(1400f,-350,500,1000);
+        shootBtn.setBounds(150f,-350,500,1000);
     }
 
     private void spawnParachuteBombers() {
-        for(int i = 0; i<3+(5*level/2); i++) {
+//        for(int i = 0; i<3+(5*level/2); i++) {
+        for(int i = 0; i<level*2; i++) {
             ParachuteBomber pbItem = parachuteBomberPool.obtain();
-            pbItem.init();
+            pbItem.init(level);
             activeParachuteBombers.add(pbItem);
         }
     }
 
-    private void shoot(){
-        if(timeSinceLastFire >= rateOfFire){
-            timeSinceLastFire -= rateOfFire;
-            Bullet bItem = bulletPool.obtain();
-            bItem.init(player.getX()+75, player.getY()+25, 700f, 0f);
-            activeBullets.add(bItem);
-            shootSound.play();
+    private void spawnShooterEnemies() {
+        for(int i = 0; i<level; i++) {
+            ShooterEnemy seItem = shooterEnemyPool.obtain();
+            seItem.init(level);
+            activeShooterEnemies.add(seItem);
         }
+    }
+
+    private void shoot(float startX, float startY, float dirX, float dirY, boolean isShotFromEnemy){
+        Bullet bItem = bulletPool.obtain();
+        bItem.init(startX, startY, dirX, dirY, isShotFromEnemy);
+        activeBullets.add(bItem);
     }
 
     @Override

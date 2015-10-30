@@ -12,35 +12,43 @@ import com.badlogic.gdx.utils.Pool;
  */
 public class Bullet extends SpaceObject implements Pool.Poolable{
 
-    private float xSpeed, ySpeed;
-    private float lifeTimer, lifeTime;
-    private float damage;
+    private int damage;
+    private float xOffset, yOffset;
+    private float maxSpeed;
+    private boolean isShotFromEnemy;
+//    private Texture texture2;
 
     public Bullet(){
         this.alive = false;
-        lifeTimer = 0f;
-        lifeTime = 4f;
 //        texture = new Texture(Gdx.files.internal("data/laser.png"));
-        texture = new Texture(Gdx.files.internal("data/laserRed.png"));
+//        texture = new Texture(Gdx.files.internal("data/laserRed.png"));
+        texture = new Texture(Gdx.files.internal("data/enemyLaser.png"));
         xSpeed = 0;
         ySpeed = 0;
         width = texture.getWidth();
         height = texture.getHeight();
         bounds = new Rectangle(x,y,width,height);
         damage = 50;
+        maxSpeed=600f;
     }
 
-    public void init(float startXPosition, float startYPosition, float xSpeed, float ySpeed){
+    public void init(float startXPosition, float startYPosition, float dirX, float dirY, boolean isShotFromEnemy){
         this.x = startXPosition;
         this.y = startYPosition;
+        this.dirX = dirX;
+        this.dirY = dirY;
         alive = true;
-        this.xSpeed = xSpeed;
-        this.ySpeed = ySpeed;
+        this.xSpeed = dirX*maxSpeed;
+        this.ySpeed = dirY*maxSpeed;
+        damage = 50;
+        this.isShotFromEnemy = isShotFromEnemy;
     }
 
     public void update(float dt){
-        x += xSpeed * dt;
-        y += ySpeed * dt;
+        rotation = (Math.atan2(dirY,dirX)*180.0d/Math.PI)-180.0f;
+
+        x += dirX * maxSpeed * dt;
+        y += dirY * maxSpeed * dt;
 
         bounds.x = x;
         bounds.y = y;
@@ -50,7 +58,14 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
     }
 
     public void render(SpriteBatch sb){
-        sb.draw(texture, x, y);
+//        sb.draw(texture,x,y);
+//        if(!isShotFromEnemy) {
+        sb.draw(texture, x, y, width / 2, height / 2, width, height, 1, 1, (float) rotation,
+                0, 0, width, height, false, false);
+//        } else {
+//            sb.draw(texture2, x, y, width / 2, height / 2, width, height, 1, 1, (float) rotation,
+//                    0, 0, width, height, false, false);
+////        }
     }
 
     @Override
@@ -60,6 +75,28 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
         alive = false;
         xSpeed = 0;
         ySpeed = 0;
+        damage = 0;
     }
 
+    @Override
+    public void dispose(){
+        super.dispose();
+//        texture2.dispose();
+    }
+
+    public int getDamage() {
+        return damage;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
+    }
+
+    public boolean isShotFromEnemy() {
+        return isShotFromEnemy;
+    }
+
+    public void setIsShotFromEnemy(boolean isShotFromEnemy) {
+        this.isShotFromEnemy = isShotFromEnemy;
+    }
 }

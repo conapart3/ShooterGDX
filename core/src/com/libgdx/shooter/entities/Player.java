@@ -57,14 +57,17 @@ public class Player extends SpaceObject {
         maxSpeed = 600f;
         knobPercentX = 0;
         knobPercentY = 0;
-        health = 100;
+        health = 1000;
         lives = 3;
         alive = true;
 //        left=right=up=down=false;
+
+        xOffset = width/2+dirX*30;
+        yOffset = height/2+dirY*30;
     }
 
     public void update(float dt) {
-        if(lives==0)
+        if(health<1)
             alive = false;
 
 //        dx = knobPercentX * maxSpeed;
