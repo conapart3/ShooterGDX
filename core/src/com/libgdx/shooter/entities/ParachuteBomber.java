@@ -32,7 +32,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         damage = 200;
     }
 
-    public void init(int level){
+    public void create(int level){
         //((max - min) + 1) + min
         x = rand.nextInt(3000-2000+1)+2000;
         y = rand.nextInt(1000-250+1)+250;

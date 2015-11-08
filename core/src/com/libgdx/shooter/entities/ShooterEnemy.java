@@ -22,6 +22,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
     private float bulletSpeed;
     private float dirX, dirY, dirLength;
     private double rotation;
+    private Weapon weapon;
 
     public ShooterEnemy(){
         this.alive = false;
@@ -41,7 +42,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
     }
 
     //pass in the level - health = 200 + (200*level/2)
-    public void init(int level){
+    public void create(int level){
         //max-min +1 +min
         x = rand.nextInt(3000-2000+1)+2000;
         y = rand.nextInt(1000-250+1)+250;

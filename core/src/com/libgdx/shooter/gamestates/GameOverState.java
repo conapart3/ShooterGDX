@@ -37,7 +37,7 @@ public class GameOverState extends State{
 
         spriteBatch = new SpriteBatch();
 
-        //init font
+        //create font
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/Fonts/Montserrat-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.minFilter = Texture.TextureFilter.Nearest;

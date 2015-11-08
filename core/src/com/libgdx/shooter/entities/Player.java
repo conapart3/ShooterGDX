@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.libgdx.shooter.game.ShooterGame;
 
 import static com.libgdx.shooter.game.ShooterGame.*;
 
@@ -24,13 +23,14 @@ public class Player extends SpaceObject {
     private float maxSpeed;
     private int lives;
     private int score;
+    private Weapon weapon;
 //    private boolean left,right,up,down;
 
     public Player() {
-        init();
+        create();
     }
 
-    public void init() {
+    public void create() {
         int FRAME_COLS = 8;
         int FRAME_ROWS = 1;
 
@@ -51,7 +51,7 @@ public class Player extends SpaceObject {
         bounds = new Rectangle(x, y, width, height);
 
         //starting position
-        x = 800 * SCALE_RATIO_X;
+        x = 150 * SCALE_RATIO_X;
         y = 800 * SCALE_RATIO_Y;
 
         maxSpeed = 600f;
@@ -64,6 +64,7 @@ public class Player extends SpaceObject {
 
         xOffset = width/2+dirX*30;
         yOffset = height/2+dirY*30;
+        weapon = new LightLaserCannon();
     }
 
     public void update(float dt) {
