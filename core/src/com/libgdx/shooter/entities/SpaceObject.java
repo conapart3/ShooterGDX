@@ -1,7 +1,10 @@
 package com.libgdx.shooter.entities;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+
+import java.util.Random;
 
 
 /**
@@ -19,6 +22,7 @@ public class SpaceObject {
     protected float dirX, dirY;//for movement, and rotation, the directional vector for where it should point/move/shoot
     protected double rotation;
     protected float xOffset,yOffset;
+    protected Random rand;
 
     protected int width, height;
 
@@ -33,6 +37,32 @@ public class SpaceObject {
     public void setPosition(float x, float y){
         this.x = x;
         this.y = y;
+    }
+//
+//    public void move(float dt){
+//        xSpeed += dx*dt;
+//        ySpeed += dy*dt;
+//
+//        x += xSpeed * dt;
+//        y += ySpeed * dt;
+//
+//        bounds.x = x;
+//        bounds.y = y;
+//
+////        if(dx>0)
+////            dx--;
+////        else if(dx<0)
+////            dx++;
+////
+////        if(dy>0)
+////            dy--;
+////        else if(dy<0)
+////            dy++;
+//    }
+
+    public void render(SpriteBatch sb){
+        sb.draw(texture,x,y,width,height);
+
     }
 
     public int getHealth() {

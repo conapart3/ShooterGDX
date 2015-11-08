@@ -39,6 +39,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         timeSinceLastFire = 0f;
         dirX = 0f;
         dirY = 0f;
+        weapon = new LightLaserCannon();
     }
 
     //pass in the level - health = 200 + (200*level/2)
@@ -50,7 +51,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         ySpeed = rand.nextInt(50)-25;
         alive = true;
         dy = dx = 0;
-        health = 100 + (200*level/2);
+        health = 100 + (20*level/2);
         isShooting = false;
         timeSinceLastFire = 0f;
         rateOfFire = 1.6f;
@@ -59,7 +60,6 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
     }
 
     public void update(float dt, float targetX, float targetY){
-
         if(health<1)
             alive = false;
 
@@ -104,6 +104,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
             ySpeed *= -1;
     }
 
+    @Override
     public void render(SpriteBatch sb){
 //        sb.draw(texture,x,y,width/2,height/2,width,height,1,1,(float)rotation);
         sb.draw(texture,x,y,width/2,height/2,width,height,1,1,(float) rotation,0,0,width,height,false,false);

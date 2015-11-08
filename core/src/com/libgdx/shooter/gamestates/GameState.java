@@ -15,10 +15,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.libgdx.shooter.entities.Bullet;
+import com.libgdx.shooter.entities.Item;
 import com.libgdx.shooter.entities.ParachuteBomber;
 import com.libgdx.shooter.entities.Player;
 import com.libgdx.shooter.entities.ShooterEnemy;
 import com.libgdx.shooter.managers.GameStateManager;
+
+import java.util.ArrayList;
 
 import static com.libgdx.shooter.game.ShooterGame.*;
 
@@ -75,11 +78,13 @@ public class GameState extends State implements InputProcessor{
     private Texture bgGround, bgMountains, bgCity;
     private float srcY = 0,srcX = 0;
 
-    private Sound shootSound, hitSound, explosionSound, laserSound;
+    private Sound shootSound, hitSound, explosionSound, laserSound, healthPickupSound, pickupSound1, pickupSound2, explosion2, explosion3;
 //    private Music bgMusic;
 
     private Vector3 touchPoint;
     private boolean shouldShoot;
+
+    private ArrayList<Item> pickups;
 
     public GameState(GameStateManager gsm){
         super(gsm);
@@ -119,6 +124,12 @@ public class GameState extends State implements InputProcessor{
 //        bgMusic.setLooping(true);
 //        bgMusic.play();
 
+//        healthPickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/healthPickup.wav"));
+//        pickupSound1 = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickup.wav"));
+//        pickupSound2 = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickup2.wav"));
+        explosion2 = Gdx.audio.newSound(Gdx.files.internal("data/Sound/Explosion2.wav"));
+        explosion3 = Gdx.audio.newSound(Gdx.files.internal("data/Sound/Explosion3.wav"));
+
         player = new Player();
         level = 0;
         rateOfFire = 0.2f;
@@ -126,6 +137,8 @@ public class GameState extends State implements InputProcessor{
         gameOverTimer = 0f;
         touchPoint = new Vector3();
         shouldShoot = false;
+
+        pickups = new ArrayList<Item>();
     }
 
     @Override
@@ -186,6 +199,16 @@ public class GameState extends State implements InputProcessor{
                 bItem.update(dt);
             }
 
+            //update pickups
+            for(int i=0; i<pickups.size(); i++){
+                Item i1 = pickups.get(i);
+                if(!i1.isAlive()){
+                    i1.dispose();
+                    pickups.remove(i);
+                }
+                i1.update(dt);
+            }
+
             checkCollisions();
 
             //spawns enemies based on level.
@@ -197,6 +220,7 @@ public class GameState extends State implements InputProcessor{
                     level++;
                     spawnParachuteBombers();
                     spawnShooterEnemies();
+                    spawnPickups();
                     player.addPoints(100 * (level - 1));
                     shouldShoot=true;
                 }
@@ -244,6 +268,10 @@ public class GameState extends State implements InputProcessor{
 
         for(int i = activeBullets.size; --i >= 0; ){
             activeBullets.get(i).render(spriteBatch);
+        }
+
+        for(int i=0; i<pickups.size(); i++){
+            pickups.get(i).render(spriteBatch);
         }
 
 //        font.draw(spriteBatch, "Level: "+level +". Lives Left: "+player.getLives(), 30, 30);
@@ -319,6 +347,9 @@ public class GameState extends State implements InputProcessor{
         hitSound.dispose();
         shootSound.dispose();
         explosionSound.dispose();
+        for(int i=0; i<pickups.size(); i++){
+            pickups.get(i).dispose();
+        }
     }
 
     private void checkCollisions(){
@@ -360,6 +391,16 @@ public class GameState extends State implements InputProcessor{
                 player.takeDamage(pb.getDamage());
                 pb.setAlive(false);
                 explosionSound.play();
+            }
+        }
+
+        //check player collisions with pickups
+        for(int i=0; i<pickups.size(); i++){
+            Item pi = pickups.get(i);
+            if(player.collides(pi.getBounds()) || pi.collides(player.getBounds())){
+//                player.addItem(pi);
+                pi.attachToPlayer(player);
+                pi.setAlive(false);
             }
         }
     }
@@ -450,6 +491,11 @@ public class GameState extends State implements InputProcessor{
             seItem.create(level);
             activeShooterEnemies.add(seItem);
         }
+    }
+
+    private void spawnPickups() {
+        Item i = Item.generateItem();
+        pickups.add(i);
     }
 
     private void shoot(float startX, float startY, float dirX, float dirY, boolean isShotFromEnemy){

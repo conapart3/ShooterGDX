@@ -8,4 +8,6 @@ import com.badlogic.gdx.math.Vector2;
  */
 public interface Weapon {
     public void useWeapon(Vector2 target);
+
+    public void setRapidFire();
 }

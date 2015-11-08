@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
+import java.util.ArrayList;
+
 import static com.libgdx.shooter.game.ShooterGame.*;
 
 /**
@@ -21,7 +23,6 @@ public class Player extends SpaceObject {
     private float knobPercentX, knobPercentY;
     private float stateTime;
     private float maxSpeed;
-    private int lives;
     private int score;
     private Weapon weapon;
 //    private boolean left,right,up,down;
@@ -58,7 +59,6 @@ public class Player extends SpaceObject {
         knobPercentX = 0;
         knobPercentY = 0;
         health = 1000;
-        lives = 3;
         alive = true;
 //        left=right=up=down=false;
 
@@ -112,8 +112,8 @@ public class Player extends SpaceObject {
             x = 0;
         if (x > 1850)
             x = 1850;
-        if (y > CEILING_OFFSET)
-            y = CEILING_OFFSET;
+        if (y > PLAYER_CEILING_OFFSET)
+            y = PLAYER_CEILING_OFFSET;
 
         bounds.x = x;
         bounds.y = y;
@@ -122,6 +122,7 @@ public class Player extends SpaceObject {
         currentFrame = playerAnimation.getKeyFrame(stateTime, true);
     }
 
+    @Override
     public void render(SpriteBatch spriteBatch) {
         spriteBatch.draw(currentFrame, x, y);
     }
@@ -140,24 +141,6 @@ public class Player extends SpaceObject {
         knobPercentY = percentY;
     }
 
-    public int getLives() {
-        return lives;
-    }
-
-    public void setLives(int lives) {
-        this.lives = lives;
-    }
-
-    public void removeLife(){
-        lives--;
-//        x = 800 * SCALE_RATIO_X;
-//        y = 800 * SCALE_RATIO_Y;
-    }
-
-    public void addLife(){
-        lives++;
-    }
-
     public int getScore() {
         return score;
     }
@@ -170,20 +153,15 @@ public class Player extends SpaceObject {
         this.score += points;
     }
 
-//    public void setUpPressed(boolean up){
-//        this.up = up;
-//    }
-//
-//    public void setDownPressed(boolean down){
-//        this.down = down;
-//    }
-//
-//    public void setLeftPressed(boolean left){
-//        this.left = left;
-//    }
-//
-//    public void setRightPressed(boolean right){
-//        this.right = right;
-//    }
+    public Weapon getWeapon() {
+        return weapon;
+    }
 
+    public void setWeapon(Weapon weapon) {
+        this.weapon = weapon;
+    }
+
+    public void addItem(Item item) {
+
+    }
 }

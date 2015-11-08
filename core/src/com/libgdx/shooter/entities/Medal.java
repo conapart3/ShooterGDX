@@ -7,22 +7,22 @@ import com.badlogic.gdx.math.Rectangle;
 /**
  * Created by Conal on 08/11/2015.
  */
-public class ShieldPickup extends Item{
+public class Medal extends Item {
 
-    public ShieldPickup(){
-//        texture = new Texture(Gdx.files.internal("data/PowerUp1.png"));
-        texture = new Texture(Gdx.files.internal("data/power_up_shield.png"));
+    public Medal(){
+//        texture = new Texture(Gdx.files.internal("data/powerupFin.png"));
+        texture = new Texture(Gdx.files.internal("data/medal.png"));
         width = texture.getWidth();
         height = texture.getHeight();
         bounds = new Rectangle(x,y,width,height);
-        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickup2.wav"));
-        super.create();
+        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickup.wav"));
+        create();
     }
 
     @Override
     public void attachToPlayer(Player player) {
         pickupSound.play();
-        System.out.println("SHIELD PICKUP");
-
+        player.addPoints(1000);
+        System.out.println("MEDAL PICKUP");
     }
 }

@@ -42,7 +42,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         dy = 0;
         dx = 0;
         health = 25 + (25*level/2);
-        damage = 200 + (200*level/5);
+        damage = 200 + (10*level);
     }
 
     public void update(float dt, float targetX, float targetY){

@@ -17,6 +17,7 @@ public class ShooterGame extends ApplicationAdapter {
 	public static float WORLD_ASPECT_RATIO;
 	public static int GROUND_OFFSET;
 	public static int CEILING_OFFSET;
+	public static int PLAYER_CEILING_OFFSET;
 	public FPSLogger fpsLogger;
 
 //	public static OrthographicCamera cam;
@@ -50,7 +51,8 @@ public class ShooterGame extends ApplicationAdapter {
 		WORLD_ASPECT_RATIO = (float)WORLD_HEIGHT/(float)WORLD_WIDTH;
 
 		GROUND_OFFSET = 145;
-		CEILING_OFFSET = 1000;
+		CEILING_OFFSET = 900;
+		PLAYER_CEILING_OFFSET = 1000;
 
 		fpsLogger = new FPSLogger();
 

@@ -9,6 +9,10 @@ public class BossEnemy extends SpaceObject {
 
     private ArrayList<Weapon> weaponList;
 
+    public BossEnemy(){
+
+    }
+
     public void create(){
 
     }

@@ -7,12 +7,11 @@ import com.badlogic.gdx.math.Rectangle;
 /**
  * Created by Conal on 08/11/2015.
  */
-public class RapidFirePickup extends Item {
+public class BulletScatterPickup extends Item {
 
-
-    public RapidFirePickup(){
-//        texture = new Texture(Gdx.files.internal("data/PowerUp1.png"));
-        texture = new Texture(Gdx.files.internal("data/sprite_mirror_0.png"));
+    public BulletScatterPickup(){
+//        texture = new Texture(Gdx.files.internal("data/powerupFin.png"));
+        texture = new Texture(Gdx.files.internal("data/Shotgun.png"));
         width = texture.getWidth();
         height = texture.getHeight();
         bounds = new Rectangle(x,y,width,height);
@@ -21,10 +20,10 @@ public class RapidFirePickup extends Item {
     }
 
     @Override
-    public void attachToPlayer(Player player){
+    public void attachToPlayer(Player player) {
         pickupSound.play();
-        player.getWeapon().setRapidFire();
-        System.out.println("RAPID FIRE PICKUP");
+//        player.setHealth(1000);
+        System.out.println("SHOTGUN PICKUP");
     }
 
 }
