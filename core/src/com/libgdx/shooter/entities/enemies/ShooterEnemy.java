@@ -1,10 +1,13 @@
-package com.libgdx.shooter.entities;
+package com.libgdx.shooter.entities.enemies;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
+import com.libgdx.shooter.entities.SpaceObject;
+import com.libgdx.shooter.entities.weapons.LightLaserCannon;
+import com.libgdx.shooter.entities.weapons.Weapon;
 
 import java.util.Random;
 
@@ -51,7 +54,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         ySpeed = rand.nextInt(50)-25;
         alive = true;
         dy = dx = 0;
-        health = 100 + (20*level/2);
+        health = 100 + (10*level);
         isShooting = false;
         timeSinceLastFire = 0f;
         rateOfFire = 1.6f;

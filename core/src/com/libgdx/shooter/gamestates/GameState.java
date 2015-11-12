@@ -14,11 +14,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import com.libgdx.shooter.entities.Bullet;
-import com.libgdx.shooter.entities.Item;
-import com.libgdx.shooter.entities.ParachuteBomber;
+import com.libgdx.shooter.entities.bullets.Bullet;
+import com.libgdx.shooter.entities.items.Item;
+import com.libgdx.shooter.entities.enemies.ParachuteBomber;
 import com.libgdx.shooter.entities.Player;
-import com.libgdx.shooter.entities.ShooterEnemy;
+import com.libgdx.shooter.entities.enemies.ShooterEnemy;
 import com.libgdx.shooter.managers.GameStateManager;
 
 import java.util.ArrayList;
@@ -44,6 +44,15 @@ public class GameState extends State implements InputProcessor{
             return new Bullet();
         }
     };
+
+//    //array containing the active bullets, pool
+//    private final Array<Bullet> activeBullets = new Array<Bullet>();
+//    private final Pool<Bullet> bulletPool = new Pool<Bullet>(){
+//        @Override
+//        protected Bullet newObject(){
+//            return new Bullet();
+//        }
+//    };
 
     //array containing active parachute bombers, pool
     private final Array<ParachuteBomber> activeParachuteBombers = new Array<ParachuteBomber>();
@@ -78,11 +87,13 @@ public class GameState extends State implements InputProcessor{
     private Texture bgGround, bgMountains, bgCity;
     private float srcY = 0,srcX = 0;
 
-    private Sound shootSound, hitSound, explosionSound, laserSound, healthPickupSound, pickupSound1, pickupSound2, explosion2, explosion3;
+    private Sound shootSound, hitSound, explosionSound, explosion2, explosion3;
 //    private Music bgMusic;
 
     private Vector3 touchPoint;
     private boolean shouldShoot;
+
+    private Texture bgGround2, bgMountains2, bgCity2;
 
     private ArrayList<Item> pickups;
 
@@ -107,6 +118,10 @@ public class GameState extends State implements InputProcessor{
         bgMountains = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerBack.png"));
         bgCity = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerCity.png"));
 //        bgCity = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerCity2.png"));
+
+        bgGround2 = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayer1Desert.png"));
+        bgMountains2 = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerBack_desert.png"));
+        bgCity2 = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerCity_Desert.png"));
 
         initStage();
 
@@ -218,6 +233,11 @@ public class GameState extends State implements InputProcessor{
                 if (nextLevelTimer > 4) {
                     nextLevelTimer -= 4;
                     level++;
+                    if(level==7) {
+                        bgGround = bgGround2;
+                        bgMountains = bgMountains2;
+                        bgCity = bgCity2;
+                    }
                     spawnParachuteBombers();
                     spawnShooterEnemies();
                     spawnPickups();
@@ -478,7 +498,7 @@ public class GameState extends State implements InputProcessor{
 
     private void spawnParachuteBombers() {
 //        for(int i = 0; i<3+(5*level/2); i++) {
-        for(int i = 0; i<level*2; i++) {
+        for(int i = 0; i<level+level/2; i++) {
             ParachuteBomber pbItem = parachuteBomberPool.obtain();
             pbItem.create(level);
             activeParachuteBombers.add(pbItem);

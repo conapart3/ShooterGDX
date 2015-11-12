@@ -1,7 +1,12 @@
-package com.libgdx.shooter.entities;
+package com.libgdx.shooter.entities.items;
 
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.libgdx.shooter.entities.Player;
+import com.libgdx.shooter.entities.SpaceObject;
+import com.libgdx.shooter.entities.weapons.*;
+import com.libgdx.shooter.entities.weapons.HeavyLaserCannon;
+import com.libgdx.shooter.entities.weapons.LightLaserCannon;
 
 import java.util.Random;
 
@@ -11,7 +16,7 @@ import static com.libgdx.shooter.game.ShooterGame.GROUND_OFFSET;
 /**
  * Created by Conal on 08/11/2015.
  */
-public class Item extends SpaceObject{
+public class Item extends SpaceObject {
 
     protected Sound pickupSound;
 
@@ -22,7 +27,7 @@ public class Item extends SpaceObject{
         y = rand.nextInt(1000-250+1)+250;
 //        xSpeed = (rand.nextInt(300-100 + 1)+100)*-1;
         xSpeed = -250;
-        ySpeed = rand.nextInt(50)-25;
+        ySpeed = rand.nextInt(150)-75;
         alive = true;
         dy = dx = 0;
         dirX = 0f;
@@ -59,7 +64,7 @@ public class Item extends SpaceObject{
         Random rand = new Random();
         int rng = rand.nextInt(8);
         if(rng == 1)
-            return new RapidFirePickup();
+            return new Minigun();
         else if(rng == 2)
             return new HeavyLaserCannon();
         else if(rng == 3)
@@ -69,7 +74,7 @@ public class Item extends SpaceObject{
         else if(rng == 5)
             return new Medal();
         else if(rng == 6)
-            return new BulletScatterPickup();
+            return new Shotgun();
         else
             return new HealthPickup();
     }

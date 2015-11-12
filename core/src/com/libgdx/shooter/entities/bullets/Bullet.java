@@ -1,10 +1,11 @@
-package com.libgdx.shooter.entities;
+package com.libgdx.shooter.entities.bullets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
+import com.libgdx.shooter.entities.SpaceObject;
 
 
 /**
@@ -12,24 +13,29 @@ import com.badlogic.gdx.utils.Pool;
  */
 public class Bullet extends SpaceObject implements Pool.Poolable{
 
-    private int damage;
+    protected int damage;
     private float xOffset, yOffset;
-    private float maxSpeed;
+    protected float maxSpeed;
     private boolean isShotFromEnemy;
 //    private Texture texture2;
 
     public Bullet(){
         this.alive = false;
-//        texture = new Texture(Gdx.files.internal("data/laser.png"));
-//        texture = new Texture(Gdx.files.internal("data/laserRed.png"));
-        texture = new Texture(Gdx.files.internal("data/enemyLaser.png"));
+        setTexture();
         xSpeed = 0;
         ySpeed = 0;
         width = texture.getWidth();
         height = texture.getHeight();
         bounds = new Rectangle(x,y,width,height);
         damage = 50;
-        maxSpeed=600f;
+        maxSpeed=1000f;
+    }
+
+    protected void setTexture(){
+//        texture = new Texture(Gdx.files.internal("data/laser.png"));
+//        texture = new Texture(Gdx.files.internal("data/laserRed.png"));
+        texture = new Texture(Gdx.files.internal("data/bullet.png"));
+
     }
 
     public void init(float startXPosition, float startYPosition, float dirX, float dirY, boolean isShotFromEnemy){

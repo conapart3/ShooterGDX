@@ -1,6 +1,5 @@
-package com.libgdx.shooter.entities;
+package com.libgdx.shooter.entities.weapons;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -9,5 +8,4 @@ import com.badlogic.gdx.math.Vector2;
 public interface Weapon {
     public void useWeapon(Vector2 target);
 
-    public void setRapidFire();
 }

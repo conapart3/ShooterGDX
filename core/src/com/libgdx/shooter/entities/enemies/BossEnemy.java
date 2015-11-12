@@ -1,4 +1,6 @@
-package com.libgdx.shooter.entities;
+package com.libgdx.shooter.entities.enemies;
+
+import com.libgdx.shooter.entities.SpaceObject;
 
 import java.util.ArrayList;
 
@@ -7,7 +9,7 @@ import java.util.ArrayList;
  */
 public class BossEnemy extends SpaceObject {
 
-    private ArrayList<Weapon> weaponList;
+    private ArrayList<com.libgdx.shooter.entities.weapons.Weapon> weaponList;
 
     public BossEnemy(){
 

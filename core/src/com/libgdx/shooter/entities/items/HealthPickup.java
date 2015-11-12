@@ -1,13 +1,14 @@
-package com.libgdx.shooter.entities;
+package com.libgdx.shooter.entities.items;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
+import com.libgdx.shooter.entities.Player;
 
 /**
  * Created by Conal on 29/10/2015.
  */
-public class HealthPickup extends Item {
+public class HealthPickup extends com.libgdx.shooter.entities.items.Item {
 
     public HealthPickup(){
 //        texture = new Texture(Gdx.files.internal("data/powerupFin.png"));

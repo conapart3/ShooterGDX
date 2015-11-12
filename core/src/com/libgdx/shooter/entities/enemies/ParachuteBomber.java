@@ -1,10 +1,11 @@
-package com.libgdx.shooter.entities;
+package com.libgdx.shooter.entities.enemies;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
+import com.libgdx.shooter.entities.SpaceObject;
 import com.libgdx.shooter.game.ShooterGame;
 
 import java.util.Random;
@@ -41,7 +42,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         alive = true;
         dy = 0;
         dx = 0;
-        health = 25 + (25*level/2);
+        health = 25 + (13*level);
         damage = 200 + (10*level);
     }
 

@@ -1,14 +1,16 @@
-package com.libgdx.shooter.entities;
+package com.libgdx.shooter.entities.weapons;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.libgdx.shooter.entities.items.Item;
+import com.libgdx.shooter.entities.Player;
 
 /**
  * Created by Conal on 08/11/2015.
  */
-public class LightLaserCannon extends Item implements Weapon{
+public class LightLaserCannon extends Item implements Weapon {
 
     private float damage = 50;
     private float rateOfFire = 0.2f;
@@ -29,12 +31,6 @@ public class LightLaserCannon extends Item implements Weapon{
     @Override
     public void useWeapon(Vector2 target){
 
-    }
-
-    @Override
-    public void setRapidFire() {
-        rapidFire=true;
-        rateOfFire = rateOfFire/2;
     }
 
     @Override

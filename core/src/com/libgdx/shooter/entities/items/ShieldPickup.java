@@ -1,30 +1,29 @@
-package com.libgdx.shooter.entities;
+package com.libgdx.shooter.entities.items;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
+import com.libgdx.shooter.entities.Player;
 
 /**
  * Created by Conal on 08/11/2015.
  */
-public class RapidFirePickup extends Item {
+public class ShieldPickup extends com.libgdx.shooter.entities.items.Item {
 
-
-    public RapidFirePickup(){
+    public ShieldPickup(){
 //        texture = new Texture(Gdx.files.internal("data/PowerUp1.png"));
-        texture = new Texture(Gdx.files.internal("data/sprite_mirror_0.png"));
+        texture = new Texture(Gdx.files.internal("data/power_up_shield.png"));
         width = texture.getWidth();
         height = texture.getHeight();
         bounds = new Rectangle(x,y,width,height);
         pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickup2.wav"));
-        create();
+        super.create();
     }
 
     @Override
-    public void attachToPlayer(Player player){
+    public void attachToPlayer(Player player) {
         pickupSound.play();
-        player.getWeapon().setRapidFire();
-        System.out.println("RAPID FIRE PICKUP");
-    }
+        System.out.println("SHIELD PICKUP");
 
+    }
 }

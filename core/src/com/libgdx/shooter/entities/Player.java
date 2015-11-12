@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
-import java.util.ArrayList;
-
 import static com.libgdx.shooter.game.ShooterGame.*;
 
 /**
@@ -24,7 +22,7 @@ public class Player extends SpaceObject {
     private float stateTime;
     private float maxSpeed;
     private int score;
-    private Weapon weapon;
+    private com.libgdx.shooter.entities.weapons.Weapon weapon;
 //    private boolean left,right,up,down;
 
     public Player() {
@@ -64,7 +62,7 @@ public class Player extends SpaceObject {
 
         xOffset = width/2+dirX*30;
         yOffset = height/2+dirY*30;
-        weapon = new LightLaserCannon();
+        weapon = new com.libgdx.shooter.entities.weapons.LightLaserCannon();
     }
 
     public void update(float dt) {
@@ -153,15 +151,15 @@ public class Player extends SpaceObject {
         this.score += points;
     }
 
-    public Weapon getWeapon() {
+    public com.libgdx.shooter.entities.weapons.Weapon getWeapon() {
         return weapon;
     }
 
-    public void setWeapon(Weapon weapon) {
+    public void setWeapon(com.libgdx.shooter.entities.weapons.Weapon weapon) {
         this.weapon = weapon;
     }
 
-    public void addItem(Item item) {
+    public void addItem(com.libgdx.shooter.entities.items.Item item) {
 
     }
 }
