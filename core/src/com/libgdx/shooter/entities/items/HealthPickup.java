@@ -10,14 +10,19 @@ import com.libgdx.shooter.entities.Player;
  */
 public class HealthPickup extends com.libgdx.shooter.entities.items.Item {
 
+
     public HealthPickup(){
-//        texture = new Texture(Gdx.files.internal("data/powerupFin.png"));
+        super();
+    }
+
+    @Override
+    protected void setPickupSound(){
+        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupHealth.wav"));
+    }
+
+    @Override
+    protected void setTexture(){
         texture = new Texture(Gdx.files.internal("data/healthPickup.png"));
-        width = texture.getWidth();
-        height = texture.getHeight();
-        bounds = new Rectangle(x,y,width,height);
-        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/healthPickup.wav"));
-        create();
     }
 
     @Override

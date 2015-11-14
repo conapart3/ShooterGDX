@@ -1,7 +1,10 @@
 package com.libgdx.shooter.entities.items;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.libgdx.shooter.entities.Player;
 import com.libgdx.shooter.entities.SpaceObject;
 import com.libgdx.shooter.entities.weapons.*;
@@ -18,7 +21,24 @@ import static com.libgdx.shooter.game.ShooterGame.GROUND_OFFSET;
  */
 public class Item extends SpaceObject {
 
-    protected Sound pickupSound;
+    protected Sound pickupSound;//set default item pickupsound, and sub classes can use their own
+
+    public Item(){
+        setPickupSound();
+        setTexture();
+        width = texture.getWidth();
+        height = texture.getHeight();
+        bounds = new Rectangle(x,y,width,height);
+        create();
+    }
+
+    protected void setPickupSound(){
+        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickup2.wav"));
+    }
+
+    protected void setTexture(){
+        texture = new Texture(Gdx.files.internal("data/sprite_mirror_0.png"));
+    }
 
     public void create(){
         //max-min +1 +min
@@ -46,7 +66,7 @@ public class Item extends SpaceObject {
 
         if(x<-200)
             alive = false;
-        if(y== CEILING_OFFSET || y< GROUND_OFFSET)
+        if(y >= CEILING_OFFSET || y <= GROUND_OFFSET)
             ySpeed *= -1;
 
     }
@@ -62,7 +82,7 @@ public class Item extends SpaceObject {
 
     public static Item generateItem(){
         Random rand = new Random();
-        int rng = rand.nextInt(8);
+        int rng = rand.nextInt(9);
         if(rng == 1)
             return new Minigun();
         else if(rng == 2)
@@ -75,12 +95,16 @@ public class Item extends SpaceObject {
             return new Medal();
         else if(rng == 6)
             return new Shotgun();
+        else if(rng == 7)
+            return new MissileLauncher();
         else
             return new HealthPickup();
+//   for testing comment out above uncomment HLC()
+//        return new HeavyLaserCannon();
     }
 
     public void dispose(){
-        texture.dispose();
+        super.dispose();
         pickupSound.dispose();
     }
 }

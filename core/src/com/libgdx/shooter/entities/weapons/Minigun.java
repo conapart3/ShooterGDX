@@ -10,24 +10,41 @@ import com.libgdx.shooter.entities.Player;
 /**
  * Created by Conal on 08/11/2015.
  */
-public class Minigun extends Item implements Weapon{
+public class Minigun extends Weapon{
 
+
+    public final WeaponType type = WeaponType.MINIGUN;
 
     public Minigun(){
-//        texture = new Texture(Gdx.files.internal("data/PowerUp1.png"));
-        texture = new Texture(Gdx.files.internal("data/sprite_mirror_0.png"));
-        width = texture.getWidth();
-        height = texture.getHeight();
-        bounds = new Rectangle(x,y,width,height);
-        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickup2.wav"));
-        create();
+        super();
+        damage = 25;
+        rateOfFire = 0.1f;
+    }
+
+
+//    @Override
+//    protected void setTexture(){
+//        texture = new Texture(Gdx.files.internal("data/sprite_mirror_0.png"));
+//    }
+
+    @Override
+    protected void setShootSound(){
+        shootSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/shootSoundMinigun.wav"));
+    }
+    @Override
+    protected void setPickupSound(){
+        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupMinigun.wav"));
     }
 
     @Override
     public void attachToPlayer(Player player){
-        pickupSound.play();
-//        player.getWeapon().setRapidFire();
-        System.out.println("RAPID FIRE PICKUP");
+        super.attachToPlayer(player);
+        System.out.println("Minigun");
+    }
+
+    @Override
+    public WeaponType getType() {
+        return type;
     }
 
     @Override

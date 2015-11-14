@@ -4,22 +4,21 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.libgdx.shooter.entities.items.Item;
 import com.libgdx.shooter.entities.Player;
+import com.libgdx.shooter.entities.items.Item;
 
 /**
- * Created by Conal on 08/11/2015.
+ * Created by Conal on 12/11/2015.
  */
-public class LightLaserCannon extends Weapon {
+public class MissileLauncher extends Weapon{
 
-    public final WeaponType type = WeaponType.LIGHT_LASER_CANNON;
+    public final WeaponType type = WeaponType.MISSILE_LAUNCHER;
 
-    public LightLaserCannon(){
+    public MissileLauncher(){
         super();
-        damage = 50;
-        rateOfFire = 0.2f;
+        damage = 300;
+        rateOfFire = 0.8f;
     }
-
 
     @Override
     protected void setTexture(){
@@ -28,11 +27,11 @@ public class LightLaserCannon extends Weapon {
 
         @Override
     protected void setShootSound(){
-        shootSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/shootSoundLightLaserCannon.wav"));
+        shootSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/shootSoundMissile.wav"));
     }
         @Override
     protected void setPickupSound(){
-        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupLightLaser.wav"));
+        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupMissileLauncher.wav"));
     }
     @Override
     public WeaponType getType() {
@@ -44,9 +43,11 @@ public class LightLaserCannon extends Weapon {
 
     }
 
+
     @Override
     public void attachToPlayer(Player player){
         super.attachToPlayer(player);
-        System.out.println("LIGHT CANNON PICKUP");
+        System.out.println("MissileLauncher");
     }
+
 }

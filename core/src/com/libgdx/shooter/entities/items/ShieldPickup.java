@@ -11,14 +11,19 @@ import com.libgdx.shooter.entities.Player;
 public class ShieldPickup extends com.libgdx.shooter.entities.items.Item {
 
     public ShieldPickup(){
-//        texture = new Texture(Gdx.files.internal("data/PowerUp1.png"));
-        texture = new Texture(Gdx.files.internal("data/power_up_shield.png"));
-        width = texture.getWidth();
-        height = texture.getHeight();
-        bounds = new Rectangle(x,y,width,height);
-        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickup2.wav"));
-        super.create();
+        super();
     }
+
+    @Override
+    protected void setPickupSound(){
+        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupShield.wav"));
+    }
+
+    @Override
+    protected void setTexture(){
+        texture = new Texture(Gdx.files.internal("data/power_up_shield.png"));
+    }
+
 
     @Override
     public void attachToPlayer(Player player) {

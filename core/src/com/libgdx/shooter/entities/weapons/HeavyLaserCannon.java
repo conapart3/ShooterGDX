@@ -10,22 +10,35 @@ import com.libgdx.shooter.entities.Player;
 /**
  * Created by Conal on 08/11/2015.
  */
-public class HeavyLaserCannon extends Item implements Weapon {
+public class HeavyLaserCannon extends Weapon {
 
-    private float damage = 100f;
-    private float rateOfFire = 0.4f;
-    private float rapidFireExpiryTime = 20f;
-    private boolean rapidFire;
+    public final WeaponType type = WeaponType.HEAVY_LASER_CANNON;
 
     public HeavyLaserCannon(){
-//        texture = new Texture(Gdx.files.internal("data/PowerUp1.png"));
+        super();
+        damage = 100;
+        rateOfFire = 0.4f;
+    }
+
+
+    @Override
+    protected void setTexture(){
         texture = new Texture(Gdx.files.internal("data/heavyCannon.png"));
-        width = texture.getWidth();
-        height = texture.getHeight();
-        bounds = new Rectangle(x,y,width,height);
-        rapidFire=false;
-        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickup2.wav"));
-        super.create();
+    }
+
+        @Override
+    protected void setShootSound(){
+        shootSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/shootSoundHeavyLaserCannon.wav"));
+    }
+
+    @Override
+    protected void setPickupSound(){
+        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupHeavyLaser.wav"));
+    }
+
+    @Override
+    public WeaponType getType() {
+        return type;
     }
 
     @Override
@@ -33,11 +46,9 @@ public class HeavyLaserCannon extends Item implements Weapon {
 
     }
 
-
     @Override
     public void attachToPlayer(Player player){
-        pickupSound.play();
-        player.setWeapon(this);
+        super.attachToPlayer(player);
         System.out.println("HEAVY CANNON PICKUP");
     }
 }

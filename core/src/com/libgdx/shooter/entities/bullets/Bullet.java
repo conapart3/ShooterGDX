@@ -1,6 +1,7 @@
 package com.libgdx.shooter.entities.bullets;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
@@ -17,11 +18,13 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
     private float xOffset, yOffset;
     protected float maxSpeed;
     private boolean isShotFromEnemy;
+    protected Sound hitSound;
 //    private Texture texture2;
 
     public Bullet(){
         this.alive = false;
         setTexture();
+        setHitSound();
         xSpeed = 0;
         ySpeed = 0;
         width = texture.getWidth();
@@ -29,6 +32,10 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
         bounds = new Rectangle(x,y,width,height);
         damage = 50;
         maxSpeed=1000f;
+    }
+
+    protected void setHitSound(){
+        hitSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/hitSoundBullet.wav"));
     }
 
     protected void setTexture(){
@@ -76,8 +83,8 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
 
     @Override
     public void reset() {
-        x = -50;
-        y = 0;
+        x = -500;
+        y = -500;
         alive = false;
         xSpeed = 0;
         ySpeed = 0;
@@ -87,7 +94,12 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
     @Override
     public void dispose(){
         super.dispose();
+        hitSound.dispose();
 //        texture2.dispose();
+    }
+
+    public void playHitSound(){
+        hitSound.play();
     }
 
     public int getDamage() {

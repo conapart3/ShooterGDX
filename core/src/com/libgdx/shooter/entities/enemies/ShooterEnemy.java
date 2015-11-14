@@ -1,6 +1,7 @@
 package com.libgdx.shooter.entities.enemies;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
@@ -21,11 +22,12 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
 
     private Random rand;
     private boolean isShooting;
-    private float timeSinceLastFire, rateOfFire;
+//    private float timeSinceLastFire, rateOfFire;//this will be moved to the weapon class!
     private float bulletSpeed;
     private float dirX, dirY, dirLength;
     private double rotation;
     private Weapon weapon;
+    private Sound explosionSound;
 
     public ShooterEnemy(){
         this.alive = false;
@@ -38,11 +40,10 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         bounds = new Rectangle(x,y,width,height);
         isShooting = false;
         bulletSpeed = 500;
-        rateOfFire = 1.6f;
-        timeSinceLastFire = 0f;
         dirX = 0f;
         dirY = 0f;
         weapon = new LightLaserCannon();
+        explosionSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/explosionShooterEnemy.wav"));
     }
 
     //pass in the level - health = 200 + (200*level/2)
@@ -56,20 +57,14 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         dy = dx = 0;
         health = 100 + (10*level);
         isShooting = false;
-        timeSinceLastFire = 0f;
-        rateOfFire = 1.6f;
         dirX = 0f;
         dirY = 0f;
     }
 
     public void update(float dt, float targetX, float targetY){
+        weapon.update(dt);
         if(health<1)
             alive = false;
-
-        //capping rate of fire so it doesn't go way above and allow many shots at once
-        timeSinceLastFire+=dt;
-        if(timeSinceLastFire > rateOfFire)
-            timeSinceLastFire = rateOfFire;
 
         if(x<1900){
             dirX = targetX - x - width/2;
@@ -79,12 +74,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
             dirY=dirY/dirLength;
 //            if(difference between targetY and y is only 50)
 //                then move out of fire line
-            if(timeSinceLastFire>=rateOfFire) {
-                timeSinceLastFire-=rateOfFire;
-                isShooting = true;
-            } else {
-                isShooting=false;
-            }
+            isShooting = weapon.isReadyToShoot();
         }
         rotation = (Math.atan2(dirY,dirX)*180.0d/Math.PI)-180.0f;
         xOffset = width/2 + dirX*30;
@@ -123,8 +113,6 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         dx = 0;
         dy = 0;
         isShooting = false;
-        timeSinceLastFire = 0f;
-        rateOfFire=1.6f;
     }
 
     @Override
@@ -138,22 +126,6 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
 
     public void setIsShooting(boolean isShooting) {
         this.isShooting = isShooting;
-    }
-
-    public float getTimeSinceLastFire() {
-        return timeSinceLastFire;
-    }
-
-    public void setTimeSinceLastFire(float timeSinceLastFire) {
-        this.timeSinceLastFire = timeSinceLastFire;
-    }
-
-    public float getRateOfFire() {
-        return rateOfFire;
-    }
-
-    public void setRateOfFire(float rateOfFire) {
-        this.rateOfFire = rateOfFire;
     }
 
     public float getDirX() {
@@ -170,5 +142,17 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
 
     public void setDirY(float dirY) {
         this.dirY = dirY;
+    }
+
+    public Weapon getWeapon() {
+        return weapon;
+    }
+
+    public void setWeapon(Weapon weapon) {
+        this.weapon = weapon;
+    }
+
+    public void playExplosion(){
+        explosionSound.play();
     }
 }

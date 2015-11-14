@@ -1,11 +1,15 @@
 package com.libgdx.shooter.entities;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.libgdx.shooter.entities.items.Item;
+import com.libgdx.shooter.entities.weapons.LightLaserCannon;
+import com.libgdx.shooter.entities.weapons.Weapon;
 
 import static com.libgdx.shooter.game.ShooterGame.*;
 
@@ -14,7 +18,6 @@ import static com.libgdx.shooter.game.ShooterGame.*;
  */
 public class Player extends SpaceObject {
 
-
     private TextureRegion[] playerFrames;
     private TextureRegion currentFrame;
     private Animation playerAnimation;
@@ -22,7 +25,9 @@ public class Player extends SpaceObject {
     private float stateTime;
     private float maxSpeed;
     private int score;
-    private com.libgdx.shooter.entities.weapons.Weapon weapon;
+    private Weapon weapon;
+    private boolean isReadyToShoot;
+    private Sound explosionSound;
 //    private boolean left,right,up,down;
 
     public Player() {
@@ -58,11 +63,11 @@ public class Player extends SpaceObject {
         knobPercentY = 0;
         health = 1000;
         alive = true;
-//        left=right=up=down=false;
 
         xOffset = width/2+dirX*30;
         yOffset = height/2+dirY*30;
-        weapon = new com.libgdx.shooter.entities.weapons.LightLaserCannon();
+        weapon = new LightLaserCannon();
+        explosionSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/explosionPlayer.wav"));
     }
 
     public void update(float dt) {
@@ -118,6 +123,9 @@ public class Player extends SpaceObject {
 
         stateTime += dt;
         currentFrame = playerAnimation.getKeyFrame(stateTime, true);
+
+        weapon.update(dt);
+        isReadyToShoot = weapon.isReadyToShoot();
     }
 
     @Override
@@ -151,15 +159,24 @@ public class Player extends SpaceObject {
         this.score += points;
     }
 
-    public com.libgdx.shooter.entities.weapons.Weapon getWeapon() {
+    public Weapon getWeapon() {
         return weapon;
     }
 
-    public void setWeapon(com.libgdx.shooter.entities.weapons.Weapon weapon) {
+    public void setWeapon(Weapon weapon) {
         this.weapon = weapon;
     }
 
-    public void addItem(com.libgdx.shooter.entities.items.Item item) {
+    public void addItem(Item item) {
 
     }
+
+    public boolean isReadyToShoot() {
+        return isReadyToShoot;
+    }
+
+    public void playExplosion(){
+        explosionSound.play();
+    }
+
 }

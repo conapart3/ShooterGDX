@@ -11,7 +11,12 @@ public class Laser extends Bullet{
     public Laser(){
         super();
         damage = damage/2;
-        maxSpeed = maxSpeed * 0.75f;
+        maxSpeed = 700f;
+    }
+
+    @Override
+    protected void setHitSound(){
+        hitSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/hitSoundLaser.wav"));
     }
 
     @Override

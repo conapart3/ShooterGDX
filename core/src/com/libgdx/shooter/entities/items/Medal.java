@@ -11,13 +11,17 @@ import com.libgdx.shooter.entities.Player;
 public class Medal extends com.libgdx.shooter.entities.items.Item {
 
     public Medal(){
-//        texture = new Texture(Gdx.files.internal("data/powerupFin.png"));
+        super();
+    }
+
+    @Override
+    protected void setPickupSound(){
+        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupMedal.wav"));
+    }
+
+    @Override
+    protected void setTexture(){
         texture = new Texture(Gdx.files.internal("data/medal.png"));
-        width = texture.getWidth();
-        height = texture.getHeight();
-        bounds = new Rectangle(x,y,width,height);
-        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickup.wav"));
-        create();
     }
 
     @Override

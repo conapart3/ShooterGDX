@@ -1,6 +1,7 @@
 package com.libgdx.shooter.entities.enemies;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
@@ -21,6 +22,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
     private Random rand;
     private int points = 100;
     private int damage;
+    private Sound explosionSound;
 
     public ParachuteBomber(){
         this.alive = false;
@@ -31,6 +33,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         height = texture.getHeight();
         bounds = new Rectangle(x,y,width,height);
         damage = 200;
+        explosionSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/explosionParachute.wav"));
     }
 
     public void create(int level){
@@ -99,5 +102,9 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
 
     public void setDamage(int damage) {
         this.damage = damage;
+    }
+
+    public void playExplosion(){
+        explosionSound.play();
     }
 }
