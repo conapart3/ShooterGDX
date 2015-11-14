@@ -17,7 +17,7 @@ public class HeavyLaserCannon extends Weapon {
     public HeavyLaserCannon(){
         super();
         damage = 100;
-        rateOfFire = 0.4f;
+        rateOfFire = 0.5f;
     }
 
 

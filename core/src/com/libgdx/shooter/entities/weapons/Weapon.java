@@ -50,12 +50,14 @@ public abstract class Weapon extends Item{
         }
     }
 
+    @Override
     public void attachToPlayer(Player player){
         pickupSound.play();
         player.setWeapon(this);
     }
 
     public void playShootSound(){
+//        shootSound.stop();
         shootSound.play();
     }
 

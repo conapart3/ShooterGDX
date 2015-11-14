@@ -10,18 +10,19 @@ public class Missile extends Bullet{
 
     public Missile(){
         super();
-        damage = damage * 2;
+        damage = 500;
         maxSpeed = 500f;
     }
 
     @Override
     protected void setHitSound(){
-        hitSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/hitSoundMissile.wav"));
+        hitSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/hitSoundBoss.wav"));
     }
 
     @Override
     protected void setTexture(){
         texture = new Texture(Gdx.files.internal("data/missile.png"));
     }
+
 
 }

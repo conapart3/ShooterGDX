@@ -31,7 +31,7 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
         height = texture.getHeight();
         bounds = new Rectangle(x,y,width,height);
         damage = 50;
-        maxSpeed=1000f;
+        maxSpeed=900f;
     }
 
     protected void setHitSound(){
@@ -53,7 +53,6 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
         alive = true;
         this.xSpeed = dirX*maxSpeed;
         this.ySpeed = dirY*maxSpeed;
-        damage = 50;
         this.isShotFromEnemy = isShotFromEnemy;
     }
 
@@ -88,7 +87,10 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
         alive = false;
         xSpeed = 0;
         ySpeed = 0;
-        damage = 0;
+        dx = 0;
+        dy = 0;
+        dirX=0;
+        dirY = 0;
     }
 
     @Override

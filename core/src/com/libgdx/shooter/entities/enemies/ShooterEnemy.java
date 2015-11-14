@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
 import com.libgdx.shooter.entities.SpaceObject;
+import com.libgdx.shooter.entities.weapons.HeavyLaserCannon;
 import com.libgdx.shooter.entities.weapons.LightLaserCannon;
 import com.libgdx.shooter.entities.weapons.Weapon;
 
@@ -28,6 +29,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
     private double rotation;
     private Weapon weapon;
     private Sound explosionSound;
+    private float lerp;
 
     public ShooterEnemy(){
         this.alive = false;
@@ -42,8 +44,9 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         bulletSpeed = 500;
         dirX = 0f;
         dirY = 0f;
-        weapon = new LightLaserCannon();
+        weapon = new HeavyLaserCannon();
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/explosionShooterEnemy.wav"));
+        lerp = 0.1f;
     }
 
     //pass in the level - health = 200 + (200*level/2)
@@ -67,8 +70,8 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
             alive = false;
 
         if(x<1900){
-            dirX = targetX - x - width/2;
-            dirY = targetY - y - height/2;
+            dirX = dt*(targetX - x - width/2);
+            dirY = dt*(targetY - y - height/2);
             dirLength = (float)Math.sqrt(dirX*dirX + dirY*dirY);
             dirX=dirX/dirLength;
             dirY=dirY/dirLength;

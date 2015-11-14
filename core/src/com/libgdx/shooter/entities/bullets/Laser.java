@@ -10,7 +10,7 @@ public class Laser extends Bullet{
 
     public Laser(){
         super();
-        damage = damage/2;
+        damage = 100;
         maxSpeed = 700f;
     }
 

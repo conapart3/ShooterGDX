@@ -171,7 +171,7 @@ public class GameState extends State implements InputProcessor{
             if(shouldShoot) {
                 if (player.isReadyToShoot()) {
                     shoot(player.getWeapon(), player.getX() + player.getxOffset(), player.getY() + player.getyOffset(), 1f, 0f, false);//x and y offset, x and y normalised direction
-                    player.getWeapon().playShootSound();
+//                    player.getWeapon().playShootSound();
                 }
             }
 
@@ -199,7 +199,7 @@ public class GameState extends State implements InputProcessor{
                 if(seItem.isShooting()){
                     shoot(seItem.getWeapon(),seItem.getX()+seItem.getxOffset(), seItem.getY()+seItem.getyOffset(),
                             seItem.getDirX(), seItem.getDirY(), true);
-                    seItem.getWeapon().playShootSound();
+//                    seItem.getWeapon().playShootSound();
                 }
             }
 
@@ -410,6 +410,7 @@ public class GameState extends State implements InputProcessor{
 
         /**
          * TODO: REFACTOR SO IT DOESNT RUN THROUGH ALL THESE FOR LOOPS
+         * TODO: ADD EXPLOSION ANIMATION
          */
         /**Check collisions between bullets and player/enemies**/
         for(int i=0; i<activeBullets.size; i++){

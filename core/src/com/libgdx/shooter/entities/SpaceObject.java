@@ -14,6 +14,7 @@ public class SpaceObject {
 
     protected float x, y;
     protected float xSpeed, ySpeed;
+
     protected float dx, dy;
     protected Rectangle bounds;
     protected Texture texture;
