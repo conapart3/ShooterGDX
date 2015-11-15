@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.libgdx.shooter.entities.items.Item;
 import com.libgdx.shooter.entities.Player;
+import com.libgdx.shooter.gamestates.GameState;
 
 /**
  * Created by Conal on 08/11/2015.
@@ -27,12 +28,14 @@ public class Shotgun extends Weapon{
 
         @Override
     protected void setShootSound(){
-        shootSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/shootSoundShotgun.wav"));
+//        shootSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/shootSoundShotgun.wav"));
+        shootSound = GameState.assetManager.get("data/Sound/shootSoundShotgun.wav");
     }
 
         @Override
     protected void setPickupSound(){
-        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupShotgun.wav"));
+//        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupShotgun.wav"));
+        pickupSound = GameState.assetManager.get("data/Sound/pickupShotgun.wav");
     }
 
     @Override

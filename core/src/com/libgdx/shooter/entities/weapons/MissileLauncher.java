@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.libgdx.shooter.entities.Player;
 import com.libgdx.shooter.entities.items.Item;
+import com.libgdx.shooter.gamestates.GameState;
 
 /**
  * Created by Conal on 12/11/2015.
@@ -27,11 +28,13 @@ public class MissileLauncher extends Weapon{
 
         @Override
     protected void setShootSound(){
-        shootSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/shootSoundMissile.wav"));
+//        shootSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/shootSoundMissile.wav"));
+        shootSound = GameState.assetManager.get("data/Sound/shootSoundMissile.wav");
     }
         @Override
     protected void setPickupSound(){
-        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupMissileLauncher.wav"));
+//        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupMissileLauncher.wav"));
+        pickupSound = GameState.assetManager.get("data/Sound/pickupMissileLauncher.wav");
     }
     @Override
     public WeaponType getType() {

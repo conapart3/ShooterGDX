@@ -3,6 +3,7 @@ package com.libgdx.shooter.gamestates;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -26,6 +27,8 @@ import com.libgdx.shooter.entities.weapons.WeaponType;
 import com.libgdx.shooter.managers.GameStateManager;
 
 import java.util.ArrayList;
+
+import javax.xml.soap.Text;
 
 import static com.libgdx.shooter.game.ShooterGame.*;
 
@@ -110,6 +113,8 @@ public class GameState extends State implements InputProcessor{
 
     private ArrayList<Item> pickups;
 
+    public static AssetManager assetManager;
+
     public GameState(GameStateManager gsm){
         super(gsm);
 
@@ -119,6 +124,7 @@ public class GameState extends State implements InputProcessor{
     public void create() {
         /** Set camera default start position **/
         cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
+        assetManager = new AssetManager();
 
         /** One spritebatch used to draw all sprites **/
         spriteBatch = new SpriteBatch();
@@ -127,6 +133,34 @@ public class GameState extends State implements InputProcessor{
         bgGround = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayer2.png"));
         bgMountains = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerBack.png"));
         bgCity = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerCity.png"));
+
+        /** Load in the background textures into AssetManager **/
+//        assetManager.load("data/BackgroundElements/bgFinalLayer2.png", Texture.class);
+//        assetManager.load("data/BackgroundElements/bgFinalLayerBack.png", Texture.class);
+//        assetManager.load("data/BackgroundElements/bgFinalLayerCity.png", Texture.class);
+//        assetManager.load("data/BackgroundElements/bgFinalLayerDesert.png", Texture.class);
+//        assetManager.load("data/BackgroundElements/bgFinalLayerBack_desert.png", Texture.class);
+//        assetManager.load("data/BackgroundElements/bgFinalLayerCity_Desert.png", Texture.class);
+
+        /** Load in the shoot sounds into AssetManager **/
+        assetManager.load("data/Sound/shootSoundMinigun.wav", Sound.class);
+        assetManager.load("data/Sound/shootSoundMissile.wav", Sound.class);
+        assetManager.load("data/Sound/shootSoundShotgun.wav", Sound.class);
+        assetManager.load("data/Sound/shootSoundHeavyLaserCannon.wav", Sound.class);
+        assetManager.load("data/Sound/shootSoundLightLaserCannon.wav", Sound.class);
+
+        /** Load in the pickup sounds into AssetManager **/
+        assetManager.load("data/Sound/pickupHeavyLaser.wav", Sound.class);
+        assetManager.load("data/Sound/pickupLightLaser.wav", Sound.class);
+        assetManager.load("data/Sound/pickupMinigun.wav", Sound.class);
+        assetManager.load("data/Sound/pickupShotgun.wav", Sound.class);
+        assetManager.load("data/Sound/pickupMissileLauncher.wav", Sound.class);
+
+        while(!assetManager.update()){
+
+        }
+        /** Load in the sprites into AssetManager **/
+//        assetManager.load("", Texture.class);
 
         /**
          * TODO: Use loader to load in the new backgrounds for the next maplevel
@@ -163,187 +197,191 @@ public class GameState extends State implements InputProcessor{
 
     @Override
     public void update(float dt) {
-        if(player.isAlive()) {
-            handleInput();
+        if(assetManager.update()) {
+            if (player.isAlive()) {
+                handleInput();
 
-            player.update(dt);
+                player.update(dt);
 
-            if(shouldShoot) {
-                if (player.isReadyToShoot()) {
-                    shoot(player.getWeapon(), player.getX() + player.getxOffset(), player.getY() + player.getyOffset(), 1f, 0f, false);//x and y offset, x and y normalised direction
+                if (shouldShoot) {
+                    if (player.isReadyToShoot()) {
+                        shoot(player.getWeapon(), player.getX() + player.getxOffset(), player.getY() + player.getyOffset(), 1f, 0f, false);//x and y offset, x and y normalised direction
 //                    player.getWeapon().playShootSound();
-                }
-            }
-
-            /** Update the active parachute bombers **/
-            int pbLen = activeParachuteBombers.size;
-            for (int i = pbLen; --i >= 0; ) {
-                ParachuteBomber pbItem = activeParachuteBombers.get(i);
-                if (!pbItem.isAlive()) {
-//                    explosionSound.play();
-                    activeParachuteBombers.removeIndex(i);
-                    parachuteBomberPool.free(pbItem);
-                }
-                pbItem.update(dt, player.getX()+player.getWidth()/2, player.getY()+player.getHeight()/2);
-            }
-
-            /** Update the active shooter enemies **/
-            int seLen = activeShooterEnemies.size;
-            for (int i = seLen; --i >= 0; ) {
-                ShooterEnemy seItem = activeShooterEnemies.get(i);
-                if (!seItem.isAlive()) {
-                    activeShooterEnemies.removeIndex(i);
-                    shooterEnemyPool.free(seItem);
-                }
-                seItem.update(dt, player.getX()+player.getWidth()/2, player.getY()+player.getHeight()/2);
-                if(seItem.isShooting()){
-                    shoot(seItem.getWeapon(),seItem.getX()+seItem.getxOffset(), seItem.getY()+seItem.getyOffset(),
-                            seItem.getDirX(), seItem.getDirY(), true);
-//                    seItem.getWeapon().playShootSound();
-                }
-            }
-
-            /** Update the active bullets **/
-            int bLen = activeBullets.size;
-            for (int i = bLen; --i >= 0; ) {
-                Bullet bItem = activeBullets.get(i);
-                if (!bItem.isAlive()) {
-                    activeBullets.removeIndex(i);
-                    bulletPool.free(bItem);
-                }
-                bItem.update(dt);
-            }
-
-            /** Update the active missiles **/
-            int mLen = activeMissiles.size;
-            for (int i = mLen; --i >= 0; ) {
-                Missile mItem = activeMissiles.get(i);
-                if (!mItem.isAlive()) {
-                    activeMissiles.removeIndex(i);
-                    missilePool.free(mItem);
-                }
-                mItem.update(dt);
-            }
-
-            /** Update the active lasers **/
-            int lLen = activeLasers.size;
-            for (int i = lLen; --i >= 0; ) {
-                Laser lItem = activeLasers.get(i);
-                if (!lItem.isAlive()) {
-                    activeLasers.removeIndex(i);
-                    laserPool.free(lItem);
-                }
-                lItem.update(dt);
-            }
-
-            /** Update the pickups **/
-            for(int i=0; i<pickups.size(); i++){
-                Item i1 = pickups.get(i);
-                if(!i1.isAlive()){
-                    i1.dispose();
-                    pickups.remove(i);
-                }
-                i1.update(dt);
-            }
-
-            checkCollisions();
-
-            /** Spawn new enemies, stop player shooting flag, start timer until next level starts **/
-            if (activeParachuteBombers.size == 0 && activeShooterEnemies.size == 0) {
-                nextLevelTimer += dt;
-                shouldShoot=false;
-                if (nextLevelTimer > 4) {
-                    nextLevelTimer -= 4;
-                    level++;
-                    if(level==7) {
-                        bgGround = bgGround2;
-                        bgMountains = bgMountains2;
-                        bgCity = bgCity2;
                     }
-                    spawnParachuteBombers();
-                    spawnShooterEnemies();
-                    spawnPickups();
-                    player.addPoints(100 * (level - 1));
-                    shouldShoot=true;
                 }
-            }
 
-            /** update the stage and update camera. srcX is used to move the background **/
-            stage.act(dt);
+                /** Update the active parachute bombers **/
+                int pbLen = activeParachuteBombers.size;
+                for (int i = pbLen; --i >= 0; ) {
+                    ParachuteBomber pbItem = activeParachuteBombers.get(i);
+                    if (!pbItem.isAlive()) {
+//                    explosionSound.play();
+                        activeParachuteBombers.removeIndex(i);
+                        parachuteBomberPool.free(pbItem);
+                    }
+                    pbItem.update(dt, player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2);
+                }
+
+                /** Update the active shooter enemies **/
+                int seLen = activeShooterEnemies.size;
+                for (int i = seLen; --i >= 0; ) {
+                    ShooterEnemy seItem = activeShooterEnemies.get(i);
+                    if (!seItem.isAlive()) {
+                        activeShooterEnemies.removeIndex(i);
+                        shooterEnemyPool.free(seItem);
+                    }
+                    seItem.update(dt, player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2);
+                    if (seItem.isShooting()) {
+                        shoot(seItem.getWeapon(), seItem.getX() + seItem.getxOffset(), seItem.getY() + seItem.getyOffset(),
+                                seItem.getDirX(), seItem.getDirY(), true);
+//                    seItem.getWeapon().playShootSound();
+                    }
+                }
+
+                /** Update the active bullets **/
+                int bLen = activeBullets.size;
+                for (int i = bLen; --i >= 0; ) {
+                    Bullet bItem = activeBullets.get(i);
+                    if (!bItem.isAlive()) {
+                        activeBullets.removeIndex(i);
+                        bulletPool.free(bItem);
+                    }
+                    bItem.update(dt);
+                }
+
+                /** Update the active missiles **/
+                int mLen = activeMissiles.size;
+                for (int i = mLen; --i >= 0; ) {
+                    Missile mItem = activeMissiles.get(i);
+                    if (!mItem.isAlive()) {
+                        activeMissiles.removeIndex(i);
+                        missilePool.free(mItem);
+                    }
+                    mItem.update(dt);
+                }
+
+                /** Update the active lasers **/
+                int lLen = activeLasers.size;
+                for (int i = lLen; --i >= 0; ) {
+                    Laser lItem = activeLasers.get(i);
+                    if (!lItem.isAlive()) {
+                        activeLasers.removeIndex(i);
+                        laserPool.free(lItem);
+                    }
+                    lItem.update(dt);
+                }
+
+                /** Update the pickups **/
+                for (int i = 0; i < pickups.size(); i++) {
+                    Item i1 = pickups.get(i);
+                    if (!i1.isAlive()) {
+                        i1.dispose();
+                        pickups.remove(i);
+                    }
+                    i1.update(dt);
+                }
+
+                checkCollisions();
+
+                /** Spawn new enemies, stop player shooting flag, start timer until next level starts **/
+                if (activeParachuteBombers.size == 0 && activeShooterEnemies.size == 0) {
+                    nextLevelTimer += dt;
+                    shouldShoot = false;
+                    if (nextLevelTimer > 4) {
+                        nextLevelTimer -= 4;
+                        level++;
+                        if (level == 7) {
+                            bgGround = bgGround2;
+                            bgMountains = bgMountains2;
+                            bgCity = bgCity2;
+                        }
+                        spawnParachuteBombers();
+                        spawnShooterEnemies();
+                        spawnPickups();
+                        player.addPoints(100 * (level - 1));
+                        shouldShoot = true;
+                    }
+                }
+
+                /** update the stage and update camera. srcX is used to move the background **/
+                stage.act(dt);
 //            updateCamera(dt);
-            cam.update();
-            srcX+=1;
-        } else {
-            /**
-             * TODO: Use screen manager and load in screens properly
-             * **/
-            /** Game is over, timer until game over screen shows **/
-            gameOverTimer += dt;
-            if (gameOverTimer > 1) {
-                gameOverTimer -= 1;
-                gameStateManager.setState(GameStateManager.GAME_OVER, player.getScore());
+                cam.update();
+                srcX += 1;
+            } else {
+                /**
+                 * TODO: Use screen manager and load in screens properly
+                 * **/
+                /** Game is over, timer until game over screen shows **/
+                gameOverTimer += dt;
+                if (gameOverTimer > 1) {
+                    gameOverTimer -= 1;
+                    gameStateManager.setState(GameStateManager.GAME_OVER, player.getScore());
+                }
             }
         }
     }
 
     @Override
     public void render() {
-        spriteBatch.setProjectionMatrix(cam.combined);
+        if(assetManager.update()) {
+            spriteBatch.setProjectionMatrix(cam.combined);
 
-        spriteBatch.enableBlending();
-        spriteBatch.begin();
+            spriteBatch.enableBlending();
+            spriteBatch.begin();
 
-        /** Draw the backgrounds and have them scroll within themselves based on srcX **/
-        bgMountains.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-        spriteBatch.draw(bgMountains, 0, 0, (int) (srcX / 3), (int) srcY, bgMountains.getWidth(), bgMountains.getHeight());
-        bgCity.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-        spriteBatch.draw(bgCity, 0, -100, (int) (srcX), (int) srcY, bgCity.getWidth(), bgCity.getHeight());
-        bgGround.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-        spriteBatch.draw(bgGround, 0, -75, (int) (srcX * 4), (int) srcY, bgGround.getWidth(), bgGround.getHeight());
+            /** Draw the backgrounds and have them scroll within themselves based on srcX **/
+            bgMountains.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+            spriteBatch.draw(bgMountains, 0, 0, (int) (srcX / 3), (int) srcY, bgMountains.getWidth(), bgMountains.getHeight());
+            bgCity.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+            spriteBatch.draw(bgCity, 0, -100, (int) (srcX), (int) srcY, bgCity.getWidth(), bgCity.getHeight());
+            bgGround.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+            spriteBatch.draw(bgGround, 0, -75, (int) (srcX * 4), (int) srcY, bgGround.getWidth(), bgGround.getHeight());
 //        srcX+=1;
 
-        player.render(spriteBatch);
+            player.render(spriteBatch);
 
-        /** Update all enemies, bullets and pickups **/
-        for(int i=0; i<activeParachuteBombers.size; i++) {
-            activeParachuteBombers.get(i).render(spriteBatch);
-        }
+            /** Update all enemies, bullets and pickups **/
+            for (int i = 0; i < activeParachuteBombers.size; i++) {
+                activeParachuteBombers.get(i).render(spriteBatch);
+            }
 
-        for(int i=0; i<activeShooterEnemies.size; i++) {
-            activeShooterEnemies.get(i).render(spriteBatch);
-        }
+            for (int i = 0; i < activeShooterEnemies.size; i++) {
+                activeShooterEnemies.get(i).render(spriteBatch);
+            }
 
-        for(int i = activeBullets.size; --i >= 0; ){
-            activeBullets.get(i).render(spriteBatch);
-        }
+            for (int i = activeBullets.size; --i >= 0; ) {
+                activeBullets.get(i).render(spriteBatch);
+            }
 
-        for(int i = activeMissiles.size; --i >= 0; ){
-            activeMissiles.get(i).render(spriteBatch);
-        }
+            for (int i = activeMissiles.size; --i >= 0; ) {
+                activeMissiles.get(i).render(spriteBatch);
+            }
 
-        for(int i = activeLasers.size; --i >= 0; ){
-            activeLasers.get(i).render(spriteBatch);
-        }
+            for (int i = activeLasers.size; --i >= 0; ) {
+                activeLasers.get(i).render(spriteBatch);
+            }
 
-        for(int i=0; i<pickups.size(); i++){
-            pickups.get(i).render(spriteBatch);
-        }
+            for (int i = 0; i < pickups.size(); i++) {
+                pickups.get(i).render(spriteBatch);
+            }
 
-        /** Draw all text on screen **/
+            /** Draw all text on screen **/
 //        font.draw(spriteBatch, "Level: "+level +". Lives Left: "+player.getLives(), 30, 30);
-        labelA.setText("Level: " + level);
-        labelA.draw(spriteBatch, 1);
+            labelA.setText("Level: " + level);
+            labelA.draw(spriteBatch, 1);
 
-        labelB.setText("Score: " + player.getScore());
-        labelB.draw(spriteBatch, 1);
+            labelB.setText("Score: " + player.getScore());
+            labelB.draw(spriteBatch, 1);
 
-        labelC.setText("Health: " + player.getHealth());
-        labelC.draw(spriteBatch, 1);
+            labelC.setText("Health: " + player.getHealth());
+            labelC.draw(spriteBatch, 1);
 
-        spriteBatch.end();
+            spriteBatch.end();
 
-        /** Draw stage **/
-        stage.draw();
+            /** Draw stage **/
+            stage.draw();
+        }
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
