@@ -10,6 +10,7 @@ import com.libgdx.shooter.entities.SpaceObject;
 import com.libgdx.shooter.entities.weapons.HeavyLaserCannon;
 import com.libgdx.shooter.entities.weapons.LightLaserCannon;
 import com.libgdx.shooter.entities.weapons.Weapon;
+import com.libgdx.shooter.gamestates.GameState;
 
 import java.util.Random;
 
@@ -45,7 +46,8 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         dirX = 0f;
         dirY = 0f;
         weapon = new HeavyLaserCannon();
-        explosionSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/explosionShooterEnemy.wav"));
+        //randomize the weapon.
+        explosionSound = GameState.assetManager.get("data/Sound/explosionShooterEnemy.wav");
         lerp = 0.1f;
     }
 
@@ -65,13 +67,15 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
     }
 
     public void update(float dt, float targetX, float targetY){
-        weapon.update(dt);
         if(health<1)
             alive = false;
 
+        //this could be the problem why some bullets shot at player from behind player.
+        weapon.update(dt);
+
         if(x<1900){
-            dirX = dt*(targetX - x - width/2);
-            dirY = dt*(targetY - y - height/2);
+            dirX = 0.001f*(targetX - x - width/2);
+            dirY = 0.001f*(targetY - y - height/2);
             dirLength = (float)Math.sqrt(dirX*dirX + dirY*dirY);
             dirX=dirX/dirLength;
             dirY=dirY/dirLength;
@@ -108,14 +112,14 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
 
     @Override
     public void reset() {
+        alive = false;
+        isShooting = false;
         x = -100;
         y = -100;
-        alive = false;
         xSpeed = 0;
         ySpeed = 0;
         dx = 0;
         dy = 0;
-        isShooting = false;
     }
 
     @Override

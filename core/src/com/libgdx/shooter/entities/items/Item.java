@@ -10,6 +10,7 @@ import com.libgdx.shooter.entities.SpaceObject;
 import com.libgdx.shooter.entities.weapons.*;
 import com.libgdx.shooter.entities.weapons.HeavyLaserCannon;
 import com.libgdx.shooter.entities.weapons.LightLaserCannon;
+import com.libgdx.shooter.gamestates.GameState;
 
 import java.util.Random;
 
@@ -33,7 +34,7 @@ public class Item extends SpaceObject {
     }
 
     protected void setPickupSound(){
-        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickup2.wav"));
+        pickupSound = GameState.assetManager.get("data/Sound/pickupShotgun.wav");
     }
 
     protected void setTexture(){

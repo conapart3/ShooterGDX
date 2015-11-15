@@ -3,6 +3,7 @@ package com.libgdx.shooter.entities;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 import java.util.Random;
 
@@ -14,6 +15,13 @@ public class SpaceObject {
 
     protected float x, y;
     protected float xSpeed, ySpeed;
+
+    /**
+     * Proper speed, velocity and acceleration implementation.
+     */
+    protected Vector2 velocity = new Vector2();
+    protected float maxSpeed = 0f;
+    protected Vector2 acceleration = new Vector2();
 
     protected float dx, dy;
     protected Rectangle bounds;
@@ -39,26 +47,17 @@ public class SpaceObject {
         this.x = x;
         this.y = y;
     }
-//
+
 //    public void move(float dt){
-//        xSpeed += dx*dt;
-//        ySpeed += dy*dt;
 //
-//        x += xSpeed * dt;
-//        y += ySpeed * dt;
+//        velocity = velocity.add(acceleration).scl(dt);
+//
+//        x = x + velocity.x * dt;
+//        y = y + velocity.y * dt;
 //
 //        bounds.x = x;
 //        bounds.y = y;
 //
-////        if(dx>0)
-////            dx--;
-////        else if(dx<0)
-////            dx++;
-////
-////        if(dy>0)
-////            dy--;
-////        else if(dy<0)
-////            dy++;
 //    }
 
     public void render(SpriteBatch sb){
@@ -136,5 +135,13 @@ public class SpaceObject {
 
     public void setHeight(int height) {
         this.height = height;
+    }
+
+    public Vector2 getAcceleration() {
+        return acceleration;
+    }
+
+    public void setAcceleration(Vector2 acceleration) {
+        this.acceleration = acceleration;
     }
 }

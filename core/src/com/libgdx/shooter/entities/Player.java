@@ -11,6 +11,7 @@ import com.libgdx.shooter.entities.items.Item;
 import com.libgdx.shooter.entities.weapons.LightLaserCannon;
 import com.libgdx.shooter.entities.weapons.MissileLauncher;
 import com.libgdx.shooter.entities.weapons.Weapon;
+import com.libgdx.shooter.gamestates.GameState;
 
 import static com.libgdx.shooter.game.ShooterGame.*;
 
@@ -67,9 +68,9 @@ public class Player extends SpaceObject {
 
         xOffset = width/2+dirX*30;
         yOffset = height/2+dirY*30;
-//        weapon = new LightLaserCannon();
-        weapon = new MissileLauncher();
-        explosionSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/explosionPlayer.wav"));
+        weapon = new LightLaserCannon();
+//        weapon = new MissileLauncher();
+        explosionSound = GameState.assetManager.get("data/Sound/explosionPlayer.wav");
     }
 
     public void update(float dt) {

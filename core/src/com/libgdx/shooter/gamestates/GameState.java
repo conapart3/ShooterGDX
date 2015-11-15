@@ -142,6 +142,9 @@ public class GameState extends State implements InputProcessor{
 //        assetManager.load("data/BackgroundElements/bgFinalLayerBack_desert.png", Texture.class);
 //        assetManager.load("data/BackgroundElements/bgFinalLayerCity_Desert.png", Texture.class);
 
+        /** Load in the textures into AssetManager **/
+//        assetManager.load("", Texture.class);
+
         /** Load in the shoot sounds into AssetManager **/
         assetManager.load("data/Sound/shootSoundMinigun.wav", Sound.class);
         assetManager.load("data/Sound/shootSoundMissile.wav", Sound.class);
@@ -155,12 +158,21 @@ public class GameState extends State implements InputProcessor{
         assetManager.load("data/Sound/pickupMinigun.wav", Sound.class);
         assetManager.load("data/Sound/pickupShotgun.wav", Sound.class);
         assetManager.load("data/Sound/pickupMissileLauncher.wav", Sound.class);
+        assetManager.load("data/Sound/pickupHealth.wav", Sound.class);
+        assetManager.load("data/Sound/pickupMedal.wav", Sound.class);
+        assetManager.load("data/Sound/pickupShield.wav", Sound.class);
 
-        while(!assetManager.update()){
+        /** load in the hit sounds for bullet types **/
+        assetManager.load("data/Sound/hitSoundLaser.wav", Sound.class);
+        assetManager.load("data/Sound/hitSoundBullet.wav", Sound.class);
+        assetManager.load("data/Sound/hitSoundMissile.wav", Sound.class);
 
-        }
-        /** Load in the sprites into AssetManager **/
-//        assetManager.load("", Texture.class);
+        /** Load in the explosion sounds into AssetManager **/
+        assetManager.load("data/Sound/explosionParachute.wav", Sound.class);
+        assetManager.load("data/Sound/explosionShooterEnemy.wav", Sound.class);
+        assetManager.load("data/Sound/explosionPlayer.wav", Sound.class);
+
+        assetManager.finishLoading();
 
         /**
          * TODO: Use loader to load in the new backgrounds for the next maplevel
@@ -215,7 +227,6 @@ public class GameState extends State implements InputProcessor{
                 for (int i = pbLen; --i >= 0; ) {
                     ParachuteBomber pbItem = activeParachuteBombers.get(i);
                     if (!pbItem.isAlive()) {
-//                    explosionSound.play();
                         activeParachuteBombers.removeIndex(i);
                         parachuteBomberPool.free(pbItem);
                     }
@@ -234,7 +245,6 @@ public class GameState extends State implements InputProcessor{
                     if (seItem.isShooting()) {
                         shoot(seItem.getWeapon(), seItem.getX() + seItem.getxOffset(), seItem.getY() + seItem.getyOffset(),
                                 seItem.getDirX(), seItem.getDirY(), true);
-//                    seItem.getWeapon().playShootSound();
                     }
                 }
 
@@ -746,7 +756,6 @@ public class GameState extends State implements InputProcessor{
             activeBullets.add(bItem3);
             weapon.playShootSound();
         }
-
     }
 
     @Override

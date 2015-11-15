@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
 import com.libgdx.shooter.entities.SpaceObject;
 import com.libgdx.shooter.game.ShooterGame;
+import com.libgdx.shooter.gamestates.GameState;
 
 import java.util.Random;
 
@@ -23,6 +24,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
     private int points = 100;
     private int damage;
     private Sound explosionSound;
+    private float lerp = 0.5f;
 
     public ParachuteBomber(){
         this.alive = false;
@@ -33,7 +35,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         height = texture.getHeight();
         bounds = new Rectangle(x,y,width,height);
         damage = 200;
-        explosionSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/explosionParachute.wav"));
+        explosionSound = GameState.assetManager.get("data/Sound/explosionParachute.wav");
     }
 
     public void create(int level){
@@ -45,8 +47,8 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         alive = true;
         dy = 0;
         dx = 0;
-        health = 25 + (13*level);
-        damage = 200 + (10*level);
+        health = 25 + (5*level);
+        damage = 200;
     }
 
     public void update(float dt, float targetX, float targetY){
@@ -54,7 +56,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
             alive = false;
 
 //        if(Math.sqrt(Math.pow((targetY-y),2) + Math.pow((targetX-x),2)) < 600){
-        if(x-targetX < 600){
+        if(x-targetX < 400 && Math.abs(y-targetY) < 400){
 //            dx = (targetX - x);
             dy = (targetY - y);
         }else{
@@ -75,7 +77,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
 
         if(x<-200)
             alive = false;
-        if(y== CEILING_OFFSET || y< GROUND_OFFSET)
+        if(y >= CEILING_OFFSET || y <= GROUND_OFFSET)
             ySpeed *= -1;
 
     }

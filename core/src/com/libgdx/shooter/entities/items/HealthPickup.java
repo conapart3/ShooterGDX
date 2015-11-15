@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.libgdx.shooter.entities.Player;
+import com.libgdx.shooter.gamestates.GameState;
 
 /**
  * Created by Conal on 29/10/2015.
@@ -17,7 +18,7 @@ public class HealthPickup extends com.libgdx.shooter.entities.items.Item {
 
     @Override
     protected void setPickupSound(){
-        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupHealth.wav"));
+        pickupSound = GameState.assetManager.get("data/Sound/pickupHealth.wav");
     }
 
     @Override

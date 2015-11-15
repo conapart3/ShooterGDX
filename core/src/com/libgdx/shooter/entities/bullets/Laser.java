@@ -2,6 +2,7 @@ package com.libgdx.shooter.entities.bullets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.libgdx.shooter.gamestates.GameState;
 
 /**
  * Created by Conal on 12/11/2015.
@@ -16,7 +17,7 @@ public class Laser extends Bullet{
 
     @Override
     protected void setHitSound(){
-        hitSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/hitSoundLaser.wav"));
+        hitSound = GameState.assetManager.get("data/Sound/hitSoundLaser.wav");
     }
 
     @Override

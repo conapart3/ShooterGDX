@@ -18,7 +18,7 @@ public class Shotgun extends Weapon{
     public Shotgun(){
         super();
         damage = 50;
-        rateOfFire = 0.8f;
+        rateOfFire = 0.7f;
     }
 
     @Override

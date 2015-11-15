@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.libgdx.shooter.entities.Player;
 import com.libgdx.shooter.entities.items.Item;
+import com.libgdx.shooter.gamestates.GameState;
 
 /**
  * Created by Conal on 08/11/2015.
@@ -38,7 +39,7 @@ public abstract class Weapon extends Item{
     }
 
     protected void setShootSound(){
-        shootSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/laserFire.wav"));
+        shootSound = GameState.assetManager.get("data/Sound/shootSoundLightLaserCannon.wav");
     }
 
     public boolean isReadyToShoot(){
@@ -52,13 +53,16 @@ public abstract class Weapon extends Item{
 
     @Override
     public void attachToPlayer(Player player){
-        pickupSound.play();
+
+        long id = pickupSound.play();
+
         player.setWeapon(this);
     }
 
     public void playShootSound(){
-//        shootSound.stop();
-        shootSound.play();
+//        if(GameState.assetManager.isLoaded())
+        shootSound.stop();
+        shootSound.play(0.3f);
     }
 
     @Override

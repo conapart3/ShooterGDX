@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
 import com.libgdx.shooter.entities.SpaceObject;
+import com.libgdx.shooter.gamestates.GameState;
 
 
 /**
@@ -35,7 +36,7 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
     }
 
     protected void setHitSound(){
-        hitSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/hitSoundBullet.wav"));
+        hitSound = GameState.assetManager.get("data/Sound/hitSoundBullet.wav");
     }
 
     protected void setTexture(){
@@ -101,7 +102,7 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
     }
 
     public void playHitSound(){
-        hitSound.play();
+        hitSound.play(0.5f);
     }
 
     public int getDamage() {
