@@ -48,17 +48,19 @@ public class SpaceObject {
         this.y = y;
     }
 
-//    public void move(float dt){
-//
-//        velocity = velocity.add(acceleration).scl(dt);
-//
-//        x = x + velocity.x * dt;
-//        y = y + velocity.y * dt;
-//
-//        bounds.x = x;
-//        bounds.y = y;
-//
-//    }
+    protected void move(float dt){
+        xSpeed = maxSpeed * dx * dt;
+        ySpeed = maxSpeed * dy * dt;
+
+        x += xSpeed * dt;
+        y += ySpeed * dt;
+
+        bounds.x = x;
+        bounds.y = y;
+
+
+
+    }
 
     public void render(SpriteBatch sb){
         sb.draw(texture,x,y,width,height);

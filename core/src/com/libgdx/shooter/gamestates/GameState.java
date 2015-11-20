@@ -24,11 +24,10 @@ import com.libgdx.shooter.entities.Player;
 import com.libgdx.shooter.entities.enemies.ShooterEnemy;
 import com.libgdx.shooter.entities.weapons.Weapon;
 import com.libgdx.shooter.entities.weapons.WeaponType;
+import com.libgdx.shooter.levels.Level;
 import com.libgdx.shooter.managers.GameStateManager;
 
 import java.util.ArrayList;
-
-import javax.xml.soap.Text;
 
 import static com.libgdx.shooter.game.ShooterGame.*;
 
@@ -37,10 +36,17 @@ import static com.libgdx.shooter.game.ShooterGame.*;
  */
 public class GameState extends State implements InputProcessor{
 
+    public static AssetManager assetManager;
     private SpriteBatch spriteBatch;
     private Player player;
-    private int level;
     private float nextLevelTimer, gameOverTimer;
+    private ArrayList<Level> levels;
+    private int numberOfLevels = 2;
+    private int level = 0, wave = 1;
+    private Level currentLevel;
+    private boolean levelSuccessFlag = false;
+    private ArrayList<Item> pickups;
+
 
     /** Array and pool containing the bullets **/
     private final Array<Bullet> activeBullets = new Array<Bullet>();
@@ -92,33 +98,19 @@ public class GameState extends State implements InputProcessor{
 
     //touchpad and stage declaration
     private Stage stage;
-//    private Touchpad touchpad;
-//    private TextureRegion shootBtnUpTextureRegion, shootBtnDownTextureRegion;
-//    private Texture shootBtnUpTexture, shootBtnDownTexture;
 
     private BitmapFont font;
-    private Label labelA, labelB, labelC;
-
-    //camera and background
-    private float lerp = 0.5f;
-    private Texture bgGround, bgMountains, bgCity;
-    private float srcY = 0,srcX = 0;
-
-//    private Music bgMusic;
+    private Label labelA, labelB, labelC, labelD;
 
     private Vector3 touchPoint;
-    private boolean shouldShoot;
+    private boolean autoShoot;
 
-    private Texture bgGround2, bgMountains2, bgCity2;
-
-    private ArrayList<Item> pickups;
-
-    public static AssetManager assetManager;
 
     public GameState(GameStateManager gsm){
         super(gsm);
 
     }
+
 
     @Override
     public void create() {
@@ -129,21 +121,15 @@ public class GameState extends State implements InputProcessor{
         /** One spritebatch used to draw all sprites **/
         spriteBatch = new SpriteBatch();
 
-        /** Load in the background textures **/
-        bgGround = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayer2.png"));
-        bgMountains = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerBack.png"));
-        bgCity = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerCity.png"));
-
-        /** Load in the background textures into AssetManager **/
-//        assetManager.load("data/BackgroundElements/bgFinalLayer2.png", Texture.class);
-//        assetManager.load("data/BackgroundElements/bgFinalLayerBack.png", Texture.class);
-//        assetManager.load("data/BackgroundElements/bgFinalLayerCity.png", Texture.class);
-//        assetManager.load("data/BackgroundElements/bgFinalLayerDesert.png", Texture.class);
-//        assetManager.load("data/BackgroundElements/bgFinalLayerBack_desert.png", Texture.class);
-//        assetManager.load("data/BackgroundElements/bgFinalLayerCity_Desert.png", Texture.class);
-
-        /** Load in the textures into AssetManager **/
-//        assetManager.load("", Texture.class);
+        /** create the levels and set currentlevel, then create it. **/
+        levels = new ArrayList<Level>();
+        String bgfilepath = "data/bgelements/bg";
+        for(int i=0; i< numberOfLevels; i++){
+            Level l = new Level(bgfilepath+"back"+i+".png", bgfilepath+"middle"+i+".png", bgfilepath+"front"+i+".png");
+            levels.add(l);
+        }
+        currentLevel = levels.get(0);
+        currentLevel.create();
 
         /** Load in the shoot sounds into AssetManager **/
         assetManager.load("data/Sound/shootSoundMinigun.wav", Sound.class);
@@ -174,19 +160,9 @@ public class GameState extends State implements InputProcessor{
 
         assetManager.finishLoading();
 
-        /**
-         * TODO: Use loader to load in the new backgrounds for the next maplevel
-         * **/
-        bgGround2 = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayer1Desert.png"));
-        bgMountains2 = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerBack_desert.png"));
-        bgCity2 = new Texture(Gdx.files.internal("data/BackgroundElements/bgFinalLayerCity_Desert.png"));
-
         /** Load in the stage **/
         initStage();
         stage = new Stage(viewport);
-//        stage.addActor(touchpad);
-//        stage.addActor(shootBtn);
-//        Gdx.input.setInputProcessor(stage);
         Gdx.input.setInputProcessor(this);
 
         /** Load in the sounds **/
@@ -202,10 +178,11 @@ public class GameState extends State implements InputProcessor{
         level = 0;
         gameOverTimer = 0f;
         touchPoint = new Vector3();
-        shouldShoot = false;
+        autoShoot = false;
 
         pickups = new ArrayList<Item>();
     }
+
 
     @Override
     public void update(float dt) {
@@ -215,10 +192,9 @@ public class GameState extends State implements InputProcessor{
 
                 player.update(dt);
 
-                if (shouldShoot) {
+                if (autoShoot) {
                     if (player.isReadyToShoot()) {
                         shoot(player.getWeapon(), player.getX() + player.getxOffset(), player.getY() + player.getyOffset(), 1f, 0f, false);//x and y offset, x and y normalised direction
-//                    player.getWeapon().playShootSound();
                     }
                 }
 
@@ -296,41 +272,43 @@ public class GameState extends State implements InputProcessor{
                 /** Spawn new enemies, stop player shooting flag, start timer until next level starts **/
                 if (activeParachuteBombers.size == 0 && activeShooterEnemies.size == 0) {
                     nextLevelTimer += dt;
-                    shouldShoot = false;
+                    autoShoot = false;
+                    levelSuccessFlag = true;
                     if (nextLevelTimer > 4) {
                         nextLevelTimer -= 4;
-                        level++;
-                        if (level == 7) {
-                            bgGround = bgGround2;
-                            bgMountains = bgMountains2;
-                            bgCity = bgCity2;
-                        }
+                        wave++;
+                        //crashes here when level 7 comes up since the level backgrounds arent loaded
+//                        if(7%wave==0) {
+//                            level++;
+//                            currentLevel = levels.get(level);
+//                        }
+                        levelSuccessFlag = false;
                         spawnParachuteBombers();
                         spawnShooterEnemies();
                         spawnPickups();
-                        player.addPoints(100 * (level - 1));
-                        shouldShoot = true;
+                        player.addPoints(100 * (wave - 1));
+                        autoShoot = true;
                     }
                 }
+            }
 
                 /** update the stage and update camera. srcX is used to move the background **/
                 stage.act(dt);
-//            updateCamera(dt);
                 cam.update();
-                srcX += 1;
-            } else {
-                /**
-                 * TODO: Use screen manager and load in screens properly
-                 * **/
-                /** Game is over, timer until game over screen shows **/
-                gameOverTimer += dt;
-                if (gameOverTimer > 1) {
-                    gameOverTimer -= 1;
-                    gameStateManager.setState(GameStateManager.GAME_OVER, player.getScore());
-                }
+                currentLevel.update(dt);
+        } else {
+            /**
+             * TODO: Use screen manager and load in screens properly
+             * **/
+            /** Game is over, timer until game over screen shows **/
+            gameOverTimer += dt;
+            if (gameOverTimer > 1) {
+                gameOverTimer -= 1;
+                gameStateManager.setState(GameStateManager.GAME_OVER, player.getScore());
             }
         }
     }
+
 
     @Override
     public void render() {
@@ -341,13 +319,7 @@ public class GameState extends State implements InputProcessor{
             spriteBatch.begin();
 
             /** Draw the backgrounds and have them scroll within themselves based on srcX **/
-            bgMountains.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-            spriteBatch.draw(bgMountains, 0, 0, (int) (srcX / 3), (int) srcY, bgMountains.getWidth(), bgMountains.getHeight());
-            bgCity.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-            spriteBatch.draw(bgCity, 0, -100, (int) (srcX), (int) srcY, bgCity.getWidth(), bgCity.getHeight());
-            bgGround.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-            spriteBatch.draw(bgGround, 0, -75, (int) (srcX * 4), (int) srcY, bgGround.getWidth(), bgGround.getHeight());
-//        srcX+=1;
+            currentLevel.render(spriteBatch);
 
             player.render(spriteBatch);
 
@@ -378,7 +350,7 @@ public class GameState extends State implements InputProcessor{
 
             /** Draw all text on screen **/
 //        font.draw(spriteBatch, "Level: "+level +". Lives Left: "+player.getLives(), 30, 30);
-            labelA.setText("Level: " + level);
+            labelA.setText("Level: " + wave);
             labelA.draw(spriteBatch, 1);
 
             labelB.setText("Score: " + player.getScore());
@@ -387,60 +359,39 @@ public class GameState extends State implements InputProcessor{
             labelC.setText("Health: " + player.getHealth());
             labelC.draw(spriteBatch, 1);
 
+//            if(levelSuccessFlag) {
+//                labelD.setText("Level " + level + " completed!");
+//                labelD.draw(spriteBatch, 1);
+//            }
+
+
             spriteBatch.end();
 
             /** Draw stage **/
             stage.draw();
         }
     }
-////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     @Override
     public void handleInput() {
-//        player.setKnobPosition(touchpad.getKnobPercentX(), touchpad.getKnobPercentY());
+        if(Gdx.input.isKeyPressed(Input.Keys.UP))
+            player.setUpPressed(true);
+        else
+            player.setUpPressed(false);
 
-//        if(Gdx.input.)
-
-        //toggle shoot button if space pressed
-//        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE))
-//            shootBtn.toggle();
-
-//        if (shootBtn.isPressed())
-//            shootBtn.toggle();
-
-//        if(shootBtn.isChecked()){
-//            if(timeSinceLastFire >= rateOfFire){
-//                timeSinceLastFire -= rateOfFire;
-//                shoot(player.getX()+player.getxOffset(), player.getY()+player.getyOffset(), 1f, 0f, false);//x and y offset, x and y normalised direction
-//                shootSound.play();
-//            }
-//        }
-
-//        if(Gdx.input.isKeyJustPressed(Input.Keys.UP)){
-//            player.setUpPressed(true);
-//        if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN))
-//            player.setDownPressed(true);
-//        if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT))
-//            player.setLeftPressed(true);
-//        if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT))
-//            player.setRightPressed(true);
-
-
-
-
+        if(Gdx.input.isKeyPressed(Input.Keys.DOWN))
+            player.setDownPressed(true);
+        else
+            player.setDownPressed(false);
     }
+
 
     @Override
     public void dispose() {
-        bgGround.dispose();
-        bgMountains.dispose();
-        bgCity.dispose();
         stage.dispose();
         spriteBatch.dispose();
         font.dispose();
-//        shootBtnUpTexture.dispose();
-//        shootBtnDownTexture.dispose();
-//        shootBtnUpTextureRegion.getTexture().dispose();
-//        shootBtnDownTextureRegion.getTexture().dispose();
         player.dispose();
         for(Bullet b : activeBullets)
             b.dispose();
@@ -448,14 +399,13 @@ public class GameState extends State implements InputProcessor{
             pb.dispose();
         for(ShooterEnemy se : activeShooterEnemies)
                 se.dispose();
-//        bgMusic.dispose();
         for(int i=0; i<pickups.size(); i++){
             pickups.get(i).dispose();
         }
     }
 
-    private void checkCollisions(){
 
+    private void checkCollisions(){
         /**
          * TODO: REFACTOR SO IT DOESNT RUN THROUGH ALL THESE FOR LOOPS
          * TODO: ADD EXPLOSION ANIMATION
@@ -614,6 +564,7 @@ public class GameState extends State implements InputProcessor{
         }
     }
 
+
     private void initStage(){
         /** Create the font and relevant styles associated for labels **/
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/Fonts/Montserrat-Regular.ttf"));
@@ -640,34 +591,15 @@ public class GameState extends State implements InputProcessor{
         labelC.setFontScale(3);
         labelC.setPosition(600, 1000);
 
-//        initTouchpad();
-//        initShootBtn();
+//        labelD = new Label(" ", labelStyle);
+//        labelD.setFontScale(8);
+//        labelD.setPosition(600, 500);
+
+
+
     }
-//
-//    private void initTouchpad(){
-//        //touchpad and stage initialising
-//        Skin touchpadSkin = new Skin();
-//        touchpadSkin.add("touchBackground", new Texture("data/touchBackground.png"));
-//        touchpadSkin.add("touchKnob", new Texture("data/touchKnob.png"));
-//        Touchpad.TouchpadStyle touchpadStyle = new Touchpad.TouchpadStyle();
-//
-//        //pixmap background instead of png background? allows transparency
-//        Pixmap bg = new Pixmap(200, 200, Pixmap.Format.RGBA8888);
-//        bg.setBlending(Pixmap.Blending.None);
-//        bg.setColor(1, 1, 1, 0.2f);
-//        bg.fillCircle(100, 100, 100);
-//        touchpadStyle.background = new TextureRegionDrawable(new TextureRegion(new Texture(bg)));
-//
-////        Drawable touchBackground = touchpadSkin.getDrawable("touchBackground");
-//        Drawable touchKnob = touchpadSkin.getDrawable("touchKnob");
-////        touchpadStyle.background = touchBackground;
-//        touchpadStyle.knob = touchKnob;
-//
-//        touchpad = new Touchpad(2f, touchpadStyle);
-////        touchpad.setBounds(150f*ratioX,60f*ratioY,300f*ratioX,300f*ratioY);
-//        touchpad.setBounds(1400f, 60f, 300f, 300f);
-//    }
-//
+
+
 //    private void initShootBtn(){
 //        shootBtnUpTexture = new Texture(Gdx.files.internal("data/Buttons/btnDefault.png"));
 //        shootBtnDownTexture = new Texture(Gdx.files.internal("data/Buttons/btnPressed.png"));
@@ -688,28 +620,31 @@ public class GameState extends State implements InputProcessor{
 
     /** Methods to spawn enemies and pickups **/
     private void spawnParachuteBombers() {
-//        for(int i = 0; i<3+(5*level/2); i++) {
-        for(int i = 0; i<level+level/2; i++) {
+//        for(int i = 0; i<3+(5*wave/2); i++) {
+        for(int i = 0; i< wave + wave /2; i++) {
             ParachuteBomber pbItem = parachuteBomberPool.obtain();
-            pbItem.create(level);
+            pbItem.create(wave);
             activeParachuteBombers.add(pbItem);
         }
     }
 
+
     private void spawnShooterEnemies() {
-        for(int i = 0; i<level/2; i++) {
+        for(int i = 0; i< wave /2; i++) {
             ShooterEnemy seItem = shooterEnemyPool.obtain();
-            seItem.create(level);
+            seItem.create(wave);
             activeShooterEnemies.add(seItem);
         }
     }
 
+
     private void spawnPickups() {
-        for(int j=0; j<level; j++) {
+        for(int j=0; j< wave; j++) {
             Item i = Item.generateItem();
             pickups.add(i);
         }
     }
+
 
     /**
      * Method to shoot. This method works out which bullet should be generated, and pulls the correct bullet
@@ -758,6 +693,7 @@ public class GameState extends State implements InputProcessor{
         }
     }
 
+
     @Override
     public void resize(int width, int height){
         viewport.update(width, height);
@@ -765,35 +701,37 @@ public class GameState extends State implements InputProcessor{
         stage.getViewport().update(WORLD_WIDTH, (int)(WORLD_WIDTH * SCREEN_ASPECT_RATIO), false);
     }
 
+
     @Override
     public void pause() {
 
     }
+
 
     @Override
     public void resume() {
 
     }
 
+
     @Override
     public boolean keyDown(int keycode) {
-        if(Gdx.input.isKeyPressed(Input.Keys.UP))
-            player.setKnobPosition(0,1);
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            player.setKnobPosition(0,-1);
         return true;
     }
 
+
     @Override
     public boolean keyUp(int keycode) {
-        player.setKnobPosition(0,0);
+
         return true;
     }
+
 
     @Override
     public boolean keyTyped(char character) {
         return false;
     }
+
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
@@ -805,21 +743,25 @@ public class GameState extends State implements InputProcessor{
         return true;
     }
 
+
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         player.setKnobPosition(0,0);
         return true;
     }
 
+
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         return false;
     }
 
+
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         return false;
     }
+
 
     @Override
     public boolean scrolled(int amount) {

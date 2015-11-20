@@ -70,23 +70,26 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         if(health<1)
             alive = false;
 
-        //this could be the problem why some bullets shot at player from behind player.
-        weapon.update(dt);
+        if(alive) {
+            //this could be the problem why some bullets shot at player from behind player.
+            weapon.update(dt);
 
-        if(x<1900){
-            dirX = 0.001f*(targetX - x - width/2);
-            dirY = 0.001f*(targetY - y - height/2);
-            dirLength = (float)Math.sqrt(dirX*dirX + dirY*dirY);
-            dirX=dirX/dirLength;
-            dirY=dirY/dirLength;
+            if (x < 1900) {
+                dirX = 0.001f * (targetX - x - width / 2);
+                dirY = 0.001f * (targetY - y - height / 2);
+                dirLength = (float) Math.sqrt(dirX * dirX + dirY * dirY);
+                dirX = dirX / dirLength;
+                dirY = dirY / dirLength;
 //            if(difference between targetY and y is only 50)
 //                then move out of fire line
-            isShooting = weapon.isReadyToShoot();
+                isShooting = weapon.isReadyToShoot();
+            }
+            rotation = (Math.atan2(dirY, dirX) * 180.0d / Math.PI) - 180.0f;
+            xOffset = width / 2 + dirX * 30;
+            yOffset = height / 2 + dirY * 30;
+        } else {
+            dy = -9.8f;
         }
-        rotation = (Math.atan2(dirY,dirX)*180.0d/Math.PI)-180.0f;
-        xOffset = width/2 + dirX*30;
-        yOffset = height/2 + dirY*30;
-
         xSpeed += dx*dt;
         ySpeed += dy*dt;
 

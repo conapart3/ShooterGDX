@@ -30,7 +30,7 @@ public class Player extends SpaceObject {
     private Weapon weapon;
     private boolean isReadyToShoot;
     private Sound explosionSound;
-//    private boolean left,right,up,down;
+    private boolean upPressed, downPressed;
 
     public Player() {
         create();
@@ -77,40 +77,18 @@ public class Player extends SpaceObject {
         if(health<1)
             alive = false;
 
-//        dx = knobPercentX * maxSpeed;
-//        dy = knobPercentY * maxSpeed;
+//        x += knobPercentX * maxSpeed * dt;
+//        y += knobPercentY * maxSpeed * dt;
 
-        x += knobPercentX * maxSpeed * dt;
-        y += knobPercentY * maxSpeed * dt;
+        if(upPressed)
+            dy = 50;
+        else if(downPressed)
+            dy = -50;
+        else
+            dy=0;
 
-//        xSpeed = maxSpeed* knobPercentX;
-//        ySpeed = maxSpeed* knobPercentY;
-
-//        if(up)
-//            ySpeed += 100f;
-//        if(down)
-//            ySpeed -= 100f;
-//        if(left)
-//            xSpeed -= 100f;
-//        if(right)
-//            xSpeed += 100f;
-
-//        x += xSpeed * dt;
-//        y += ySpeed * dt;
-
-//        xSpeed*=0.5;
-//        ySpeed*=0.5;
-
-//        xSpeed += knobPercentX * maxSpeed * dt;
-//        ySpeed += knobPercentY * maxSpeed * dt;
-
-        //apply acceleration to speed (dy and dx are acceleration)
-//        xSpeed += dx*dt;
-//        ySpeed += dy*dt;
-
-        //position differs by the velocity
-//        x += xSpeed * dt;
-//        y += ySpeed * dt;
+        ySpeed = maxSpeed * dy * dt;
+        y += ySpeed * dt;
 
         if (y < GROUND_OFFSET)
             y = GROUND_OFFSET;
@@ -182,4 +160,11 @@ public class Player extends SpaceObject {
         explosionSound.play();
     }
 
+    public void setUpPressed(boolean upPressed) {
+        this.upPressed = upPressed;
+    }
+
+    public void setDownPressed(boolean downPressed) {
+        this.downPressed = downPressed;
+    }
 }
