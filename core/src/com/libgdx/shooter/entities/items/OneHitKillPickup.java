@@ -27,4 +27,9 @@ public class OneHitKillPickup extends Item {
     }
 
 
+    @Override
+    public void use(Player p){
+        p.setOneHitKill();
+    }
+
 }

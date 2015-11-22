@@ -33,6 +33,7 @@ public class Player extends SpaceObject {
     private Sound explosionSound;
     private boolean upPressed, downPressed;
     private ArrayList<Item> items;
+    private float pointsMultiplier = 1f;
 
     public Player() {
         create();
@@ -142,10 +143,11 @@ public class Player extends SpaceObject {
     }
 
     public void addItem(Item item) {
-        if(item.getClass().isAssignableFrom(Weapon.class)){
+        if(item.isWeapon()){
             setWeapon((Weapon)item);
         }else {
             items.add(item);
+            item.use(this);
         }
     }
 
@@ -171,5 +173,31 @@ public class Player extends SpaceObject {
 
     public void setItems(ArrayList<Item> items) {
         this.items = items;
+    }
+
+    public void addShield() {
+        this.health += 1000;
+    }
+
+    public void setOneHitKill() {
+    }
+
+    public void addMedal() {
+        addPoints(1000);
+    }
+
+    public void setDoublePoints() {
+        pointsMultiplier = 1.1f;
+        /**
+         * todo: x2 for a period of time
+         */
+    }
+
+    public float getPointsMultiplier() {
+        return pointsMultiplier;
+    }
+
+    public void setPointsMultiplier(float pointsMultiplier) {
+        this.pointsMultiplier = pointsMultiplier;
     }
 }

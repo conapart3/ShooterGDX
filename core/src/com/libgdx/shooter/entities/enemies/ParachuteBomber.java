@@ -63,11 +63,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
          * todo: make this algorithm for moving toward the player better
          */
         if (x - targetX < 400) {
-            if (y < targetY) {
-                dy += 50;
-            } else if (y > targetY) {
-                dy -= 50;
-            }
+            dy = (y-targetY)/2;
         } else {
             dy = 0;
         }

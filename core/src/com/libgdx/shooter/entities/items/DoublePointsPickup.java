@@ -27,4 +27,9 @@ public class DoublePointsPickup extends Item {
         texture = new Texture(Gdx.files.internal("data/pickupDoublePoints.png"));
     }
 
+    @Override
+    public void use(Player p){
+        p.setDoublePoints();
+    }
+
 }

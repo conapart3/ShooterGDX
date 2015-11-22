@@ -2,10 +2,12 @@ package com.libgdx.shooter.gamestates;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.libgdx.shooter.managers.GameStateManager;
 
@@ -34,6 +36,7 @@ public class MenuState extends State {
 
         sb = new SpriteBatch();
 
+//        font = new BitmapFont(Gdx.files.internal("data/Fonts/outrider.fnt"), Gdx.files.internal("data/Fonts/outrider_0.png"), false);
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/Fonts/Montserrat-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 72;

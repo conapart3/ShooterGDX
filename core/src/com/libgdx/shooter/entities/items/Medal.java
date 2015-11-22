@@ -27,4 +27,8 @@ public class Medal extends com.libgdx.shooter.entities.items.Item {
         texture = new Texture(Gdx.files.internal("data/pickupMedal.png"));
     }
 
+    @Override
+    public void use(Player p){
+        p.addMedal();
+    }
 }

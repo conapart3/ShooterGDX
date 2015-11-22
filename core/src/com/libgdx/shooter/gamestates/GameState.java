@@ -20,6 +20,7 @@ import com.libgdx.shooter.entities.Particle;
 import com.libgdx.shooter.entities.bullets.Bullet;
 import com.libgdx.shooter.entities.bullets.Laser;
 import com.libgdx.shooter.entities.bullets.Missile;
+import com.libgdx.shooter.entities.enemies.BossEnemy;
 import com.libgdx.shooter.entities.items.Item;
 import com.libgdx.shooter.entities.enemies.ParachuteBomber;
 import com.libgdx.shooter.entities.Player;
@@ -116,12 +117,13 @@ public class GameState extends State implements InputProcessor{
 
     //touchpad and stage declaration
     private Stage stage;
-
     private BitmapFont font;
     private Label labelA, labelB, labelC, labelD;
 
     private Vector3 touchPoint;
     private boolean autoShoot;
+
+    private BossEnemy boss;
 
 
     public GameState(GameStateManager gsm){
@@ -178,6 +180,8 @@ public class GameState extends State implements InputProcessor{
         assetManager.load("data/Sound/explosionShooterEnemy.wav", Sound.class);
         assetManager.load("data/Sound/explosionPlayer.wav", Sound.class);
 
+//        assetManager.load("data/boss1.png", Texture.class);
+
         assetManager.finishLoading();
 
         /** Load in the stage **/
@@ -203,6 +207,7 @@ public class GameState extends State implements InputProcessor{
         pickups = new ArrayList<Item>();
 
         particles = new ArrayList<Particle>();
+        boss = new BossEnemy();
     }
 
     @Override
@@ -300,27 +305,48 @@ public class GameState extends State implements InputProcessor{
                 i1.update(dt);
             }
 
+            /** Update the boss **/
+            if(boss.isAlive()) {
+                boss.update(dt, player.getX(), player.getY());
+                if (boss.isShooting()) {
+                    shoot(boss.getWeapon(), boss.getX() + boss.getxOffset(), boss.getY() + boss.getyOffset(),
+                            boss.getDirX(), boss.getDirY(), true);
+                }
+            }
+
             checkCollisions();
 
             /** Spawn new enemies, stop player shooting flag, start timer until next level starts **/
-            if (activeParachuteBombers.size == 0 && activeShooterEnemies.size == 0) {
+            if (activeParachuteBombers.size == 0 && activeShooterEnemies.size == 0 && !boss.isAlive()) {
                 nextLevelTimer += dt;
                 autoShoot = false;
                 levelSuccessFlag = true;
                 if (nextLevelTimer > 4) {
                     nextLevelTimer -= 4;
                     wave++;
-                    //crashes here when level 7 comes up since the level backgrounds arent loaded
-//                        if(7%wave==0) {
-//                            level++;
-//                            currentLevel = levels.get(level);
-//                        }
-                    levelSuccessFlag = false;
-                    spawnParachuteBombers();
-                    spawnShooterEnemies();
-                    spawnPickups();
-                    player.addPoints(100 * (wave - 1));
-                    autoShoot = true;
+//                    if(7%wave==0) {
+//                        //nextlevel
+//                        level++;
+//                        currentLevel = levels.get(level);
+//                        wave = 1;
+//                    }
+                    if(wave<=5+level) {
+                        levelSuccessFlag = false;
+                        spawnParachuteBombers();
+                        spawnShooterEnemies();
+                        spawnPickups();
+                        player.addPoints(100 * (wave - 1));
+                        autoShoot = true;
+                    } else if(wave == 6+level){
+                        levelSuccessFlag = false;
+                        spawnBoss();
+                        player.addPoints(100 * (wave - 1));
+                        autoShoot = true;
+                    } else if(wave%(7+level)==0){
+                        currentLevel=levels.get(level%2);//level starts at 0 therefore get curlevel-1
+                        level++;
+                        wave = 0;
+                    }
                 }
             }
 
@@ -353,77 +379,82 @@ public class GameState extends State implements InputProcessor{
 
     @Override
     public void render() {
-        if(assetManager.update()) {
-            spriteBatch.setProjectionMatrix(cam.combined);
-            shapeRenderer.setProjectionMatrix(cam.combined);
+        spriteBatch.setProjectionMatrix(cam.combined);
+        shapeRenderer.setProjectionMatrix(cam.combined);
 
-            spriteBatch.enableBlending();
-            spriteBatch.begin();
+        spriteBatch.enableBlending();
+        spriteBatch.begin();
 
-            /** Draw the backgrounds and have them scroll within themselves based on srcX **/
-            currentLevel.render(spriteBatch);
+        /** Draw the backgrounds and have them scroll within themselves based on srcX **/
+        currentLevel.render(spriteBatch);
 
-            player.render(spriteBatch);
+        player.render(spriteBatch);
 
-            /** Update all enemies, bullets and pickups **/
-            for (int i = 0; i < activeParachuteBombers.size; i++) {
-                activeParachuteBombers.get(i).render(spriteBatch);
-            }
+        /** Update all enemies, bullets and pickups **/
+        for (int i = 0; i < activeParachuteBombers.size; i++) {
+            activeParachuteBombers.get(i).render(spriteBatch);
+        }
 
-            for (int i = 0; i < activeShooterEnemies.size; i++) {
-                activeShooterEnemies.get(i).render(spriteBatch);
-            }
+        for (int i = 0; i < activeShooterEnemies.size; i++) {
+            activeShooterEnemies.get(i).render(spriteBatch);
+        }
 
-            for (int i = activeBullets.size; --i >= 0; ) {
-                activeBullets.get(i).render(spriteBatch);
-            }
+        for (int i = 0; i < pickups.size(); i++) {
+            pickups.get(i).render(spriteBatch);
+        }
 
-            for (int i = activeMissiles.size; --i >= 0; ) {
-                activeMissiles.get(i).render(spriteBatch);
-            }
 
-            for (int i = activeLasers.size; --i >= 0; ) {
-                activeLasers.get(i).render(spriteBatch);
-            }
+        for(int i = activeExplosions.size; --i >= 0; ){
+            activeExplosions.get(i).render(spriteBatch);
+        }
 
-            for (int i = 0; i < pickups.size(); i++) {
-                pickups.get(i).render(spriteBatch);
-            }
+        if(boss.isAlive())
+            boss.render(spriteBatch);
 
-            for(int i=0; i< player.getItems().size(); i++){
-                spriteBatch.draw(player.getItems().get(i).getTexture(), 100 + (100 * i), 100f);
-            }
+        for(int i=0; i<particles.size(); i++){
+            particles.get(i).render(shapeRenderer);
+        }
 
-            for(int i = activeExplosions.size; --i >= 0; ){
-                activeExplosions.get(i).render(spriteBatch);
-            }
+        for (int i = activeBullets.size; --i >= 0; ) {
+            activeBullets.get(i).render(spriteBatch);
+        }
 
-            for(int i=0; i<particles.size(); i++){
-                particles.get(i).render(shapeRenderer);
-            }
+        for (int i = activeMissiles.size; --i >= 0; ) {
+            activeMissiles.get(i).render(spriteBatch);
+        }
 
-            /** Draw all text on screen **/
+        for (int i = activeLasers.size; --i >= 0; ) {
+            activeLasers.get(i).render(spriteBatch);
+        }
+
+
+        for(int i=0; i< player.getItems().size(); i++){
+            spriteBatch.draw(player.getItems().get(i).getTexture(), 100 + (100 * i), 100f);
+        }
+        /** Draw all text on screen **/
 //        font.draw(spriteBatch, "Level: "+level +". Lives Left: "+player.getLives(), 30, 30);
-            labelA.setText("Level: " + level);
-            labelA.draw(spriteBatch, 1);
+        labelA.setText("Level: " + level);
+        labelA.draw(spriteBatch, 1);
 
-            labelB.setText("Score: " + player.getScore());
-            labelB.draw(spriteBatch, 1);
+        labelB.setText("Score: " + player.getScore());
+        labelB.draw(spriteBatch, 1);
 
-            labelC.setText("Health: " + player.getHealth());
-            labelC.draw(spriteBatch, 1);
+        labelC.setText("Health: " + player.getHealth());
+        labelC.draw(spriteBatch, 1);
 
+        labelD.setText("Wave: " + wave);
+        labelD.draw(spriteBatch, 1);
 //            if(levelSuccessFlag) {
 //                labelD.setText("Level " + level + " completed!");
 //                labelD.draw(spriteBatch, 1);
 //            }
 
 
-            spriteBatch.end();
+        spriteBatch.end();
 
-            /** Draw stage **/
-            stage.draw();
-        }
+        /** Draw stage **/
+        stage.draw();
+
     }
 
 
@@ -448,6 +479,7 @@ public class GameState extends State implements InputProcessor{
             pickups.get(i).dispose();
         }
         shapeRenderer.dispose();
+        boss.dispose();
     }
 
 
@@ -465,7 +497,7 @@ public class GameState extends State implements InputProcessor{
                     if (pb.collides(b.getBounds()) || b.collides(pb.getBounds())) {
                         b.setAlive(false);
                         pb.takeDamage(b.getDamage());
-                        player.addPoints(b.getDamage());
+                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
                         if(!pb.isAlive()) {
                             pb.playExplosion();
                             spawnExplosion(pb.getX(), pb.getY());
@@ -479,10 +511,23 @@ public class GameState extends State implements InputProcessor{
                     if (se.collides(b.getBounds()) || b.collides(se.getBounds())) {
                         b.setAlive(false);
                         se.takeDamage(b.getDamage());
-                        player.addPoints(b.getDamage());
+                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
                         if(!se.isAlive()) {
                             se.playExplosion();
                             spawnExplosion(se.getX(), se.getY());
+                        } else {
+                            b.playHitSound();
+                        }
+                    }
+                }
+                if(boss.isAlive()){
+                    if(boss.collides(b.getBounds()) || b.collides(boss.getBounds())){
+                        b.setAlive(false);
+                        boss.takeDamage(b.getDamage());
+                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
+                        if(!boss.isAlive()){
+                            boss.playExplosion();
+                            spawnExplosion(boss.getX(), boss.getY());
                         } else {
                             b.playHitSound();
                         }
@@ -503,44 +548,57 @@ public class GameState extends State implements InputProcessor{
 
         /**Check collisions between lasers and player/enemies**/
         for(int i=0; i<activeLasers.size; i++){
-            Laser l = activeLasers.get(i);
-            if(!l.isShotFromEnemy()) {
+            Laser b = activeLasers.get(i);
+            if(!b.isShotFromEnemy()) {
                 for (int j = 0; j < activeParachuteBombers.size; j++) {
                     ParachuteBomber pb = activeParachuteBombers.get(j);
-                    if (pb.collides(l.getBounds()) || l.collides(pb.getBounds())) {
-                        l.setAlive(false);
-                        pb.takeDamage(l.getDamage());
-                        player.addPoints(l.getDamage());
+                    if (pb.collides(b.getBounds()) || b.collides(pb.getBounds())) {
+                        b.setAlive(false);
+                        pb.takeDamage(b.getDamage());
+                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
                         if(!pb.isAlive()) {
                             pb.playExplosion();
                             spawnExplosion(pb.getX(), pb.getY());
                         } else {
-                            l.playHitSound();
+                            b.playHitSound();
                         }
                     }
                 }
                 for (int k = 0; k < activeShooterEnemies.size; k++) {
                     ShooterEnemy se = activeShooterEnemies.get(k);
-                    if (se.collides(l.getBounds()) || l.collides(se.getBounds())) {
-                        l.setAlive(false);
-                        se.takeDamage(l.getDamage());
-                        player.addPoints(l.getDamage());
+                    if (se.collides(b.getBounds()) || b.collides(se.getBounds())) {
+                        b.setAlive(false);
+                        se.takeDamage(b.getDamage());
+                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
                         if(!se.isAlive()) {
                             se.playExplosion();
                             spawnExplosion(se.getX(), se.getY());
                         } else {
-                            l.playHitSound();
+                            b.playHitSound();
+                        }
+                    }
+                }
+                if(boss.isAlive()){
+                    if(boss.collides(b.getBounds()) || b.collides(boss.getBounds())){
+                        b.setAlive(false);
+                        boss.takeDamage(b.getDamage());
+                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
+                        if(!boss.isAlive()){
+                            boss.playExplosion();
+                            spawnExplosion(boss.getX(), boss.getY());
+                        } else {
+                            b.playHitSound();
                         }
                     }
                 }
             } else {
-                if (player.collides(l.getBounds()) || l.collides(player.getBounds())) {
-                    l.setAlive(false);
-                    player.takeDamage(l.getDamage());
+                if (player.collides(b.getBounds()) || b.collides(player.getBounds())) {
+                    b.setAlive(false);
+                    player.takeDamage(b.getDamage());
                     if(!player.isAlive()) {
                         player.playExplosion();
                     } else {
-                        l.playHitSound();
+                        b.playHitSound();
                     }
                 }
             }
@@ -548,44 +606,57 @@ public class GameState extends State implements InputProcessor{
 
         /**Check collisions between missiles and player/enemies**/
         for(int i=0; i<activeMissiles.size; i++){
-            Missile m = activeMissiles.get(i);
-            if(!m.isShotFromEnemy()) {
+            Missile b = activeMissiles.get(i);
+            if(!b.isShotFromEnemy()) {
                 for (int j = 0; j < activeParachuteBombers.size; j++) {
                     ParachuteBomber pb = activeParachuteBombers.get(j);
-                    if (pb.collides(m.getBounds()) || m.collides(pb.getBounds())) {
-                        m.setAlive(false);
-                        pb.takeDamage(m.getDamage());
-                        player.addPoints(m.getDamage());
+                    if (pb.collides(b.getBounds()) || b.collides(pb.getBounds())) {
+                        b.setAlive(false);
+                        pb.takeDamage(b.getDamage());
+                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
                         if(!pb.isAlive()) {
                             pb.playExplosion();
                             spawnExplosion(pb.getX(), pb.getY());
                         } else {
-                            m.playHitSound();
+                            b.playHitSound();
                         }
                     }
                 }
                 for (int k = 0; k < activeShooterEnemies.size; k++) {
                     ShooterEnemy se = activeShooterEnemies.get(k);
-                    if (se.collides(m.getBounds()) || m.collides(se.getBounds())) {
-                        m.setAlive(false);
-                        se.takeDamage(m.getDamage());
-                        player.addPoints(m.getDamage());
+                    if (se.collides(b.getBounds()) || b.collides(se.getBounds())) {
+                        b.setAlive(false);
+                        se.takeDamage(b.getDamage());
+                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
                         if(!se.isAlive()) {
                             se.playExplosion();
                             spawnExplosion(se.getX(), se.getY());
                         } else {
-                            m.playHitSound();
+                            b.playHitSound();
+                        }
+                    }
+                }
+                if(boss.isAlive()){
+                    if(boss.collides(b.getBounds()) || b.collides(boss.getBounds())){
+                        b.setAlive(false);
+                        boss.takeDamage(b.getDamage());
+                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
+                        if(!boss.isAlive()){
+                            boss.playExplosion();
+                            spawnExplosion(boss.getX(), boss.getY());
+                        } else {
+                            b.playHitSound();
                         }
                     }
                 }
             } else {
-                if (player.collides(m.getBounds()) || m.collides(player.getBounds())) {
-                    m.setAlive(false);
-                    player.takeDamage(m.getDamage());
+                if (player.collides(b.getBounds()) || b.collides(player.getBounds())) {
+                    b.setAlive(false);
+                    player.takeDamage(b.getDamage());
                     if(!player.isAlive()) {
                         player.playExplosion();
                     } else {
-                        m.playHitSound();
+                        b.playHitSound();
                     }
                 }
             }
@@ -626,33 +697,32 @@ public class GameState extends State implements InputProcessor{
 
     private void initStage(){
         /** Create the font and relevant styles associated for labels **/
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/Fonts/Montserrat-Regular.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.minFilter = Texture.TextureFilter.Nearest;
-        parameter.magFilter = Texture.TextureFilter.MipMapLinearNearest;
-        parameter.size = 14;
-        font = generator.generateFont(parameter);
-        generator.dispose();
+//        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/Fonts/Montserrat-Regular.ttf"));
+//        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+//        parameter.minFilter = Texture.TextureFilter.Nearest;
+//        parameter.magFilter = Texture.TextureFilter.MipMapLinearNearest;
+//        parameter.size = 14;
+//        font = generator.generateFont(parameter);
+//        generator.dispose();
+
+        font = new BitmapFont(Gdx.files.internal("data/Fonts/outrider.fnt"), Gdx.files.internal("data/Fonts/outrider_0.png"), false);
 
         //create labels
 //        font = new BitmapFont();
         Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
 
         labelA = new Label("Level: ", labelStyle);
-        labelA.setFontScale(3);
-        labelA.setPosition(100, 1000);
+        labelA.setPosition(50, 1000);
 
         labelB = new Label("Score: ", labelStyle);
-        labelB.setFontScale(3);
         labelB.setPosition(1500, 1000);
 
-        labelC = new Label("Lives: ", labelStyle);
-        labelC.setFontScale(3);
-        labelC.setPosition(600, 1000);
+        labelC = new Label("Health: ", labelStyle);
+        labelC.setPosition(800, 1000);
 
-//        labelD = new Label(" ", labelStyle);
+        labelD = new Label(" ", labelStyle);
 //        labelD.setFontScale(8);
-//        labelD.setPosition(600, 500);
+        labelD.setPosition(350, 1000);
 
 
 
@@ -711,6 +781,11 @@ public class GameState extends State implements InputProcessor{
         }
     }
 
+    private void spawnBoss(){
+        boss.dispose();
+        boss = new BossEnemy("data/boss1big1paintphotoshopped.png", level);
+        boss.create();
+    }
 
     /**
      * Method to shoot. This method works out which bullet should be generated, and pulls the correct bullet

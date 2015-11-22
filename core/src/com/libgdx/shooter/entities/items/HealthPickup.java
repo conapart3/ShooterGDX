@@ -28,4 +28,8 @@ public class HealthPickup extends com.libgdx.shooter.entities.items.Item {
         texture = new Texture(Gdx.files.internal("data/pickupHealth.png"));
     }
 
+    @Override
+    public void use(Player p){
+        p.setHealth(1000);
+    }
 }

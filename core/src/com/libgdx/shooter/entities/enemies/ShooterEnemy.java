@@ -24,13 +24,10 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
 
     private Random rand;
     private boolean isShooting;
-//    private float timeSinceLastFire, rateOfFire;//this will be moved to the weapon class!
-    private float bulletSpeed;
     private float dirX, dirY, dirLength;
     private double rotation;
     private Weapon weapon;
     private Sound explosionSound;
-    private float lerp;
 
 
     public ShooterEnemy(){
@@ -43,13 +40,11 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         height = texture.getHeight();
         bounds = new Rectangle(x,y,width,height);
         isShooting = false;
-        bulletSpeed = 500;
         dirX = 0f;
         dirY = 0f;
         weapon = new HeavyLaserCannon();
         //randomize the weapon.
         explosionSound = GameState.assetManager.get("data/Sound/explosionShooterEnemy.wav");
-        lerp = 0.1f;
     }
 
 
@@ -71,7 +66,8 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
 
     public void update(float dt, float targetX, float targetY){
         //this could be the problem why some bullets shot at player from behind player.
-        weapon.update(dt);
+        if(alive)
+            weapon.update(dt);
 
         if (x < 1900) {
             dirX = 0.001f * (targetX - x - width / 2);

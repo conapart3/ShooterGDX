@@ -24,7 +24,7 @@ public class Item extends SpaceObject {
 
 
     protected Sound pickupSound;//set default item pickupsound, and sub classes can use their own
-
+    protected boolean isWeapon;
 
     public Item(){
         setPickupSound();
@@ -33,6 +33,7 @@ public class Item extends SpaceObject {
         height = texture.getHeight();
         bounds = new Rectangle(x,y,width,height);
         create();
+        isWeapon = false;
     }
 
 
@@ -93,4 +94,11 @@ public class Item extends SpaceObject {
         pickupSound.dispose();
     }
 
+    public boolean isWeapon() {
+        return isWeapon;
+    }
+
+    public void use(Player p){
+
+    }
 }

@@ -29,6 +29,7 @@ public abstract class Weapon extends Item{
         height = texture.getHeight();
         bounds = new Rectangle(x,y,width,height);
         super.create();
+        isWeapon = true;
     }
 
     public void update(float dt){
