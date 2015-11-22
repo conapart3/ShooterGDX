@@ -1,6 +1,7 @@
 package com.libgdx.shooter.gamestates;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -84,6 +85,8 @@ public class MenuState extends State {
         if (textButton1.isPressed()){
             gameStateManager.setState(GameStateManager.GAME, 0);
         }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER))
+            gameStateManager.setState(GameStateManager.GAME,0);
     }
 
     @Override

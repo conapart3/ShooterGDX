@@ -32,6 +32,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
     private Sound explosionSound;
     private float lerp;
 
+
     public ShooterEnemy(){
         this.alive = false;
         rand = new Random();
@@ -51,6 +52,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         lerp = 0.1f;
     }
 
+
     //pass in the level - health = 200 + (200*level/2)
     public void create(int level){
         //max-min +1 +min
@@ -66,30 +68,25 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         dirY = 0f;
     }
 
+
     public void update(float dt, float targetX, float targetY){
-        if(health<1)
-            alive = false;
+        //this could be the problem why some bullets shot at player from behind player.
+        weapon.update(dt);
 
-        if(alive) {
-            //this could be the problem why some bullets shot at player from behind player.
-            weapon.update(dt);
-
-            if (x < 1900) {
-                dirX = 0.001f * (targetX - x - width / 2);
-                dirY = 0.001f * (targetY - y - height / 2);
-                dirLength = (float) Math.sqrt(dirX * dirX + dirY * dirY);
-                dirX = dirX / dirLength;
-                dirY = dirY / dirLength;
+        if (x < 1900) {
+            dirX = 0.001f * (targetX - x - width / 2);
+            dirY = 0.001f * (targetY - y - height / 2);
+            dirLength = (float) Math.sqrt(dirX * dirX + dirY * dirY);
+            dirX = dirX / dirLength;
+            dirY = dirY / dirLength;
 //            if(difference between targetY and y is only 50)
 //                then move out of fire line
-                isShooting = weapon.isReadyToShoot();
-            }
-            rotation = (Math.atan2(dirY, dirX) * 180.0d / Math.PI) - 180.0f;
-            xOffset = width / 2 + dirX * 30;
-            yOffset = height / 2 + dirY * 30;
-        } else {
-            dy = -9.8f;
+            isShooting = weapon.isReadyToShoot();
         }
+        rotation = (Math.atan2(dirY, dirX) * 180.0d / Math.PI) - 180.0f;
+        xOffset = width / 2 + dirX * 30;
+        yOffset = height / 2 + dirY * 30;
+
         xSpeed += dx*dt;
         ySpeed += dy*dt;
 
@@ -107,11 +104,13 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
             ySpeed *= -1;
     }
 
+
     @Override
     public void render(SpriteBatch sb){
 //        sb.draw(texture,x,y,width/2,height/2,width,height,1,1,(float)rotation);
         sb.draw(texture,x,y,width/2,height/2,width,height,1,1,(float) rotation,0,0,width,height,false,false);
     }
+
 
     @Override
     public void reset() {
@@ -125,44 +124,55 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         dy = 0;
     }
 
+
     @Override
     public void dispose(){
         super.dispose();
     }
 
+
     public boolean isShooting() {
         return isShooting;
     }
+
 
     public void setIsShooting(boolean isShooting) {
         this.isShooting = isShooting;
     }
 
+
     public float getDirX() {
         return dirX;
     }
+
 
     public void setDirX(float dirX) {
         this.dirX = dirX;
     }
 
+
     public float getDirY() {
         return dirY;
     }
+
 
     public void setDirY(float dirY) {
         this.dirY = dirY;
     }
 
+
     public Weapon getWeapon() {
         return weapon;
     }
+
 
     public void setWeapon(Weapon weapon) {
         this.weapon = weapon;
     }
 
+
     public void playExplosion(){
         explosionSound.play();
     }
+
 }

@@ -15,20 +15,16 @@ public class Medal extends com.libgdx.shooter.entities.items.Item {
         super();
     }
 
+
     @Override
     protected void setPickupSound(){
         pickupSound = GameState.assetManager.get("data/Sound/pickupMedal.wav");
     }
 
-    @Override
-    protected void setTexture(){
-        texture = new Texture(Gdx.files.internal("data/medal.png"));
-    }
 
     @Override
-    public void attachToPlayer(Player player) {
-        pickupSound.play();
-        player.addPoints(1000);
-        System.out.println("MEDAL PICKUP");
+    protected void setTexture(){
+        texture = new Texture(Gdx.files.internal("data/pickupMedal.png"));
     }
+
 }

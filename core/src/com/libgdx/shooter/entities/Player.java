@@ -13,6 +13,8 @@ import com.libgdx.shooter.entities.weapons.MissileLauncher;
 import com.libgdx.shooter.entities.weapons.Weapon;
 import com.libgdx.shooter.gamestates.GameState;
 
+import java.util.ArrayList;
+
 import static com.libgdx.shooter.game.ShooterGame.*;
 
 /**
@@ -23,7 +25,6 @@ public class Player extends SpaceObject {
     private TextureRegion[] playerFrames;
     private TextureRegion currentFrame;
     private Animation playerAnimation;
-    private float knobPercentX, knobPercentY;
     private float stateTime;
     private float maxSpeed;
     private int score;
@@ -31,6 +32,7 @@ public class Player extends SpaceObject {
     private boolean isReadyToShoot;
     private Sound explosionSound;
     private boolean upPressed, downPressed;
+    private ArrayList<Item> items;
 
     public Player() {
         create();
@@ -41,6 +43,7 @@ public class Player extends SpaceObject {
         int FRAME_ROWS = 1;
 
         texture = new Texture(Gdx.files.internal("data/shipAnimation.png"));
+        explosionSound = GameState.assetManager.get("data/Sound/explosionPlayer.wav");
         TextureRegion[][] textureRegions = TextureRegion.split(texture, texture.getWidth() / FRAME_COLS, texture.getHeight() / FRAME_ROWS);
         playerFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
 
@@ -61,24 +64,19 @@ public class Player extends SpaceObject {
         y = 800 * SCALE_RATIO_Y;
 
         maxSpeed = 600f;
-        knobPercentX = 0;
-        knobPercentY = 0;
         health = 1000;
         alive = true;
 
         xOffset = width/2+dirX*30;
         yOffset = height/2+dirY*30;
+
+        items = new ArrayList<Item>();
         weapon = new LightLaserCannon();
-//        weapon = new MissileLauncher();
-        explosionSound = GameState.assetManager.get("data/Sound/explosionPlayer.wav");
     }
 
     public void update(float dt) {
         if(health<1)
             alive = false;
-
-//        x += knobPercentX * maxSpeed * dt;
-//        y += knobPercentY * maxSpeed * dt;
 
         if(upPressed)
             dy = 50;
@@ -123,11 +121,6 @@ public class Player extends SpaceObject {
         }
     }
 
-    public void setKnobPosition(float percentX, float percentY) {
-        knobPercentX = percentX;
-        knobPercentY = percentY;
-    }
-
     public int getScore() {
         return score;
     }
@@ -149,7 +142,11 @@ public class Player extends SpaceObject {
     }
 
     public void addItem(Item item) {
-
+        if(item.getClass().isAssignableFrom(Weapon.class)){
+            setWeapon((Weapon)item);
+        }else {
+            items.add(item);
+        }
     }
 
     public boolean isReadyToShoot() {
@@ -166,5 +163,13 @@ public class Player extends SpaceObject {
 
     public void setDownPressed(boolean downPressed) {
         this.downPressed = downPressed;
+    }
+
+    public ArrayList<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(ArrayList<Item> items) {
+        this.items = items;
     }
 }

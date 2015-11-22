@@ -24,7 +24,7 @@ public class HeavyLaserCannon extends Weapon {
 
     @Override
     protected void setTexture(){
-        texture = new Texture(Gdx.files.internal("data/heavyCannon.png"));
+        texture = new Texture(Gdx.files.internal("data/pickupHeavyLaser.png"));
     }
 
         @Override
@@ -49,9 +49,4 @@ public class HeavyLaserCannon extends Weapon {
 
     }
 
-    @Override
-    public void attachToPlayer(Player player){
-        super.attachToPlayer(player);
-        System.out.println("HEAVY CANNON PICKUP");
-    }
 }

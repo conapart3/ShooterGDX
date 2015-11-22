@@ -10,11 +10,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+import com.libgdx.shooter.entities.Particle;
 import com.libgdx.shooter.entities.bullets.Bullet;
 import com.libgdx.shooter.entities.bullets.Laser;
 import com.libgdx.shooter.entities.bullets.Missile;
@@ -22,9 +24,11 @@ import com.libgdx.shooter.entities.items.Item;
 import com.libgdx.shooter.entities.enemies.ParachuteBomber;
 import com.libgdx.shooter.entities.Player;
 import com.libgdx.shooter.entities.enemies.ShooterEnemy;
+import com.libgdx.shooter.entities.items.ItemFactory;
 import com.libgdx.shooter.entities.weapons.Weapon;
 import com.libgdx.shooter.entities.weapons.WeaponType;
 import com.libgdx.shooter.levels.Level;
+import com.libgdx.shooter.managers.Animator;
 import com.libgdx.shooter.managers.GameStateManager;
 
 import java.util.ArrayList;
@@ -38,14 +42,19 @@ public class GameState extends State implements InputProcessor{
 
     public static AssetManager assetManager;
     private SpriteBatch spriteBatch;
+    private ShapeRenderer shapeRenderer;
     private Player player;
     private float nextLevelTimer, gameOverTimer;
     private ArrayList<Level> levels;
     private int numberOfLevels = 2;
-    private int level = 0, wave = 1;
+    private int level = 1, wave = 0;
     private Level currentLevel;
     private boolean levelSuccessFlag = false;
+
+    private ItemFactory itemFactory;
     private ArrayList<Item> pickups;
+
+    private ArrayList<Particle> particles;
 
 
     /** Array and pool containing the bullets **/
@@ -96,6 +105,15 @@ public class GameState extends State implements InputProcessor{
         }
     };
 
+    /** Array and pool containing the shooter enemies **/
+    private final Array<Animator> activeExplosions = new Array<Animator>();
+    private final Pool<Animator> explosionPool = new Pool<Animator>(){
+        @Override
+        protected Animator newObject(){
+            return new Animator("data/explosion.png", 12, 1, false);
+        }
+    };
+
     //touchpad and stage declaration
     private Stage stage;
 
@@ -120,16 +138,18 @@ public class GameState extends State implements InputProcessor{
 
         /** One spritebatch used to draw all sprites **/
         spriteBatch = new SpriteBatch();
+        shapeRenderer = new ShapeRenderer();
 
         /** create the levels and set currentlevel, then create it. **/
         levels = new ArrayList<Level>();
         String bgfilepath = "data/bgelements/bg";
         for(int i=0; i< numberOfLevels; i++){
             Level l = new Level(bgfilepath+"back"+i+".png", bgfilepath+"middle"+i+".png", bgfilepath+"front"+i+".png");
+            l.create();
             levels.add(l);
         }
         currentLevel = levels.get(0);
-        currentLevel.create();
+//        currentLevel.create();
 
         /** Load in the shoot sounds into AssetManager **/
         assetManager.load("data/Sound/shootSoundMinigun.wav", Sound.class);
@@ -175,127 +195,148 @@ public class GameState extends State implements InputProcessor{
 
         /** Create new player and other misc things **/
         player = new Player();
-        level = 0;
         gameOverTimer = 0f;
         touchPoint = new Vector3();
         autoShoot = false;
 
+        itemFactory = new ItemFactory();
         pickups = new ArrayList<Item>();
-    }
 
+        particles = new ArrayList<Particle>();
+    }
 
     @Override
     public void update(float dt) {
-        if(assetManager.update()) {
-            if (player.isAlive()) {
-                handleInput();
+        if (player.isAlive()) {
+            handleInput();
 
-                player.update(dt);
+            player.update(dt);
 
-                if (autoShoot) {
-                    if (player.isReadyToShoot()) {
-                        shoot(player.getWeapon(), player.getX() + player.getxOffset(), player.getY() + player.getyOffset(), 1f, 0f, false);//x and y offset, x and y normalised direction
-                    }
+            if (autoShoot) {
+                if (player.isReadyToShoot()) {
+                    shoot(player.getWeapon(), player.getX() + player.getxOffset(), player.getY() + player.getyOffset(), 1f, 0f, false);//x and y offset, x and y normalised direction
                 }
+            }
 
-                /** Update the active parachute bombers **/
-                int pbLen = activeParachuteBombers.size;
-                for (int i = pbLen; --i >= 0; ) {
-                    ParachuteBomber pbItem = activeParachuteBombers.get(i);
-                    if (!pbItem.isAlive()) {
-                        activeParachuteBombers.removeIndex(i);
-                        parachuteBomberPool.free(pbItem);
-                    }
-                    pbItem.update(dt, player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2);
+            /** Update the active parachute bombers **/
+            int pbLen = activeParachuteBombers.size;
+            for (int i = pbLen; --i >= 0; ) {
+                ParachuteBomber pbItem = activeParachuteBombers.get(i);
+                if (!pbItem.isAlive()) {
+                    createParticles(pbItem.getX(), pbItem.getY());
+                    activeParachuteBombers.removeIndex(i);
+                    parachuteBomberPool.free(pbItem);
                 }
+                pbItem.update(dt, player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2);
+            }
 
-                /** Update the active shooter enemies **/
-                int seLen = activeShooterEnemies.size;
-                for (int i = seLen; --i >= 0; ) {
-                    ShooterEnemy seItem = activeShooterEnemies.get(i);
-                    if (!seItem.isAlive()) {
-                        activeShooterEnemies.removeIndex(i);
-                        shooterEnemyPool.free(seItem);
-                    }
-                    seItem.update(dt, player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2);
-                    if (seItem.isShooting()) {
-                        shoot(seItem.getWeapon(), seItem.getX() + seItem.getxOffset(), seItem.getY() + seItem.getyOffset(),
-                                seItem.getDirX(), seItem.getDirY(), true);
-                    }
+            /** Update the active shooter enemies **/
+            int seLen = activeShooterEnemies.size;
+            for (int i = seLen; --i >= 0; ) {
+                ShooterEnemy seItem = activeShooterEnemies.get(i);
+                if (!seItem.isAlive()) {
+                    activeShooterEnemies.removeIndex(i);
+                    shooterEnemyPool.free(seItem);
                 }
-
-                /** Update the active bullets **/
-                int bLen = activeBullets.size;
-                for (int i = bLen; --i >= 0; ) {
-                    Bullet bItem = activeBullets.get(i);
-                    if (!bItem.isAlive()) {
-                        activeBullets.removeIndex(i);
-                        bulletPool.free(bItem);
-                    }
-                    bItem.update(dt);
+                seItem.update(dt, player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2);
+                if (seItem.isShooting()) {
+                    shoot(seItem.getWeapon(), seItem.getX() + seItem.getxOffset(), seItem.getY() + seItem.getyOffset(),
+                            seItem.getDirX(), seItem.getDirY(), true);
                 }
+            }
 
-                /** Update the active missiles **/
-                int mLen = activeMissiles.size;
-                for (int i = mLen; --i >= 0; ) {
-                    Missile mItem = activeMissiles.get(i);
-                    if (!mItem.isAlive()) {
-                        activeMissiles.removeIndex(i);
-                        missilePool.free(mItem);
-                    }
-                    mItem.update(dt);
+            /** Update the active bullets **/
+            int bLen = activeBullets.size;
+            for (int i = bLen; --i >= 0; ) {
+                Bullet bItem = activeBullets.get(i);
+                if (!bItem.isAlive()) {
+                    activeBullets.removeIndex(i);
+                    bulletPool.free(bItem);
                 }
+                bItem.update(dt);
+            }
 
-                /** Update the active lasers **/
-                int lLen = activeLasers.size;
-                for (int i = lLen; --i >= 0; ) {
-                    Laser lItem = activeLasers.get(i);
-                    if (!lItem.isAlive()) {
-                        activeLasers.removeIndex(i);
-                        laserPool.free(lItem);
-                    }
-                    lItem.update(dt);
+            /** Update the active missiles **/
+            int mLen = activeMissiles.size;
+            for (int i = mLen; --i >= 0; ) {
+                Missile mItem = activeMissiles.get(i);
+                if (!mItem.isAlive()) {
+                    activeMissiles.removeIndex(i);
+                    missilePool.free(mItem);
                 }
+                mItem.update(dt);
+            }
 
-                /** Update the pickups **/
-                for (int i = 0; i < pickups.size(); i++) {
-                    Item i1 = pickups.get(i);
-                    if (!i1.isAlive()) {
-                        i1.dispose();
-                        pickups.remove(i);
-                    }
-                    i1.update(dt);
+            /** Update the active lasers **/
+            int lLen = activeLasers.size;
+            for (int i = lLen; --i >= 0; ) {
+                Laser lItem = activeLasers.get(i);
+                if (!lItem.isAlive()) {
+                    activeLasers.removeIndex(i);
+                    laserPool.free(lItem);
                 }
+                lItem.update(dt);
+            }
 
-                checkCollisions();
+            /** Update the active explosions **/
+            int expLen = activeExplosions.size;
+            for (int i = expLen; --i >= 0; ) {
+                Animator aItem = activeExplosions.get(i);
+                if (!aItem.isAlive()) {
+//                    createParticles(pbItem.getX(), pbItem.getY());
+                    activeExplosions.removeIndex(i);
+                    explosionPool.free(aItem);
+                }
+                aItem.update(dt);
+            }
 
-                /** Spawn new enemies, stop player shooting flag, start timer until next level starts **/
-                if (activeParachuteBombers.size == 0 && activeShooterEnemies.size == 0) {
-                    nextLevelTimer += dt;
-                    autoShoot = false;
-                    levelSuccessFlag = true;
-                    if (nextLevelTimer > 4) {
-                        nextLevelTimer -= 4;
-                        wave++;
-                        //crashes here when level 7 comes up since the level backgrounds arent loaded
+            /** Update the pickups **/
+            for (int i = 0; i < pickups.size(); i++) {
+                Item i1 = pickups.get(i);
+                if (!i1.isAlive()) {
+                    i1.dispose();
+                    pickups.remove(i);
+                }
+                i1.update(dt);
+            }
+
+            checkCollisions();
+
+            /** Spawn new enemies, stop player shooting flag, start timer until next level starts **/
+            if (activeParachuteBombers.size == 0 && activeShooterEnemies.size == 0) {
+                nextLevelTimer += dt;
+                autoShoot = false;
+                levelSuccessFlag = true;
+                if (nextLevelTimer > 4) {
+                    nextLevelTimer -= 4;
+                    wave++;
+                    //crashes here when level 7 comes up since the level backgrounds arent loaded
 //                        if(7%wave==0) {
 //                            level++;
 //                            currentLevel = levels.get(level);
 //                        }
-                        levelSuccessFlag = false;
-                        spawnParachuteBombers();
-                        spawnShooterEnemies();
-                        spawnPickups();
-                        player.addPoints(100 * (wave - 1));
-                        autoShoot = true;
-                    }
+                    levelSuccessFlag = false;
+                    spawnParachuteBombers();
+                    spawnShooterEnemies();
+                    spawnPickups();
+                    player.addPoints(100 * (wave - 1));
+                    autoShoot = true;
                 }
             }
 
-                /** update the stage and update camera. srcX is used to move the background **/
-                stage.act(dt);
-                cam.update();
-                currentLevel.update(dt);
+            for(int i=0; i<particles.size(); i++){
+                particles.get(i).update(dt);
+                if(particles.get(i).shouldRemove()){
+                    particles.remove(i);
+                    i--;
+                }
+            }
+
+            currentLevel.update(dt);
+
+            /** update the stage and update camera. srcX is used to move the background **/
+            stage.act(dt);
+            cam.update();
         } else {
             /**
              * TODO: Use screen manager and load in screens properly
@@ -314,6 +355,7 @@ public class GameState extends State implements InputProcessor{
     public void render() {
         if(assetManager.update()) {
             spriteBatch.setProjectionMatrix(cam.combined);
+            shapeRenderer.setProjectionMatrix(cam.combined);
 
             spriteBatch.enableBlending();
             spriteBatch.begin();
@@ -348,9 +390,21 @@ public class GameState extends State implements InputProcessor{
                 pickups.get(i).render(spriteBatch);
             }
 
+            for(int i=0; i< player.getItems().size(); i++){
+                spriteBatch.draw(player.getItems().get(i).getTexture(), 100 + (100 * i), 100f);
+            }
+
+            for(int i = activeExplosions.size; --i >= 0; ){
+                activeExplosions.get(i).render(spriteBatch);
+            }
+
+            for(int i=0; i<particles.size(); i++){
+                particles.get(i).render(shapeRenderer);
+            }
+
             /** Draw all text on screen **/
 //        font.draw(spriteBatch, "Level: "+level +". Lives Left: "+player.getLives(), 30, 30);
-            labelA.setText("Level: " + wave);
+            labelA.setText("Level: " + level);
             labelA.draw(spriteBatch, 1);
 
             labelB.setText("Score: " + player.getScore());
@@ -375,15 +429,6 @@ public class GameState extends State implements InputProcessor{
 
     @Override
     public void handleInput() {
-        if(Gdx.input.isKeyPressed(Input.Keys.UP))
-            player.setUpPressed(true);
-        else
-            player.setUpPressed(false);
-
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            player.setDownPressed(true);
-        else
-            player.setDownPressed(false);
     }
 
 
@@ -402,6 +447,7 @@ public class GameState extends State implements InputProcessor{
         for(int i=0; i<pickups.size(); i++){
             pickups.get(i).dispose();
         }
+        shapeRenderer.dispose();
     }
 
 
@@ -422,6 +468,7 @@ public class GameState extends State implements InputProcessor{
                         player.addPoints(b.getDamage());
                         if(!pb.isAlive()) {
                             pb.playExplosion();
+                            spawnExplosion(pb.getX(), pb.getY());
                         } else {
                             b.playHitSound();
                         }
@@ -435,6 +482,7 @@ public class GameState extends State implements InputProcessor{
                         player.addPoints(b.getDamage());
                         if(!se.isAlive()) {
                             se.playExplosion();
+                            spawnExplosion(se.getX(), se.getY());
                         } else {
                             b.playHitSound();
                         }
@@ -465,6 +513,7 @@ public class GameState extends State implements InputProcessor{
                         player.addPoints(l.getDamage());
                         if(!pb.isAlive()) {
                             pb.playExplosion();
+                            spawnExplosion(pb.getX(), pb.getY());
                         } else {
                             l.playHitSound();
                         }
@@ -478,6 +527,7 @@ public class GameState extends State implements InputProcessor{
                         player.addPoints(l.getDamage());
                         if(!se.isAlive()) {
                             se.playExplosion();
+                            spawnExplosion(se.getX(), se.getY());
                         } else {
                             l.playHitSound();
                         }
@@ -508,6 +558,7 @@ public class GameState extends State implements InputProcessor{
                         player.addPoints(m.getDamage());
                         if(!pb.isAlive()) {
                             pb.playExplosion();
+                            spawnExplosion(pb.getX(), pb.getY());
                         } else {
                             m.playHitSound();
                         }
@@ -521,6 +572,7 @@ public class GameState extends State implements InputProcessor{
                         player.addPoints(m.getDamage());
                         if(!se.isAlive()) {
                             se.playExplosion();
+                            spawnExplosion(se.getX(), se.getY());
                         } else {
                             m.playHitSound();
                         }
@@ -547,8 +599,10 @@ public class GameState extends State implements InputProcessor{
                 pb.setAlive(false);
                 if(!player.isAlive()) {
                     player.playExplosion();
+                    spawnExplosion(pb.getX(), pb.getY());
                 } else {
                     pb.playExplosion();
+                    spawnExplosion(pb.getX(), pb.getY());
                 }
             }
         }
@@ -557,13 +611,18 @@ public class GameState extends State implements InputProcessor{
         for(int i=0; i<pickups.size(); i++){
             Item pi = pickups.get(i);
             if(player.collides(pi.getBounds()) || pi.collides(player.getBounds())){
-//                player.addItem(pi);
-                pi.attachToPlayer(player);
+                player.addItem(pi);
+                pi.playPickupSound();
                 pi.setAlive(false);
             }
         }
     }
 
+    private void spawnExplosion(float x, float y){
+        Animator explosion = explosionPool.obtain();
+        explosion.create(x,y);
+        activeExplosions.add(explosion);
+    }
 
     private void initStage(){
         /** Create the font and relevant styles associated for labels **/
@@ -639,9 +698,16 @@ public class GameState extends State implements InputProcessor{
 
 
     private void spawnPickups() {
-        for(int j=0; j< wave; j++) {
-            Item i = Item.generateItem();
+        for(int j=0; j< level; j++) {
+            Item i = itemFactory.generateItemOrWeapon();
             pickups.add(i);
+        }
+    }
+
+
+    private void createParticles(float x, float y){
+        for(int i=0; i<6; i++){
+            particles.add(new Particle(x,y));
         }
     }
 
@@ -716,12 +782,25 @@ public class GameState extends State implements InputProcessor{
 
     @Override
     public boolean keyDown(int keycode) {
+
+        if(keycode==Input.Keys.UP)
+            player.setUpPressed(true);
+
+        if(keycode==Input.Keys.DOWN)
+            player.setDownPressed(true);
+
         return true;
     }
 
 
     @Override
     public boolean keyUp(int keycode) {
+
+        if(keycode==Input.Keys.UP)
+            player.setUpPressed(false);
+
+        if(keycode==Input.Keys.DOWN)
+            player.setDownPressed(false);
 
         return true;
     }
@@ -737,16 +816,20 @@ public class GameState extends State implements InputProcessor{
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         cam.unproject(touchPoint.set(screenX,screenY,0));
         if(touchPoint.x < WORLD_WIDTH/2)
-            player.setKnobPosition(0,-1);
+            player.setUpPressed(true);
         else if(touchPoint.x > WORLD_WIDTH/2)
-            player.setKnobPosition(0,1);
+            player.setDownPressed(true);
         return true;
     }
 
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        player.setKnobPosition(0,0);
+        cam.unproject(touchPoint.set(screenX, screenY, 0));
+        if(touchPoint.x < WORLD_WIDTH/2)
+            player.setUpPressed(false);
+        else if(touchPoint.x > WORLD_WIDTH/2)
+            player.setDownPressed(false);
         return true;
     }
 

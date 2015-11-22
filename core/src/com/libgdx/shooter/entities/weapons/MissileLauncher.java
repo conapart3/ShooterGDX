@@ -23,7 +23,7 @@ public class MissileLauncher extends Weapon{
 
     @Override
     protected void setTexture(){
-        texture = new Texture(Gdx.files.internal("data/lightCannon.png"));
+        texture = new Texture(Gdx.files.internal("data/pickupMissile.png"));
     }
 
         @Override
@@ -46,11 +46,5 @@ public class MissileLauncher extends Weapon{
 
     }
 
-
-    @Override
-    public void attachToPlayer(Player player){
-        super.attachToPlayer(player);
-        System.out.println("MissileLauncher");
-    }
 
 }

@@ -15,21 +15,17 @@ public class ShieldPickup extends com.libgdx.shooter.entities.items.Item {
         super();
     }
 
+
     @Override
     protected void setPickupSound(){
         pickupSound = GameState.assetManager.get("data/Sound/pickupShield.wav");
     }
 
+
     @Override
     protected void setTexture(){
-        texture = new Texture(Gdx.files.internal("data/power_up_shield.png"));
+        texture = new Texture(Gdx.files.internal("data/pickupShield.png"));
     }
 
 
-    @Override
-    public void attachToPlayer(Player player) {
-        pickupSound.play();
-        System.out.println("SHIELD PICKUP");
-
-    }
 }

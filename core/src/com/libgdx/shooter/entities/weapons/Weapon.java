@@ -51,14 +51,6 @@ public abstract class Weapon extends Item{
         }
     }
 
-    @Override
-    public void attachToPlayer(Player player){
-
-        long id = pickupSound.play();
-
-        player.setWeapon(this);
-    }
-
     public void playShootSound(){
 //        if(GameState.assetManager.isLoaded())
         shootSound.stop();

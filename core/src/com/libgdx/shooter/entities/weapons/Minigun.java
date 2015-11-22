@@ -23,10 +23,10 @@ public class Minigun extends Weapon{
     }
 
 
-//    @Override
-//    protected void setTexture(){
-//        texture = new Texture(Gdx.files.internal("data/sprite_mirror_0.png"));
-//    }
+    @Override
+    protected void setTexture(){
+        texture = new Texture(Gdx.files.internal("data/pickupMinigun.png"));
+    }
 
     @Override
     protected void setShootSound(){
@@ -39,11 +39,6 @@ public class Minigun extends Weapon{
         pickupSound = GameState.assetManager.get("data/Sound/pickupMinigun.wav");
     }
 
-    @Override
-    public void attachToPlayer(Player player){
-        super.attachToPlayer(player);
-        System.out.println("Minigun");
-    }
 
     @Override
     public WeaponType getType() {

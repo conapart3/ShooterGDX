@@ -3,12 +3,15 @@ package com.libgdx.shooter.entities.enemies;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
 import com.libgdx.shooter.entities.SpaceObject;
 import com.libgdx.shooter.game.ShooterGame;
 import com.libgdx.shooter.gamestates.GameState;
+import com.libgdx.shooter.managers.Animator;
 
 import java.util.Random;
 
@@ -26,6 +29,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
     private Sound explosionSound;
     private float lerp = 0.5f;
 
+
     public ParachuteBomber(){
         this.alive = false;
         rand = new Random();
@@ -35,8 +39,10 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         height = texture.getHeight();
         bounds = new Rectangle(x,y,width,height);
         damage = 200;
+
         explosionSound = GameState.assetManager.get("data/Sound/explosionParachute.wav");
     }
+
 
     public void create(int level){
         //((max - min) + 1) + min
@@ -51,22 +57,24 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         damage = 200;
     }
 
-    public void update(float dt, float targetX, float targetY){
-        if(health<1)
-            alive = false;
 
-//        if(Math.sqrt(Math.pow((targetY-y),2) + Math.pow((targetX-x),2)) < 600){
-        if(x-targetX < 400 && Math.abs(y-targetY) < 400){
-//            dx = (targetX - x);
-            dy = (targetY - y);
-        }else{
-//            dx=0;
-            dy=0;
+    public void update(float dt, float targetX, float targetY){
+        /**
+         * todo: make this algorithm for moving toward the player better
+         */
+        if (x - targetX < 400) {
+            if (y < targetY) {
+                dy += 50;
+            } else if (y > targetY) {
+                dy -= 50;
+            }
+        } else {
+            dy = 0;
         }
 
         //apply acceleration to speed (dy and dx are acceleration)
-        xSpeed += dx*dt;
-        ySpeed += dy*dt;
+        xSpeed += dx * dt;
+        ySpeed += dy * dt;
 
         //position differs by the velocity
         x += xSpeed * dt;
@@ -75,16 +83,18 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         bounds.x = x;
         bounds.y = y;
 
-        if(x<-200)
+        if (x < -200)
             alive = false;
-        if(y >= CEILING_OFFSET || y <= GROUND_OFFSET)
+        if (y >= CEILING_OFFSET || y <= GROUND_OFFSET)
             ySpeed *= -1;
 
     }
 
+
     public void render(SpriteBatch sb){
         sb.draw(texture, x, y);
     }
+
 
     @Override
     public void reset() {
@@ -98,15 +108,19 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         health = 0;
     }
 
+
     public int getDamage() {
         return damage;
     }
+
 
     public void setDamage(int damage) {
         this.damage = damage;
     }
 
+
     public void playExplosion(){
         explosionSound.play();
     }
+
 }

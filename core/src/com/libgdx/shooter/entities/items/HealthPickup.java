@@ -16,35 +16,16 @@ public class HealthPickup extends com.libgdx.shooter.entities.items.Item {
         super();
     }
 
+
     @Override
     protected void setPickupSound(){
         pickupSound = GameState.assetManager.get("data/Sound/pickupHealth.wav");
     }
 
-    @Override
-    protected void setTexture(){
-        texture = new Texture(Gdx.files.internal("data/healthPickup.png"));
-    }
 
     @Override
-    public void attachToPlayer(Player player) {
-        pickupSound.play();
-        player.setHealth(1000);
-        System.out.println("HEALTH PICKUP");
+    protected void setTexture(){
+        texture = new Texture(Gdx.files.internal("data/pickupHealth.png"));
     }
-//
-//    @Override
-//    public void create(){
-//        super.create();
-//    }
-//
-//    @Override
-//    public void update(float dt){
-//        super.update(dt);
-//    }
-//
-//    @Override
-//    public void render(SpriteBatch sb){
-//        super.render(sb);
-//    }
+
 }

@@ -22,7 +22,9 @@ import static com.libgdx.shooter.game.ShooterGame.GROUND_OFFSET;
  */
 public class Item extends SpaceObject {
 
+
     protected Sound pickupSound;//set default item pickupsound, and sub classes can use their own
+
 
     public Item(){
         setPickupSound();
@@ -33,13 +35,16 @@ public class Item extends SpaceObject {
         create();
     }
 
+
     protected void setPickupSound(){
         pickupSound = GameState.assetManager.get("data/Sound/pickupShotgun.wav");
     }
 
+
     protected void setTexture(){
         texture = new Texture(Gdx.files.internal("data/sprite_mirror_0.png"));
     }
+
 
     public void create(){
         //max-min +1 +min
@@ -55,6 +60,7 @@ public class Item extends SpaceObject {
         dirY = 0f;
     }
 
+
     public void update(float dt){
         xSpeed += dx*dt;
         ySpeed += dy*dt;
@@ -69,7 +75,6 @@ public class Item extends SpaceObject {
             alive = false;
         if(y >= CEILING_OFFSET || y <= GROUND_OFFSET)
             ySpeed *= -1;
-
     }
 
 
@@ -77,35 +82,15 @@ public class Item extends SpaceObject {
         super.render(sb);
     }
 
-    public void attachToPlayer(Player player){
+
+    public void playPickupSound(){
         pickupSound.play();
     }
 
-    public static Item generateItem(){
-        Random rand = new Random();
-        int rng = rand.nextInt(9);
-        if(rng == 1)
-            return new Minigun();
-        else if(rng == 2)
-            return new HeavyLaserCannon();
-        else if(rng == 3)
-            return new LightLaserCannon();
-        else if(rng == 4)
-            return new ShieldPickup();
-        else if(rng == 5)
-            return new Medal();
-        else if(rng == 6)
-            return new Shotgun();
-        else if(rng == 7)
-            return new MissileLauncher();
-        else
-            return new HealthPickup();
-//   for testing comment out above uncomment HLC()
-//        return new HeavyLaserCannon();
-    }
 
     public void dispose(){
         super.dispose();
         pickupSound.dispose();
     }
+
 }

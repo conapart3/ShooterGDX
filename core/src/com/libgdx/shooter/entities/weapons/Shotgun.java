@@ -23,7 +23,8 @@ public class Shotgun extends Weapon{
 
     @Override
     protected void setTexture(){
-        texture = new Texture(Gdx.files.internal("data/Shotgun.png"));
+//        texture = new Texture(Gdx.files.internal("data/Shotgun.png"));
+        texture = new Texture(Gdx.files.internal("data/pickupShotgun.png"));
     }
 
         @Override
@@ -36,12 +37,6 @@ public class Shotgun extends Weapon{
     protected void setPickupSound(){
 //        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupShotgun.wav"));
         pickupSound = GameState.assetManager.get("data/Sound/pickupShotgun.wav");
-    }
-
-    @Override
-    public void attachToPlayer(Player player){
-        super.attachToPlayer(player);
-        System.out.println("Shotgun");
     }
 
     @Override

@@ -32,6 +32,7 @@ public class SpaceObject {
     protected double rotation;
     protected float xOffset,yOffset;
     protected Random rand;
+    protected boolean explosionFinished;
 
     protected int width, height;
 
@@ -105,6 +106,8 @@ public class SpaceObject {
 
     public void takeDamage(int i) {
         this.health -= i;
+        if(health<1)
+            alive = false;
     }
 
     public float getxOffset() {
@@ -145,5 +148,17 @@ public class SpaceObject {
 
     public void setAcceleration(Vector2 acceleration) {
         this.acceleration = acceleration;
+    }
+
+    public Texture getTexture() {
+        return texture;
+    }
+
+    public boolean isExplosionFinished() {
+        return explosionFinished;
+    }
+
+    public void setExplosionFinished(boolean explosionFinished) {
+        this.explosionFinished = explosionFinished;
     }
 }
