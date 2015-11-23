@@ -33,7 +33,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
     public ParachuteBomber(){
         this.alive = false;
         rand = new Random();
-        texture = new Texture(Gdx.files.internal("data/mine.png"));
+        texture = new Texture(Gdx.files.internal("data/newminePaint.png"));
         health = 50;
         width = texture.getWidth();
         height = texture.getHeight();

@@ -57,7 +57,6 @@ public class GameState extends State implements InputProcessor{
 
     private ArrayList<Particle> particles;
 
-
     /** Array and pool containing the bullets **/
     private final Array<Bullet> activeBullets = new Array<Bullet>();
     private final Pool<Bullet> bulletPool = new Pool<Bullet>(){
@@ -111,7 +110,7 @@ public class GameState extends State implements InputProcessor{
     private final Pool<Animator> explosionPool = new Pool<Animator>(){
         @Override
         protected Animator newObject(){
-            return new Animator("data/explosion.png", 12, 1, false);
+            return new Animator("data/explosionBlue.png", 12, 1, false);
         }
     };
 
@@ -179,6 +178,7 @@ public class GameState extends State implements InputProcessor{
         assetManager.load("data/Sound/explosionParachute.wav", Sound.class);
         assetManager.load("data/Sound/explosionShooterEnemy.wav", Sound.class);
         assetManager.load("data/Sound/explosionPlayer.wav", Sound.class);
+        assetManager.load("data/Sound/explosionBoss.wav", Sound.class);
 
 //        assetManager.load("data/boss1.png", Texture.class);
 
@@ -227,26 +227,28 @@ public class GameState extends State implements InputProcessor{
             int pbLen = activeParachuteBombers.size;
             for (int i = pbLen; --i >= 0; ) {
                 ParachuteBomber pbItem = activeParachuteBombers.get(i);
-                if (!pbItem.isAlive()) {
+                if (pbItem.isAlive()) {
+                    pbItem.update(dt, player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2);
+                } else {
                     createParticles(pbItem.getX(), pbItem.getY());
                     activeParachuteBombers.removeIndex(i);
                     parachuteBomberPool.free(pbItem);
                 }
-                pbItem.update(dt, player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2);
             }
 
             /** Update the active shooter enemies **/
             int seLen = activeShooterEnemies.size;
             for (int i = seLen; --i >= 0; ) {
                 ShooterEnemy seItem = activeShooterEnemies.get(i);
-                if (!seItem.isAlive()) {
+                if (seItem.isAlive()) {
+                    seItem.update(dt, player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2);
+                    if (seItem.isShooting()) {
+                        shoot(seItem.getWeapon(), seItem.getX() + seItem.getxOffset(), seItem.getY() + seItem.getyOffset(),
+                                seItem.getDirX(), seItem.getDirY(), true);
+                    }
+                } else {
                     activeShooterEnemies.removeIndex(i);
                     shooterEnemyPool.free(seItem);
-                }
-                seItem.update(dt, player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2);
-                if (seItem.isShooting()) {
-                    shoot(seItem.getWeapon(), seItem.getX() + seItem.getxOffset(), seItem.getY() + seItem.getyOffset(),
-                            seItem.getDirX(), seItem.getDirY(), true);
                 }
             }
 
@@ -254,55 +256,61 @@ public class GameState extends State implements InputProcessor{
             int bLen = activeBullets.size;
             for (int i = bLen; --i >= 0; ) {
                 Bullet bItem = activeBullets.get(i);
-                if (!bItem.isAlive()) {
+                if (bItem.isAlive()) {
+                    bItem.update(dt);
+                } else {
                     activeBullets.removeIndex(i);
                     bulletPool.free(bItem);
                 }
-                bItem.update(dt);
             }
 
             /** Update the active missiles **/
             int mLen = activeMissiles.size;
             for (int i = mLen; --i >= 0; ) {
                 Missile mItem = activeMissiles.get(i);
-                if (!mItem.isAlive()) {
+                if (mItem.isAlive()) {
+                    mItem.update(dt);
+                } else{
                     activeMissiles.removeIndex(i);
                     missilePool.free(mItem);
                 }
-                mItem.update(dt);
             }
 
             /** Update the active lasers **/
             int lLen = activeLasers.size;
             for (int i = lLen; --i >= 0; ) {
                 Laser lItem = activeLasers.get(i);
-                if (!lItem.isAlive()) {
+                if (lItem.isAlive()) {
+                    lItem.update(dt);
+                }else {
                     activeLasers.removeIndex(i);
                     laserPool.free(lItem);
                 }
-                lItem.update(dt);
             }
 
             /** Update the active explosions **/
             int expLen = activeExplosions.size;
             for (int i = expLen; --i >= 0; ) {
                 Animator aItem = activeExplosions.get(i);
-                if (!aItem.isAlive()) {
+                if (aItem.isAlive()) {
+                    aItem.update(dt);
+                } else {
 //                    createParticles(pbItem.getX(), pbItem.getY());
                     activeExplosions.removeIndex(i);
                     explosionPool.free(aItem);
+
                 }
-                aItem.update(dt);
             }
 
             /** Update the pickups **/
             for (int i = 0; i < pickups.size(); i++) {
                 Item i1 = pickups.get(i);
-                if (!i1.isAlive()) {
+                if (i1.isAlive()) {
+                    i1.update(dt);
+                } else {
                     i1.dispose();
                     pickups.remove(i);
                 }
-                i1.update(dt);
             }
 
             /** Update the boss **/
@@ -351,8 +359,9 @@ public class GameState extends State implements InputProcessor{
             }
 
             for(int i=0; i<particles.size(); i++){
-                particles.get(i).update(dt);
-                if(particles.get(i).shouldRemove()){
+                if(particles.get(i).isAlive()){
+                    particles.get(i).update(dt);
+                }else{
                     particles.remove(i);
                     i--;
                 }
@@ -408,8 +417,9 @@ public class GameState extends State implements InputProcessor{
             activeExplosions.get(i).render(spriteBatch);
         }
 
-        if(boss.isAlive())
+        if(boss.isAlive()) {
             boss.render(spriteBatch);
+        }
 
         for(int i=0; i<particles.size(); i++){
             particles.get(i).render(shapeRenderer);
@@ -426,7 +436,6 @@ public class GameState extends State implements InputProcessor{
         for (int i = activeLasers.size; --i >= 0; ) {
             activeLasers.get(i).render(spriteBatch);
         }
-
 
         for(int i=0; i< player.getItems().size(); i++){
             spriteBatch.draw(player.getItems().get(i).getTexture(), 100 + (100 * i), 100f);
@@ -501,6 +510,7 @@ public class GameState extends State implements InputProcessor{
                         if(!pb.isAlive()) {
                             pb.playExplosion();
                             spawnExplosion(pb.getX(), pb.getY());
+                            createParticles(pb.getX(), pb.getY());
                         } else {
                             b.playHitSound();
                         }
@@ -689,6 +699,7 @@ public class GameState extends State implements InputProcessor{
         }
     }
 
+
     private void spawnExplosion(float x, float y){
         Animator explosion = explosionPool.obtain();
         explosion.create(x,y);
@@ -705,7 +716,7 @@ public class GameState extends State implements InputProcessor{
 //        font = generator.generateFont(parameter);
 //        generator.dispose();
 
-        font = new BitmapFont(Gdx.files.internal("data/Fonts/outrider.fnt"), Gdx.files.internal("data/Fonts/outrider_0.png"), false);
+        font = new BitmapFont(Gdx.files.internal("data/Fonts/nextwave.fnt"), Gdx.files.internal("data/Fonts/nextwave_0.png"), false);
 
         //create labels
 //        font = new BitmapFont();

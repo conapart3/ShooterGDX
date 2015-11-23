@@ -9,8 +9,7 @@ import com.badlogic.gdx.math.MathUtils;
 public class Particle extends SpaceObject {
 
     private float timer;
-    private float time;
-    private boolean remove;
+    private float lifetime;
     private float radians;
 
     public Particle(float x, float y){
@@ -22,12 +21,9 @@ public class Particle extends SpaceObject {
         dx = MathUtils.cos(radians)*maxSpeed;
         dy = MathUtils.sin(radians)*maxSpeed;
 
+        lifetime = 5;
         timer = 0;
-        timer = 1;
-    }
-
-    public boolean shouldRemove(){
-        return remove;
+        alive = true;
     }
 
     public void update(float dt){
@@ -35,8 +31,8 @@ public class Particle extends SpaceObject {
         y += dy * dt;
 
         timer += dt;
-        if(timer > time)
-            remove = true;
+        if(timer > lifetime)
+            alive = false;
     }
 
     public void render(ShapeRenderer sr){

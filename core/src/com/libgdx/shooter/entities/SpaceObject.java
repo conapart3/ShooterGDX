@@ -50,8 +50,8 @@ public class SpaceObject {
     }
 
     protected void move(float dt){
-        xSpeed = maxSpeed * dx * dt;
-        ySpeed = maxSpeed * dy * dt;
+        xSpeed += maxSpeed * dx * dt;
+        ySpeed += maxSpeed * dy * dt;
 
         x += xSpeed * dt;
         y += ySpeed * dt;

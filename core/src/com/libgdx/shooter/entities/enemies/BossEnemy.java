@@ -46,7 +46,7 @@ public class BossEnemy extends SpaceObject {
         dirY = 0f;
         this.level = level;
         health = 1000*level;
-        explosionSound = GameState.assetManager.get("data/Sound/explosionShooterEnemy.wav");
+        explosionSound = GameState.assetManager.get("data/Sound/explosionBoss.wav");
         rand = new Random();
         weaponList = new ArrayList<Weapon>();
         x = -500;
@@ -80,7 +80,7 @@ public class BossEnemy extends SpaceObject {
         if(alive)
             weapon.update(dt);
 
-        if (x < 1900) {
+        if (x < 1500) {
             dirX = 0.001f * (targetX - x - width / 2);
             dirY = 0.001f * (targetY - y - height / 2);
             dirLength = (float) Math.sqrt(dirX * dirX + dirY * dirY);
@@ -90,8 +90,8 @@ public class BossEnemy extends SpaceObject {
             isShooting = weapon.isReadyToShoot();
         }
 
-        xOffset = width / 2 + dirX * 30;
-        yOffset = height / 2 + dirY * 30;
+        xOffset = width / 2 + dirX * 200;
+        yOffset = height / 2 + dirY * 200;
 
         xSpeed += dx*dt;
         ySpeed += dy*dt;
