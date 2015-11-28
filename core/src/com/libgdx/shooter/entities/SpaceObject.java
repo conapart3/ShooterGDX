@@ -2,6 +2,7 @@ package com.libgdx.shooter.entities;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -15,12 +16,14 @@ public class SpaceObject {
 
     protected float x, y;
     protected float xSpeed, ySpeed;
+    protected float radians;
+    protected boolean strafe;
 
     /**
      * Proper speed, velocity and acceleration implementation.
      */
     protected Vector2 velocity = new Vector2();
-    protected float maxSpeed = 0f;
+    protected float maxSpeed = 500f;
     protected Vector2 acceleration = new Vector2();
 
     protected float dx, dy;
@@ -50,18 +53,33 @@ public class SpaceObject {
     }
 
     protected void move(float dt){
-        xSpeed += maxSpeed * dx * dt;
-        ySpeed += maxSpeed * dy * dt;
+        xSpeed += dx*dt;
+        ySpeed += dy*dt;
 
         x += xSpeed * dt;
         y += ySpeed * dt;
 
         bounds.x = x;
         bounds.y = y;
-
-
-
     }
+
+    protected void speedLimit(){
+        if(xSpeed>maxSpeed)
+            xSpeed = maxSpeed;
+        if(xSpeed<-maxSpeed)
+            xSpeed = -maxSpeed;
+        if(ySpeed>maxSpeed)
+            ySpeed = maxSpeed;
+        if(ySpeed<-maxSpeed)
+            ySpeed = -maxSpeed;
+    }
+//
+//    protected void randomStrafe(){
+//        strafe = true;
+//        radians = MathUtils.random(2 * 3.1415f);
+//        dx = MathUtils.cos(radians)*100;
+//        dy = MathUtils.sin(radians)*100;
+//    }
 
     public void render(SpriteBatch sb){
         sb.draw(texture,x,y,width,height);

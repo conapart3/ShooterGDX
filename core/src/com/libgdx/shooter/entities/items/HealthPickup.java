@@ -30,6 +30,6 @@ public class HealthPickup extends com.libgdx.shooter.entities.items.Item {
 
     @Override
     public void use(Player p){
-        p.setHealth(1000);
+        p.addHealth(1000);
     }
 }

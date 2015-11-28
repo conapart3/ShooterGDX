@@ -65,7 +65,7 @@ public class Player extends SpaceObject {
         y = 800 * SCALE_RATIO_Y;
 
         maxSpeed = 600f;
-        health = 1000;
+        health = 2000;
         alive = true;
 
         xOffset = width/2+dirX*30;
@@ -182,6 +182,9 @@ public class Player extends SpaceObject {
     public void setOneHitKill() {
     }
 
+    public void addHealth(int hp){
+        this.health += hp;
+    }
     public void addMedal() {
         addPoints(1000);
     }

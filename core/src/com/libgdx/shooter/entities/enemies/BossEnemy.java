@@ -24,9 +24,10 @@ public class BossEnemy extends SpaceObject {
     private ArrayList<com.libgdx.shooter.entities.weapons.Weapon> weaponList;
     private Sound explosionSound;
     private int level;
-    private boolean isShooting;
+    private boolean isShooting, releaseBomb = false;
     private float dirLength;
     private Weapon weapon;
+    private float releaseBombLifeTime = 3f, releaseBombTimer = 0f;
 
 
     public BossEnemy(){
@@ -51,6 +52,7 @@ public class BossEnemy extends SpaceObject {
         weaponList = new ArrayList<Weapon>();
         x = -500;
         y = -500;
+        releaseBombTimer = 0f;
     }
 
 
@@ -68,6 +70,8 @@ public class BossEnemy extends SpaceObject {
         dirY = 0f;
 //        damage = 200;
         weapon = new MissileLauncher();
+        releaseBombTimer = 0f;
+        releaseBomb = false;
     }
 
 
@@ -77,8 +81,17 @@ public class BossEnemy extends SpaceObject {
 ////            isShooting=weaponList.get(0).isReadyToShoot();
 //        }
 
-        if(alive)
+        if(alive) {
             weapon.update(dt);
+
+            releaseBombTimer += dt;
+            if(releaseBombTimer>=releaseBombLifeTime){
+                releaseBombTimer -= releaseBombLifeTime;
+                releaseBomb = true;
+            } else {
+                releaseBomb = false;
+            }
+        }
 
         if (x < 1500) {
             dirX = 0.001f * (targetX - x - width / 2);
@@ -120,6 +133,7 @@ public class BossEnemy extends SpaceObject {
             texture.dispose();
     }
 
+
     public void playExplosion(){
         explosionSound.play();
     }
@@ -159,4 +173,11 @@ public class BossEnemy extends SpaceObject {
         this.dirY = dirY;
     }
 
+    public boolean isReleaseBomb() {
+        return releaseBomb;
+    }
+
+    public void setReleaseBomb(boolean releaseBomb) {
+        this.releaseBomb = releaseBomb;
+    }
 }

@@ -28,17 +28,20 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
     private int damage;
     private Sound explosionSound;
     private float lerp = 0.5f;
+    private boolean fromBoss;
+    private float dirLength;
 
 
     public ParachuteBomber(){
         this.alive = false;
         rand = new Random();
-        texture = new Texture(Gdx.files.internal("data/newminePaint.png"));
+        texture = new Texture(Gdx.files.internal("data/newmine.png"));
         health = 50;
         width = texture.getWidth();
         height = texture.getHeight();
         bounds = new Rectangle(x,y,width,height);
         damage = 200;
+        maxSpeed = 500f;
 
         explosionSound = GameState.assetManager.get("data/Sound/explosionParachute.wav");
     }
@@ -53,7 +56,25 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         alive = true;
         dy = 0;
         dx = 0;
-        health = 25 + (5*level);
+        health = 25 + (10*level);
+        damage = 200;
+    }
+
+    public void create(int level, float startX, float startY, float targetX, float targetY){
+        //((max - min) + 1) + min
+        x = startX;
+        y = startY;
+        ySpeed = -50;
+        alive = true;
+
+        /** normalise dx and dy to be a unit vector to multiply by maxSpeed **/
+        dx = targetX-x;
+        dy = targetY-y;
+        dirLength = (float) Math.sqrt(dx * dx + dy * dy);
+        dx = dx/dirLength;
+        dy = dy/dirLength;
+
+        health = 25 + (10*level);
         damage = 200;
     }
 
@@ -62,15 +83,15 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         /**
          * todo: make this algorithm for moving toward the player better
          */
-        if (x - targetX < 400) {
-            dy = (y-targetY)/2;
-        } else {
-            dy = 0;
-        }
+//        if (x - targetX < 400) {
+//            dy = (y-targetY)/2;
+//        } else {
+//            dy = 0;
+//        }
 
         //apply acceleration to speed (dy and dx are acceleration)
-        xSpeed += dx * dt;
-        ySpeed += dy * dt;
+        xSpeed += maxSpeed * dx * dt;
+        ySpeed += maxSpeed * dy * dt;
 
         //position differs by the velocity
         x += xSpeed * dt;
@@ -119,4 +140,11 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         explosionSound.play();
     }
 
+    public boolean isFromBoss() {
+        return fromBoss;
+    }
+
+    public void setFromBoss(boolean fromBoss) {
+        this.fromBoss = fromBoss;
+    }
 }

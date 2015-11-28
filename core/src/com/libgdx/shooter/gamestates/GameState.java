@@ -230,7 +230,7 @@ public class GameState extends State implements InputProcessor{
                 if (pbItem.isAlive()) {
                     pbItem.update(dt, player.getX() + player.getWidth() / 2, player.getY() + player.getHeight() / 2);
                 } else {
-                    createParticles(pbItem.getX(), pbItem.getY());
+//                    createParticles(pbItem.getX(), pbItem.getY());
                     activeParachuteBombers.removeIndex(i);
                     parachuteBomberPool.free(pbItem);
                 }
@@ -320,6 +320,9 @@ public class GameState extends State implements InputProcessor{
                     shoot(boss.getWeapon(), boss.getX() + boss.getxOffset(), boss.getY() + boss.getyOffset(),
                             boss.getDirX(), boss.getDirY(), true);
                 }
+                if(boss.isReleaseBomb()){
+                    releaseBomb();
+                }
             }
 
             checkCollisions();
@@ -339,6 +342,7 @@ public class GameState extends State implements InputProcessor{
 //                        wave = 1;
 //                    }
                     if(wave<=5+level) {
+//                    if(wave<=0+level) {
                         levelSuccessFlag = false;
                         spawnParachuteBombers();
                         spawnShooterEnemies();
@@ -346,11 +350,13 @@ public class GameState extends State implements InputProcessor{
                         player.addPoints(100 * (wave - 1));
                         autoShoot = true;
                     } else if(wave == 6+level){
+//                    } else if(wave == 1+level){
                         levelSuccessFlag = false;
                         spawnBoss();
                         player.addPoints(100 * (wave - 1));
                         autoShoot = true;
                     } else if(wave%(7+level)==0){
+//                    } else if(wave%(2+level)==0){
                         currentLevel=levels.get(level%2);//level starts at 0 therefore get curlevel-1
                         level++;
                         wave = 0;
@@ -510,7 +516,7 @@ public class GameState extends State implements InputProcessor{
                         if(!pb.isAlive()) {
                             pb.playExplosion();
                             spawnExplosion(pb.getX(), pb.getY());
-                            createParticles(pb.getX(), pb.getY());
+//                            createParticles(pb.getX(), pb.getY());
                         } else {
                             b.playHitSound();
                         }
@@ -700,6 +706,12 @@ public class GameState extends State implements InputProcessor{
     }
 
 
+    private void releaseBomb(){
+        ParachuteBomber pb = parachuteBomberPool.obtain();
+        pb.create(level, boss.getX()+(boss.getWidth()/2), boss.getY(), player.getX()+player.getxOffset(), player.getY()+player.getyOffset());
+        activeParachuteBombers.add(pb);
+    }
+
     private void spawnExplosion(float x, float y){
         Animator explosion = explosionPool.obtain();
         explosion.create(x,y);
@@ -794,7 +806,7 @@ public class GameState extends State implements InputProcessor{
 
     private void spawnBoss(){
         boss.dispose();
-        boss = new BossEnemy("data/boss1big1paintphotoshopped.png", level);
+        boss = new BossEnemy("data/bigboss1.png", level);
         boss.create();
     }
 
@@ -901,9 +913,9 @@ public class GameState extends State implements InputProcessor{
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         cam.unproject(touchPoint.set(screenX,screenY,0));
-        if(touchPoint.x < WORLD_WIDTH/2)
+        if(touchPoint.x > WORLD_WIDTH/2)
             player.setUpPressed(true);
-        else if(touchPoint.x > WORLD_WIDTH/2)
+        else if(touchPoint.x < WORLD_WIDTH/2)
             player.setDownPressed(true);
         return true;
     }
@@ -912,9 +924,9 @@ public class GameState extends State implements InputProcessor{
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         cam.unproject(touchPoint.set(screenX, screenY, 0));
-        if(touchPoint.x < WORLD_WIDTH/2)
+        if(touchPoint.x > WORLD_WIDTH/2)
             player.setUpPressed(false);
-        else if(touchPoint.x > WORLD_WIDTH/2)
+        else if(touchPoint.x < WORLD_WIDTH/2)
             player.setDownPressed(false);
         return true;
     }

@@ -4,11 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
 import com.libgdx.shooter.entities.SpaceObject;
 import com.libgdx.shooter.entities.weapons.HeavyLaserCannon;
-import com.libgdx.shooter.entities.weapons.LightLaserCannon;
 import com.libgdx.shooter.entities.weapons.Weapon;
 import com.libgdx.shooter.gamestates.GameState;
 
@@ -28,6 +28,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
     private double rotation;
     private Weapon weapon;
     private Sound explosionSound;
+    private float strafeChangeTime = 4f, strafeTimer =0f;
 
 
     public ShooterEnemy(){
@@ -35,7 +36,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         rand = new Random();
 //        texture = new Texture(Gdx.files.internal("data/shooterEnemy.png"));
 //        texture = new Texture(Gdx.files.internal("data/crab3d.png"));
-        texture = new Texture(Gdx.files.internal("data/PearlEnemyPaint.png"));
+        texture = new Texture(Gdx.files.internal("data/pearlEnemyFinal.png"));
         health = 200;
         width = texture.getWidth();
         height = texture.getHeight();
@@ -46,6 +47,8 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         weapon = new HeavyLaserCannon();
         //randomize the weapon.
         explosionSound = GameState.assetManager.get("data/Sound/explosionShooterEnemy.wav");
+        maxSpeed = 400;
+        strafe = false;
     }
 
 
@@ -54,14 +57,17 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         //max-min +1 +min
         x = rand.nextInt(3000-2000+1)+2000;
         y = rand.nextInt(1000-250+1)+250;
-        xSpeed = (rand.nextInt(300-100 + 1)+100)*-1;
+//        xSpeed = (rand.nextInt(300-100 + 1)+100)*-1;
+        xSpeed = -maxSpeed;
         ySpeed = rand.nextInt(50)-25;
         alive = true;
-        dy = dx = 0;
-        health = 100 + (10*level);
+        dy = 0;
+        dx = -50;
+        health = 100 + (50*level);
         isShooting = false;
         dirX = 0f;
         dirY = 0f;
+        strafe = false;
     }
 
 
@@ -71,8 +77,8 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
             weapon.update(dt);
 
         if (x < 1900) {
-            dirX = 0.001f * (targetX - x - width / 2);
-            dirY = 0.001f * (targetY - y - height / 2);
+            dirX = (targetX - x - width / 2);
+            dirY = (targetY - y - height / 2);
             dirLength = (float) Math.sqrt(dirX * dirX + dirY * dirY);
             dirX = dirX / dirLength;
             dirY = dirY / dirLength;
@@ -84,28 +90,64 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         xOffset = width / 2 + dirX * 30;
         yOffset = height / 2 + dirY * 30;
 
-        xSpeed += dx*dt;
-        ySpeed += dy*dt;
 
-        x += xSpeed * dt;
-        y += ySpeed * dt;
-
-        bounds.x = x;
-        bounds.y = y;
+        strafeTimer += dt;
 
         if(x<-200)
             alive = false;
-        if(x<1300)
-            xSpeed=0;
+
+        if(x<1200) {
+            dx = 300f;
+        } else {
+            dx = 0f;
+        }
+
+        if(x<1500 && x>1300 && y>400 && y<600){
+            if(strafeTimer > strafeChangeTime){
+                strafeTimer = strafeTimer - strafeChangeTime;
+                randomStrafe();
+            }
+        } else {
+            strafe=false;
+        }
+
+//        if(strafe){
+            if(x>1500)
+                dx = -300f;
+            if(x<1300 && xSpeed<0)
+                dx = 300f;
+            if(y>600 && ySpeed>0)
+                dy = -300f;
+            if(y<400 && ySpeed<0)
+                dy = 300f;
+//            if(y<700 && y> 350){
+//                if(ySpeed>0)
+//                    dy = -20;
+//                if(ySpeed<0)
+//                    dy=20;
+//            }
+//        }
+
         if(y>= CEILING_OFFSET || y<= GROUND_OFFSET)
-            ySpeed *= -1;
+            ySpeed = 0;
+
+
+        super.speedLimit();
+        super.move(dt);
+
     }
 
+    private void randomStrafe(){
+        strafe = true;
+        radians = MathUtils.random(2 * 3.1415f);
+        dx = MathUtils.cos(radians)*50;
+        dy = MathUtils.sin(radians)*50;
+    }
 
     @Override
     public void render(SpriteBatch sb){
 //        sb.draw(texture,x,y,width/2,height/2,width,height,1,1,(float)rotation);
-        sb.draw(texture,x,y,width/2,height/2,width,height,1,1,(float) rotation,0,0,width,height,false,false);
+        sb.draw(texture, x, y, width / 2, height / 2, width, height, 1, 1, (float) rotation, 0, 0, width, height, false, false);
     }
 
 
