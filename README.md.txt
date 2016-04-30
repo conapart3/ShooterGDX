@@ -1,1 +1,3 @@
-Hello this is a readme
+## ShooterGDX
+
+- This is currently in development.
