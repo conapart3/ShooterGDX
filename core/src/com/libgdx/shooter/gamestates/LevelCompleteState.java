@@ -8,31 +8,38 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.libgdx.shooter.Context;
+import com.libgdx.shooter.game.ShooterGame;
 import com.libgdx.shooter.managers.GameStateManager;
 
 import static com.libgdx.shooter.game.ShooterGame.WORLD_HEIGHT;
 import static com.libgdx.shooter.game.ShooterGame.WORLD_WIDTH;
 
 /**
- * Created by Conal on 25/10/2015.
+ * Created by Conal on 12/10/2016.
  */
-public class MenuState extends State {
+public class LevelCompleteState extends State {
 
-    private final String title = "ShooterGDX";
+    private final String title = "Level Complete";
     private SpriteBatch sb;
     private BitmapFont font;
-    private TextButton textButton1, textButton2, textButton3;
+    private Label label1, label2;
     private TextButton.TextButtonStyle textButtonStyle;
     private Stage stage;
+    private int score, level;
+    private TextButton textButton1;
 
-    public MenuState(GameStateManager gsm){
+    public LevelCompleteState(GameStateManager gsm) {
         super(gsm);
     }
 
     @Override
     public void create() {
+        score = ShooterGame.getCurrentContext().score;
+        level = ShooterGame.getCurrentContext().level;
+
         cam.position.set(WORLD_WIDTH/2, WORLD_HEIGHT/2, 0);
 
         sb = new SpriteBatch();
@@ -46,19 +53,20 @@ public class MenuState extends State {
         textButtonStyle = new TextButton.TextButtonStyle();
         textButtonStyle.font = font;
 
-        textButton1 = new TextButton("Play", textButtonStyle);
-        textButton2 = new TextButton("High Scores", textButtonStyle);
-        textButton3 = new TextButton("Quit", textButtonStyle);
+        Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
+
+        label1 = new Label("Level: " +level, labelStyle);
+        label2 = new Label("Score: " +score, labelStyle);
+
+        textButton1 = new TextButton("Continue", textButtonStyle);
 
 //        textButton1.setBounds(500f, 500f, 300, 300);
-        textButton1.setPosition(500f,500f);
-        textButton2.setPosition(500f,400f);
-        textButton3.setPosition(500f,300f);
+        label1.setPosition(500f,500f);
+        label2.setPosition(500f,400f);
 
         stage = new Stage(viewport);
-        stage.addActor(textButton1);
-        stage.addActor(textButton2);
-        stage.addActor(textButton3);
+        stage.addActor(label1);
+        stage.addActor(label2);
 
         Gdx.input.setInputProcessor(stage);
 
@@ -77,20 +85,23 @@ public class MenuState extends State {
 
         sb.begin();
 
+        label1.draw(sb, 1);
+        label2.draw(sb, 1);
+
         textButton1.draw(sb, 1);
-        textButton2.draw(sb, 1);
-        textButton3.draw(sb, 1);
 
         sb.end();
+
     }
 
     @Override
     public void handleInput() {
-        if (textButton1.isPressed()){
+        if (textButton1.isPressed())
             gameStateManager.setState(GameStateManager.GAME);
-        }
+
         if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER))
             gameStateManager.setState(GameStateManager.GAME);
+
     }
 
     @Override
@@ -98,13 +109,15 @@ public class MenuState extends State {
         sb.dispose();
         font.dispose();
         stage.dispose();
+
     }
 
     @Override
-    public void resize(int width, int height){
+    public void resize(int width, int height) {
         viewport.update(width, height);
         cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
 //        stage.getViewport().update(WORLD_WIDTH, (int)(WORLD_WIDTH * SCREEN_ASPECT_RATIO), false);
+
     }
 
     @Override
@@ -114,10 +127,6 @@ public class MenuState extends State {
 
     @Override
     public void resume() {
-
-    }
-
-    private void initStage(){
 
     }
 }

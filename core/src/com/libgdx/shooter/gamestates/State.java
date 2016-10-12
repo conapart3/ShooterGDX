@@ -3,6 +3,7 @@ package com.libgdx.shooter.gamestates;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.libgdx.shooter.Context;
 import com.libgdx.shooter.managers.GameStateManager;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -19,6 +20,7 @@ public abstract class State {
     protected GameStateManager gameStateManager;
     protected OrthographicCamera cam;
     protected Viewport viewport;
+    protected Context context;
 
 
     public State (GameStateManager gsm){

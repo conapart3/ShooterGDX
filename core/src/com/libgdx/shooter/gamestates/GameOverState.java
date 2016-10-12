@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.libgdx.shooter.Context;
 import com.libgdx.shooter.managers.GameStateManager;
 
 import static com.libgdx.shooter.game.ShooterGame.WORLD_HEIGHT;
@@ -26,9 +27,8 @@ public class GameOverState extends State{
     private Label labelA, labelB;
     private Stage stage;
 
-    public GameOverState(GameStateManager gsm, int score){
+    public GameOverState(GameStateManager gsm){
         super(gsm);
-        this.score = score;
     }
 
     @Override
@@ -87,7 +87,7 @@ public class GameOverState extends State{
     public void handleInput() {
 
         if (Gdx.input.justTouched()){
-            gameStateManager.setState(GameStateManager.GAME, 0);
+            gameStateManager.setState(GameStateManager.GAME);
         }
     }
 

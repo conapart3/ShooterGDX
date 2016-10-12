@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+import com.libgdx.shooter.Context;
 import com.libgdx.shooter.entities.Particle;
 import com.libgdx.shooter.entities.bullets.Bullet;
 import com.libgdx.shooter.entities.bullets.Laser;
@@ -28,6 +29,7 @@ import com.libgdx.shooter.entities.enemies.ShooterEnemy;
 import com.libgdx.shooter.entities.items.ItemFactory;
 import com.libgdx.shooter.entities.weapons.Weapon;
 import com.libgdx.shooter.entities.weapons.WeaponType;
+import com.libgdx.shooter.game.ShooterGame;
 import com.libgdx.shooter.levels.Level;
 import com.libgdx.shooter.managers.Animator;
 import com.libgdx.shooter.managers.GameStateManager;
@@ -48,7 +50,7 @@ public class GameState extends State implements InputProcessor{
     private float nextLevelTimer, gameOverTimer;
     private ArrayList<Level> levels;
     private int numberOfLevels = 2;
-    private int level = 1, wave = 0;
+    private int level = ShooterGame.getCurrentContext().level, wave = 0;
     private Level currentLevel;
     private boolean levelSuccessFlag = false;
 
@@ -341,8 +343,8 @@ public class GameState extends State implements InputProcessor{
 //                        currentLevel = levels.get(level);
 //                        wave = 1;
 //                    }
-                    if(wave<=5+level) {
-//                    if(wave<=0+level) {
+//                    if(wave<=5+level) {
+                    if(wave<=0+level) {
                         levelSuccessFlag = false;
                         spawnParachuteBombers();
                         spawnShooterEnemies();
@@ -355,11 +357,14 @@ public class GameState extends State implements InputProcessor{
                         spawnBoss();
                         player.addPoints(100 * (wave - 1));
                         autoShoot = true;
-                    } else if(wave%(7+level)==0){
+                    } else if(wave%(7+level)==0){ //level is complete!
 //                    } else if(wave%(2+level)==0){
                         currentLevel=levels.get(level%2);//level starts at 0 therefore get curlevel-1
                         level++;
+                        ShooterGame.getCurrentContext().level = level;
+                        ShooterGame.getCurrentContext().score = player.getScore();
                         wave = 0;
+                        gameStateManager.setState(GameStateManager.LEVEL_COMPLETE_STATE);
                     }
                 }
             }
@@ -386,7 +391,8 @@ public class GameState extends State implements InputProcessor{
             gameOverTimer += dt;
             if (gameOverTimer > 1) {
                 gameOverTimer -= 1;
-                gameStateManager.setState(GameStateManager.GAME_OVER, player.getScore());
+                ShooterGame.getCurrentContext().score = player.getScore();
+                gameStateManager.setState(GameStateManager.GAME_OVER);
             }
         }
     }

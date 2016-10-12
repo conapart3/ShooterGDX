@@ -5,7 +5,9 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
+import com.libgdx.shooter.Context;
 import com.libgdx.shooter.managers.GameStateManager;
+import com.libgdx.shooter.managers.StyleManager;
 
 
 public class ShooterGame extends Game {
@@ -20,6 +22,7 @@ public class ShooterGame extends Game {
 	public static int CEILING_OFFSET;
 	public static int PLAYER_CEILING_OFFSET;
 	public FPSLogger fpsLogger;
+	private static Context context;
 
 //	public static OrthographicCamera cam;
 //	public Viewport viewport;
@@ -30,6 +33,13 @@ public class ShooterGame extends Game {
 	/*create all images sounds and media for game*/
 	@Override
 	public void create () {
+		context = getCurrentContext();
+		context.level = 1;
+		context.score = 0;
+
+		// Initialize the style manager static members
+		StyleManager.init();
+
 		//put all images your going to render in a spritebatch.
 		//this batches up all images and renders at once. WAY MORE EFFICIENT
 
@@ -105,6 +115,13 @@ public class ShooterGame extends Game {
 	@Override
 	public void resume () {
 		gsm.resume();
+	}
+
+	public static Context getCurrentContext(){
+		if(context==null){
+			context = new Context();
+		}
+		return context;
 	}
 
 }

@@ -1,7 +1,9 @@
 package com.libgdx.shooter.managers;
 
+import com.libgdx.shooter.Context;
 import com.libgdx.shooter.gamestates.GameOverState;
 import com.libgdx.shooter.gamestates.GameState;
+import com.libgdx.shooter.gamestates.LevelCompleteState;
 import com.libgdx.shooter.gamestates.MenuState;
 import com.libgdx.shooter.gamestates.State;
 
@@ -18,23 +20,27 @@ public class GameStateManager {
     public static final int MENU = 0;
     public static final int GAME = 1;
     public static final int GAME_OVER = 2;
+    public static final int LEVEL_COMPLETE_STATE = 3;
 
     public GameStateManager(){
-        setState(MENU,0);
+        setState(MENU);
     }
 
-    public void setState(int state, int score){
+    public void setState(int newState){
         if(currentState != null)
             currentState.dispose();
 
-        if(state==MENU)
+        if(newState==MENU)
             currentState = new MenuState(this);
 
-        if(state==GAME)
+        if(newState==GAME)
             currentState = new GameState(this);
 
-        if(state==GAME_OVER)
-            currentState = new GameOverState(this, score);
+        if(newState==GAME_OVER)
+            currentState = new GameOverState(this);
+
+        if(newState==LEVEL_COMPLETE_STATE)
+            currentState = new LevelCompleteState(this);
 
         currentState.create();
         currentState.update(0f);
