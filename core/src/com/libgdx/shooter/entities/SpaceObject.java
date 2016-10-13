@@ -2,7 +2,6 @@ package com.libgdx.shooter.entities;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -33,28 +32,28 @@ public class SpaceObject {
     protected int health;
     protected float dirX, dirY;//for movement, and rotation, the directional vector for where it should point/move/shoot
     protected double rotation;
-    protected float xOffset,yOffset;
+    protected float xOffset, yOffset;
     protected Random rand;
     protected boolean explosionFinished;
 
     protected int width, height;
 
-    public boolean collides(Rectangle a){
+    public boolean collides(Rectangle a) {
         return a.overlaps(bounds);
     }
 
-    public void dispose(){
+    public void dispose() {
         texture.dispose();
     }
 
-    public void setPosition(float x, float y){
+    public void setPosition(float x, float y) {
         this.x = x;
         this.y = y;
     }
 
-    protected void move(float dt){
-        xSpeed += dx*dt;
-        ySpeed += dy*dt;
+    protected void move(float dt) {
+        xSpeed += dx * dt;
+        ySpeed += dy * dt;
 
         x += xSpeed * dt;
         y += ySpeed * dt;
@@ -63,14 +62,14 @@ public class SpaceObject {
         bounds.y = y;
     }
 
-    protected void speedLimit(){
-        if(xSpeed>maxSpeed)
+    protected void speedLimit() {
+        if (xSpeed > maxSpeed)
             xSpeed = maxSpeed;
-        if(xSpeed<-maxSpeed)
+        if (xSpeed < -maxSpeed)
             xSpeed = -maxSpeed;
-        if(ySpeed>maxSpeed)
+        if (ySpeed > maxSpeed)
             ySpeed = maxSpeed;
-        if(ySpeed<-maxSpeed)
+        if (ySpeed < -maxSpeed)
             ySpeed = -maxSpeed;
     }
 //
@@ -81,8 +80,8 @@ public class SpaceObject {
 //        dy = MathUtils.sin(radians)*100;
 //    }
 
-    public void render(SpriteBatch sb){
-        sb.draw(texture,x,y,width,height);
+    public void render(SpriteBatch sb) {
+        sb.draw(texture, x, y, width, height);
 
     }
 
@@ -124,7 +123,7 @@ public class SpaceObject {
 
     public void takeDamage(int i) {
         this.health -= i;
-        if(health<1)
+        if (health < 1)
             alive = false;
     }
 
@@ -142,7 +141,7 @@ public class SpaceObject {
 
     public void setyOffset(float yOffset) {
         this.yOffset = yOffset;
-  }
+    }
 
     public int getWidth() {
         return width;

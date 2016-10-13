@@ -2,13 +2,10 @@ package com.libgdx.shooter.gamestates;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.libgdx.shooter.Context;
 import com.libgdx.shooter.managers.GameStateManager;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
-import static com.libgdx.shooter.game.ShooterGame.SCREEN_HEIGHT;
-import static com.libgdx.shooter.game.ShooterGame.SCREEN_WIDTH;
 import static com.libgdx.shooter.game.ShooterGame.WORLD_HEIGHT;
 import static com.libgdx.shooter.game.ShooterGame.WORLD_WIDTH;
 
@@ -23,7 +20,7 @@ public abstract class State {
     protected Context context;
 
 
-    public State (GameStateManager gsm){
+    public State(GameStateManager gsm) {
         this.gameStateManager = gsm;
         cam = new OrthographicCamera();
 
@@ -37,11 +34,18 @@ public abstract class State {
     }
 
     public abstract void create();
+
     public abstract void update(float delta);
+
     public abstract void render();
+
     public abstract void handleInput();
+
     public abstract void dispose();
+
     public abstract void resize(int width, int height);
+
     public abstract void pause();
+
     public abstract void resume();
 }

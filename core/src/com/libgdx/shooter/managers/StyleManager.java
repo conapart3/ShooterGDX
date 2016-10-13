@@ -10,7 +10,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
  */
 public class StyleManager {
 
-    /** Create all styles here and make accessible to public so the same styles are created once. **/
+    /**
+     * Create all styles here and make accessible to public so the same styles are created once.
+     **/
 
     public static BitmapFont font;
     public static TextButton.TextButtonStyle textButtonStyle;
@@ -19,7 +21,7 @@ public class StyleManager {
         init();
     }
 
-    public static void init(){
+    public static void init() {
 //        font = new BitmapFont(Gdx.files.internal("data/Fonts/outrider.fnt"), Gdx.files.internal("data/Fonts/outrider_0.png"), false);
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/Fonts/Montserrat-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();

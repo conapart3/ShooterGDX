@@ -8,9 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.libgdx.shooter.Context;
 import com.libgdx.shooter.game.ShooterGame;
 import com.libgdx.shooter.managers.GameStateManager;
 
@@ -40,7 +38,7 @@ public class LevelCompleteState extends State {
         score = ShooterGame.getCurrentContext().score;
         level = ShooterGame.getCurrentContext().level;
 
-        cam.position.set(WORLD_WIDTH/2, WORLD_HEIGHT/2, 0);
+        cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
 
         sb = new SpriteBatch();
 
@@ -55,14 +53,14 @@ public class LevelCompleteState extends State {
 
         Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
 
-        label1 = new Label("Level: " +level, labelStyle);
-        label2 = new Label("Score: " +score, labelStyle);
+        label1 = new Label("Level: " + level, labelStyle);
+        label2 = new Label("Score: " + score, labelStyle);
 
         textButton1 = new TextButton("Continue", textButtonStyle);
 
 //        textButton1.setBounds(500f, 500f, 300, 300);
-        label1.setPosition(500f,500f);
-        label2.setPosition(500f,400f);
+        label1.setPosition(500f, 500f);
+        label2.setPosition(500f, 400f);
 
         stage = new Stage(viewport);
         stage.addActor(label1);
@@ -99,7 +97,7 @@ public class LevelCompleteState extends State {
         if (textButton1.isPressed())
             gameStateManager.setState(GameStateManager.GAME);
 
-        if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER))
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER))
             gameStateManager.setState(GameStateManager.GAME);
 
     }

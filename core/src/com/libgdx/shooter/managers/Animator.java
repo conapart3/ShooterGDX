@@ -19,7 +19,7 @@ public class Animator implements Pool.Poolable {
     private TextureRegion currentFrame;
     private Animation animation;
     private float stateTime = 0f;
-    private float x,y, xSpeed;
+    private float x, y, xSpeed;
     private int FRAME_COLS, FRAME_ROWS;
     private int index = 0;
     private boolean looping;
@@ -27,15 +27,15 @@ public class Animator implements Pool.Poolable {
     private int numFrames;
 
 
-    public Animator(String filePath, int columns, int rows, boolean looping){
-        this.FRAME_ROWS=rows;
-        this.FRAME_COLS=columns;
+    public Animator(String filePath, int columns, int rows, boolean looping) {
+        this.FRAME_ROWS = rows;
+        this.FRAME_COLS = columns;
         this.looping = looping;
 
         texture = new Texture(Gdx.files.internal(filePath));
-        TextureRegion[][] textureRegions = TextureRegion.split(texture, texture.getWidth()/FRAME_COLS, texture.getHeight()/FRAME_ROWS);
+        TextureRegion[][] textureRegions = TextureRegion.split(texture, texture.getWidth() / FRAME_COLS, texture.getHeight() / FRAME_ROWS);
 
-        numFrames = FRAME_COLS*FRAME_ROWS;
+        numFrames = FRAME_COLS * FRAME_ROWS;
         frames = new TextureRegion[numFrames];
         for (int i = 0; i < FRAME_ROWS; i++) {
             for (int j = 0; j < FRAME_COLS; j++) {
@@ -47,7 +47,7 @@ public class Animator implements Pool.Poolable {
     }
 
 
-    public void create(float x, float y){
+    public void create(float x, float y) {
         this.x = x;
         this.y = y;
         xSpeed = -250;
@@ -56,17 +56,17 @@ public class Animator implements Pool.Poolable {
     }
 
 
-    public void update(float dt){
-        x += xSpeed *dt;
+    public void update(float dt) {
+        x += xSpeed * dt;
         stateTime += dt;
         currentFrame = animation.getKeyFrame(stateTime, looping);
         alive = !animation.isAnimationFinished(stateTime);
     }
 
 
-    public void render(SpriteBatch sb){
-        if(currentFrame!=null)
-            sb.draw(currentFrame,x,y);
+    public void render(SpriteBatch sb) {
+        if (currentFrame != null)
+            sb.draw(currentFrame, x, y);
     }
 
     public boolean isAlive() {
@@ -77,7 +77,7 @@ public class Animator implements Pool.Poolable {
         this.alive = alive;
     }
 
-    public void reset(){
+    public void reset() {
         x = -500;
         y = -500;
         stateTime = 0;
@@ -85,10 +85,10 @@ public class Animator implements Pool.Poolable {
         xSpeed = 0;
     }
 
-    public void dispose(){
+    public void dispose() {
         texture.dispose();
         currentFrame.getTexture().dispose();
-        for(int i=0; i<frames.length; i++){
+        for (int i = 0; i < frames.length; i++) {
             frames[i].getTexture().dispose();
         }
     }

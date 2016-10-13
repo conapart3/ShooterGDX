@@ -10,25 +10,25 @@ import com.libgdx.shooter.gamestates.GameState;
  */
 public class OneHitKillPickup extends Item {
 
-    public OneHitKillPickup(){
+    public OneHitKillPickup() {
         super();
     }
 
 
     @Override
-    protected void setPickupSound(){
+    protected void setPickupSound() {
         pickupSound = GameState.assetManager.get("data/Sound/pickupHealth.wav");
     }
 
 
     @Override
-    protected void setTexture(){
+    protected void setTexture() {
         texture = new Texture(Gdx.files.internal("data/pickupOneHitKill.png"));
     }
 
 
     @Override
-    public void use(Player p){
+    public void use(Player p) {
         p.setOneHitKill();
     }
 

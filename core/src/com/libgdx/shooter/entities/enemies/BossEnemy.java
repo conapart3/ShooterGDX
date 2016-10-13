@@ -30,23 +30,23 @@ public class BossEnemy extends SpaceObject {
     private float releaseBombLifeTime = 3f, releaseBombTimer = 0f;
 
 
-    public BossEnemy(){
+    public BossEnemy() {
         this.alive = false;
     }
 
 
-    public BossEnemy(String filePath, int level){
+    public BossEnemy(String filePath, int level) {
         this.alive = false;
         texture = new Texture(Gdx.files.internal(filePath));
 //        texture = GameState.assetManager.get("data/boss1.png");
         width = texture.getWidth();
         height = texture.getHeight();
-        bounds = new Rectangle(x+50,y+50,width-100,height-100);
+        bounds = new Rectangle(x + 50, y + 50, width - 100, height - 100);
         isShooting = false;
         dirX = 0f;
         dirY = 0f;
         this.level = level;
-        health = 1000*level;
+        health = 1000 * level;
         explosionSound = GameState.assetManager.get("data/Sound/explosionBoss.wav");
         rand = new Random();
         weaponList = new ArrayList<Weapon>();
@@ -56,15 +56,15 @@ public class BossEnemy extends SpaceObject {
     }
 
 
-    public void create(){
+    public void create() {
         x = 2000;
         y = 300;
         xSpeed = -100;
-        ySpeed = rand.nextInt(100)-50;
+        ySpeed = rand.nextInt(100) - 50;
         alive = true;
         dy = 0;
         dx = 0;
-        health = 5000 + (1000*level);
+        health = 5000 + (1000 * level);
         isShooting = false;
         dirX = 0f;
         dirY = 0f;
@@ -75,17 +75,17 @@ public class BossEnemy extends SpaceObject {
     }
 
 
-    public void update(float dt, float targetX, float targetY){
+    public void update(float dt, float targetX, float targetY) {
 //        for(int i=0; i<weaponList.size(); i++){
 //            weaponList.get(i).update(dt);
 ////            isShooting=weaponList.get(0).isReadyToShoot();
 //        }
 
-        if(alive) {
+        if (alive) {
             weapon.update(dt);
 
             releaseBombTimer += dt;
-            if(releaseBombTimer>=releaseBombLifeTime){
+            if (releaseBombTimer >= releaseBombLifeTime) {
                 releaseBombTimer -= releaseBombLifeTime;
                 releaseBomb = true;
             } else {
@@ -106,35 +106,35 @@ public class BossEnemy extends SpaceObject {
         xOffset = width / 2 + dirX * 200;
         yOffset = height / 2 + dirY * 200;
 
-        xSpeed += dx*dt;
-        ySpeed += dy*dt;
+        xSpeed += dx * dt;
+        ySpeed += dy * dt;
 
-        x+= xSpeed * dt;
-        y+= ySpeed * dt;
+        x += xSpeed * dt;
+        y += ySpeed * dt;
 
-        bounds.x = x+50;
-        bounds.y = y+50;
+        bounds.x = x + 50;
+        bounds.y = y + 50;
 
-        if(x<1000)
-            xSpeed=0;
-        if(y>= CEILING_OFFSET-(height/2) || y<= GROUND_OFFSET)
+        if (x < 1000)
+            xSpeed = 0;
+        if (y >= CEILING_OFFSET - (height / 2) || y <= GROUND_OFFSET)
             ySpeed *= -1;
     }
 
 
-    public void render(SpriteBatch sb){
+    public void render(SpriteBatch sb) {
 //        sb.draw(texture,x,y,width/2,height/2,width,height,1,1,(float) rotation,0,0,width,height,false,false);
-        sb.draw(texture,x,y);
+        sb.draw(texture, x, y);
     }
 
     @Override
-    public void dispose(){
-        if(texture!=null)
+    public void dispose() {
+        if (texture != null)
             texture.dispose();
     }
 
 
-    public void playExplosion(){
+    public void playExplosion() {
         explosionSound.play();
     }
 

@@ -2,21 +2,18 @@ package com.libgdx.shooter.entities.weapons;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.libgdx.shooter.entities.items.Item;
-import com.libgdx.shooter.entities.Player;
 import com.libgdx.shooter.gamestates.GameState;
 
 /**
  * Created by Conal on 08/11/2015.
  */
-public class Minigun extends Weapon{
+public class Minigun extends Weapon {
 
 
     public final WeaponType type = WeaponType.MINIGUN;
 
-    public Minigun(){
+    public Minigun() {
         super();
         damage = 25;
         rateOfFire = 0.1f;
@@ -24,17 +21,18 @@ public class Minigun extends Weapon{
 
 
     @Override
-    protected void setTexture(){
+    protected void setTexture() {
         texture = new Texture(Gdx.files.internal("data/pickupMinigun.png"));
     }
 
     @Override
-    protected void setShootSound(){
+    protected void setShootSound() {
 //        shootSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/shootSoundMinigun.wav"));
         shootSound = GameState.assetManager.get("data/Sound/shootSoundMinigun.wav");
     }
+
     @Override
-    protected void setPickupSound(){
+    protected void setPickupSound() {
 //        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupMinigun.wav"));
         pickupSound = GameState.assetManager.get("data/Sound/pickupMinigun.wav");
     }

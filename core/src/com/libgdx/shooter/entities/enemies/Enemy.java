@@ -15,13 +15,13 @@ public class Enemy extends SpaceObject {
     protected int points;
     protected int health;
 
-    public Enemy(){
+    public Enemy() {
         this.alive = false;
         rand = new Random();
         setTexture();
     }
 
-    protected void setTexture(){
+    protected void setTexture() {
 
     }
 

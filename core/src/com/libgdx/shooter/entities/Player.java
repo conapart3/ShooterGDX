@@ -9,13 +9,15 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.libgdx.shooter.entities.items.Item;
 import com.libgdx.shooter.entities.weapons.LightLaserCannon;
-import com.libgdx.shooter.entities.weapons.MissileLauncher;
 import com.libgdx.shooter.entities.weapons.Weapon;
 import com.libgdx.shooter.gamestates.GameState;
 
 import java.util.ArrayList;
 
-import static com.libgdx.shooter.game.ShooterGame.*;
+import static com.libgdx.shooter.game.ShooterGame.GROUND_OFFSET;
+import static com.libgdx.shooter.game.ShooterGame.PLAYER_CEILING_OFFSET;
+import static com.libgdx.shooter.game.ShooterGame.SCALE_RATIO_X;
+import static com.libgdx.shooter.game.ShooterGame.SCALE_RATIO_Y;
 
 /**
  * Created by Conal on 26/09/2015.
@@ -68,23 +70,23 @@ public class Player extends SpaceObject {
         health = 2000;
         alive = true;
 
-        xOffset = width/2+dirX*30;
-        yOffset = height/2+dirY*30;
+        xOffset = width / 2 + dirX * 30;
+        yOffset = height / 2 + dirY * 30;
 
         items = new ArrayList<Item>();
         weapon = new LightLaserCannon();
     }
 
     public void update(float dt) {
-        if(health<1)
+        if (health < 1)
             alive = false;
 
-        if(upPressed)
+        if (upPressed)
             dy = 50;
-        else if(downPressed)
+        else if (downPressed)
             dy = -50;
         else
-            dy=0;
+            dy = 0;
 
         ySpeed = maxSpeed * dy * dt;
         y += ySpeed * dt;
@@ -114,10 +116,10 @@ public class Player extends SpaceObject {
     }
 
     @Override
-    public void dispose(){
+    public void dispose() {
         super.dispose();
         currentFrame.getTexture().dispose();
-        for(int i=0; i<playerFrames.length; i++){
+        for (int i = 0; i < playerFrames.length; i++) {
             playerFrames[i].getTexture().dispose();
         }
     }
@@ -130,7 +132,7 @@ public class Player extends SpaceObject {
         this.score = score;
     }
 
-    public void addPoints(float points){
+    public void addPoints(float points) {
         this.score += points;
     }
 
@@ -143,9 +145,9 @@ public class Player extends SpaceObject {
     }
 
     public void addItem(Item item) {
-        if(item.isWeapon()){
-            setWeapon((Weapon)item);
-        }else {
+        if (item.isWeapon()) {
+            setWeapon((Weapon) item);
+        } else {
             items.add(item);
             item.use(this);
         }
@@ -155,7 +157,7 @@ public class Player extends SpaceObject {
         return isReadyToShoot;
     }
 
-    public void playExplosion(){
+    public void playExplosion() {
         explosionSound.play();
     }
 
@@ -182,9 +184,10 @@ public class Player extends SpaceObject {
     public void setOneHitKill() {
     }
 
-    public void addHealth(int hp){
+    public void addHealth(int hp) {
         this.health += hp;
     }
+
     public void addMedal() {
         addPoints(1000);
     }

@@ -7,9 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.libgdx.shooter.entities.Player;
 import com.libgdx.shooter.entities.SpaceObject;
-import com.libgdx.shooter.entities.weapons.*;
-import com.libgdx.shooter.entities.weapons.HeavyLaserCannon;
-import com.libgdx.shooter.entities.weapons.LightLaserCannon;
 import com.libgdx.shooter.gamestates.GameState;
 
 import java.util.Random;
@@ -26,35 +23,35 @@ public class Item extends SpaceObject {
     protected Sound pickupSound;//set default item pickupsound, and sub classes can use their own
     protected boolean isWeapon;
 
-    public Item(){
+    public Item() {
         setPickupSound();
         setTexture();
         width = texture.getWidth();
         height = texture.getHeight();
-        bounds = new Rectangle(x,y,width,height);
+        bounds = new Rectangle(x, y, width, height);
         create();
         isWeapon = false;
     }
 
 
-    protected void setPickupSound(){
+    protected void setPickupSound() {
         pickupSound = GameState.assetManager.get("data/Sound/pickupShotgun.wav");
     }
 
 
-    protected void setTexture(){
+    protected void setTexture() {
         texture = new Texture(Gdx.files.internal("data/sprite_mirror_0.png"));
     }
 
 
-    public void create(){
+    public void create() {
         //max-min +1 +min
         rand = new Random();
-        x = rand.nextInt(3000-2000+1)+2000;
-        y = rand.nextInt(1000-250+1)+250;
+        x = rand.nextInt(3000 - 2000 + 1) + 2000;
+        y = rand.nextInt(1000 - 250 + 1) + 250;
 //        xSpeed = (rand.nextInt(300-100 + 1)+100)*-1;
         xSpeed = -250;
-        ySpeed = rand.nextInt(150)-75;
+        ySpeed = rand.nextInt(150) - 75;
         alive = true;
         dy = dx = 0;
         dirX = 0f;
@@ -62,9 +59,9 @@ public class Item extends SpaceObject {
     }
 
 
-    public void update(float dt){
-        xSpeed += dx*dt;
-        ySpeed += dy*dt;
+    public void update(float dt) {
+        xSpeed += dx * dt;
+        ySpeed += dy * dt;
 
         x += xSpeed * dt;
         y += ySpeed * dt;
@@ -72,24 +69,24 @@ public class Item extends SpaceObject {
         bounds.x = x;
         bounds.y = y;
 
-        if(x<-200)
+        if (x < -200)
             alive = false;
-        if(y >= CEILING_OFFSET || y <= GROUND_OFFSET)
+        if (y >= CEILING_OFFSET || y <= GROUND_OFFSET)
             ySpeed *= -1;
     }
 
 
-    public void render(SpriteBatch sb){
+    public void render(SpriteBatch sb) {
         super.render(sb);
     }
 
 
-    public void playPickupSound(){
+    public void playPickupSound() {
         pickupSound.play();
     }
 
 
-    public void dispose(){
+    public void dispose() {
         super.dispose();
         pickupSound.dispose();
     }
@@ -98,7 +95,7 @@ public class Item extends SpaceObject {
         return isWeapon;
     }
 
-    public void use(Player p){
+    public void use(Player p) {
 
     }
 }

@@ -9,16 +9,16 @@ public class BlackHole extends SpaceObject {
 
 //    private float
 
-    public BlackHole(){
+    public BlackHole() {
         super();
     }
 
 
-    public void update(float dt){
+    public void update(float dt) {
 
     }
 
-    public void render(){
+    public void render() {
 
     }
 }

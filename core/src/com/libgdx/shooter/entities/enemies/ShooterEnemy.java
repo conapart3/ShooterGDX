@@ -20,7 +20,7 @@ import static com.libgdx.shooter.game.ShooterGame.GROUND_OFFSET;
 /**
  * Created by Conal on 28/10/2015.
  */
-public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
+public class ShooterEnemy extends SpaceObject implements Pool.Poolable {
 
     private Random rand;
     private boolean isShooting;
@@ -28,10 +28,10 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
     private double rotation;
     private Weapon weapon;
     private Sound explosionSound;
-    private float strafeChangeTime = 4f, strafeTimer =0f;
+    private float strafeChangeTime = 4f, strafeTimer = 0f;
 
 
-    public ShooterEnemy(){
+    public ShooterEnemy() {
         this.alive = false;
         rand = new Random();
 //        texture = new Texture(Gdx.files.internal("data/shooterEnemy.png"));
@@ -40,7 +40,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
         health = 200;
         width = texture.getWidth();
         height = texture.getHeight();
-        bounds = new Rectangle(x,y,width,height);
+        bounds = new Rectangle(x, y, width, height);
         isShooting = false;
         dirX = 0f;
         dirY = 0f;
@@ -53,17 +53,17 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
 
 
     //pass in the level - health = 200 + (200*level/2)
-    public void create(int level){
+    public void create(int level) {
         //max-min +1 +min
-        x = rand.nextInt(3000-2000+1)+2000;
-        y = rand.nextInt(1000-250+1)+250;
+        x = rand.nextInt(3000 - 2000 + 1) + 2000;
+        y = rand.nextInt(1000 - 250 + 1) + 250;
 //        xSpeed = (rand.nextInt(300-100 + 1)+100)*-1;
         xSpeed = -maxSpeed;
-        ySpeed = rand.nextInt(50)-25;
+        ySpeed = rand.nextInt(50) - 25;
         alive = true;
         dy = 0;
         dx = -50;
-        health = 100 + (50*level);
+        health = 100 + (50 * level);
         isShooting = false;
         dirX = 0f;
         dirY = 0f;
@@ -71,9 +71,9 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
     }
 
 
-    public void update(float dt, float targetX, float targetY){
+    public void update(float dt, float targetX, float targetY) {
         //this could be the problem why some bullets shot at player from behind player.
-        if(alive)
+        if (alive)
             weapon.update(dt);
 
         if (x < 1900) {
@@ -93,33 +93,33 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
 
         strafeTimer += dt;
 
-        if(x<-200)
+        if (x < -200)
             alive = false;
 
-        if(x<1200) {
+        if (x < 1200) {
             dx = 300f;
         } else {
             dx = 0f;
         }
 
-        if(x<1500 && x>1300 && y>400 && y<600){
-            if(strafeTimer > strafeChangeTime){
+        if (x < 1500 && x > 1300 && y > 400 && y < 600) {
+            if (strafeTimer > strafeChangeTime) {
                 strafeTimer = strafeTimer - strafeChangeTime;
                 randomStrafe();
             }
         } else {
-            strafe=false;
+            strafe = false;
         }
 
 //        if(strafe){
-            if(x>1500)
-                dx = -300f;
-            if(x<1300 && xSpeed<0)
-                dx = 300f;
-            if(y>600 && ySpeed>0)
-                dy = -300f;
-            if(y<400 && ySpeed<0)
-                dy = 300f;
+        if (x > 1500)
+            dx = -300f;
+        if (x < 1300 && xSpeed < 0)
+            dx = 300f;
+        if (y > 600 && ySpeed > 0)
+            dy = -300f;
+        if (y < 400 && ySpeed < 0)
+            dy = 300f;
 //            if(y<700 && y> 350){
 //                if(ySpeed>0)
 //                    dy = -20;
@@ -128,7 +128,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
 //            }
 //        }
 
-        if(y>= CEILING_OFFSET || y<= GROUND_OFFSET)
+        if (y >= CEILING_OFFSET || y <= GROUND_OFFSET)
             ySpeed = 0;
 
 
@@ -137,15 +137,15 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
 
     }
 
-    private void randomStrafe(){
+    private void randomStrafe() {
         strafe = true;
         radians = MathUtils.random(2 * 3.1415f);
-        dx = MathUtils.cos(radians)*50;
-        dy = MathUtils.sin(radians)*50;
+        dx = MathUtils.cos(radians) * 50;
+        dy = MathUtils.sin(radians) * 50;
     }
 
     @Override
-    public void render(SpriteBatch sb){
+    public void render(SpriteBatch sb) {
 //        sb.draw(texture,x,y,width/2,height/2,width,height,1,1,(float)rotation);
         sb.draw(texture, x, y, width / 2, height / 2, width, height, 1, 1, (float) rotation, 0, 0, width, height, false, false);
     }
@@ -165,7 +165,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
 
 
     @Override
-    public void dispose(){
+    public void dispose() {
         super.dispose();
     }
 
@@ -210,7 +210,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable{
     }
 
 
-    public void playExplosion(){
+    public void playExplosion() {
         explosionSound.play();
     }
 

@@ -14,7 +14,7 @@ import com.libgdx.shooter.gamestates.GameState;
 /**
  * Created by Conal on 22/10/2015.
  */
-public class Bullet extends SpaceObject implements Pool.Poolable{
+public class Bullet extends SpaceObject implements Pool.Poolable {
 
     protected int damage;
     private float xOffset, yOffset;
@@ -24,7 +24,7 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
 //    private Texture texture2;
 
 
-    public Bullet(){
+    public Bullet() {
         this.alive = false;
         setTexture();
         setHitSound();
@@ -32,18 +32,18 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
         ySpeed = 0;
         width = texture.getWidth();
         height = texture.getHeight();
-        bounds = new Rectangle(x,y,width,height);
+        bounds = new Rectangle(x, y, width, height);
         damage = 50;
-        maxSpeed=900f;
+        maxSpeed = 900f;
     }
 
 
-    protected void setHitSound(){
+    protected void setHitSound() {
         hitSound = GameState.assetManager.get("data/Sound/hitSoundBullet.wav");
     }
 
 
-    protected void setTexture(){
+    protected void setTexture() {
 //        texture = new Texture(Gdx.files.internal("data/laser.png"));
 //        texture = new Texture(Gdx.files.internal("data/laserRed.png"));
         texture = new Texture(Gdx.files.internal("data/bullet.png"));
@@ -51,20 +51,20 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
     }
 
 
-    public void init(float startXPosition, float startYPosition, float dirX, float dirY, boolean isShotFromEnemy){
+    public void init(float startXPosition, float startYPosition, float dirX, float dirY, boolean isShotFromEnemy) {
         this.x = startXPosition;
         this.y = startYPosition;
         this.dirX = dirX;
         this.dirY = dirY;
         alive = true;
-        this.xSpeed = dirX*maxSpeed;
-        this.ySpeed = dirY*maxSpeed;
+        this.xSpeed = dirX * maxSpeed;
+        this.ySpeed = dirY * maxSpeed;
         this.isShotFromEnemy = isShotFromEnemy;
     }
 
 
-    public void update(float dt){
-        rotation = (Math.atan2(dirY,dirX)*180.0d/Math.PI)-180.0f;
+    public void update(float dt) {
+        rotation = (Math.atan2(dirY, dirX) * 180.0d / Math.PI) - 180.0f;
 
         x += dirX * maxSpeed * dt;
         y += dirY * maxSpeed * dt;
@@ -72,12 +72,12 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
         bounds.x = x;
         bounds.y = y;
 
-        if(x>2000 || x<-50 || y<ShooterGame.GROUND_OFFSET || y>ShooterGame.CEILING_OFFSET+250)
+        if (x > 2000 || x < -50 || y < ShooterGame.GROUND_OFFSET || y > ShooterGame.CEILING_OFFSET + 250)
             alive = false;
     }
 
 
-    public void render(SpriteBatch sb){
+    public void render(SpriteBatch sb) {
         sb.draw(texture, x, y, width / 2, height / 2, width, height, 1, 1, (float) rotation,
                 0, 0, width, height, false, false);
     }
@@ -92,20 +92,20 @@ public class Bullet extends SpaceObject implements Pool.Poolable{
         ySpeed = 0;
         dx = 0;
         dy = 0;
-        dirX=0;
+        dirX = 0;
         dirY = 0;
     }
 
 
     @Override
-    public void dispose(){
+    public void dispose() {
         super.dispose();
         hitSound.dispose();
 //        texture2.dispose();
     }
 
 
-    public void playHitSound(){
+    public void playHitSound() {
         hitSound.play(0.5f);
     }
 

@@ -2,14 +2,11 @@ package com.libgdx.shooter.gamestates;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.libgdx.shooter.Context;
 import com.libgdx.shooter.managers.GameStateManager;
 
 import static com.libgdx.shooter.game.ShooterGame.WORLD_HEIGHT;
@@ -27,13 +24,13 @@ public class MenuState extends State {
     private TextButton.TextButtonStyle textButtonStyle;
     private Stage stage;
 
-    public MenuState(GameStateManager gsm){
+    public MenuState(GameStateManager gsm) {
         super(gsm);
     }
 
     @Override
     public void create() {
-        cam.position.set(WORLD_WIDTH/2, WORLD_HEIGHT/2, 0);
+        cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
 
         sb = new SpriteBatch();
 
@@ -51,9 +48,9 @@ public class MenuState extends State {
         textButton3 = new TextButton("Quit", textButtonStyle);
 
 //        textButton1.setBounds(500f, 500f, 300, 300);
-        textButton1.setPosition(500f,500f);
-        textButton2.setPosition(500f,400f);
-        textButton3.setPosition(500f,300f);
+        textButton1.setPosition(500f, 500f);
+        textButton2.setPosition(500f, 400f);
+        textButton3.setPosition(500f, 300f);
 
         stage = new Stage(viewport);
         stage.addActor(textButton1);
@@ -86,10 +83,10 @@ public class MenuState extends State {
 
     @Override
     public void handleInput() {
-        if (textButton1.isPressed()){
+        if (textButton1.isPressed()) {
             gameStateManager.setState(GameStateManager.GAME);
         }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER))
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER))
             gameStateManager.setState(GameStateManager.GAME);
     }
 
@@ -101,7 +98,7 @@ public class MenuState extends State {
     }
 
     @Override
-    public void resize(int width, int height){
+    public void resize(int width, int height) {
         viewport.update(width, height);
         cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
 //        stage.getViewport().update(WORLD_WIDTH, (int)(WORLD_WIDTH * SCREEN_ASPECT_RATIO), false);
@@ -117,7 +114,7 @@ public class MenuState extends State {
 
     }
 
-    private void initStage(){
+    private void initStage() {
 
     }
 }

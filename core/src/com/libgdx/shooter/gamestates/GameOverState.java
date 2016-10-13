@@ -1,7 +1,6 @@
 package com.libgdx.shooter.gamestates;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -9,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.libgdx.shooter.Context;
 import com.libgdx.shooter.managers.GameStateManager;
 
 import static com.libgdx.shooter.game.ShooterGame.WORLD_HEIGHT;
@@ -18,7 +16,7 @@ import static com.libgdx.shooter.game.ShooterGame.WORLD_WIDTH;
 /**
  * Created by Conal on 23/10/2015.
  */
-public class GameOverState extends State{
+public class GameOverState extends State {
 
     private SpriteBatch spriteBatch;
     private String GAME_OVER = "GAME OVER";
@@ -27,13 +25,13 @@ public class GameOverState extends State{
     private Label labelA, labelB;
     private Stage stage;
 
-    public GameOverState(GameStateManager gsm){
+    public GameOverState(GameStateManager gsm) {
         super(gsm);
     }
 
     @Override
     public void create() {
-        cam.position.set(WORLD_WIDTH/2, WORLD_HEIGHT/2, 0);
+        cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
 
         spriteBatch = new SpriteBatch();
 
@@ -73,7 +71,7 @@ public class GameOverState extends State{
         spriteBatch.setProjectionMatrix(cam.combined);
         spriteBatch.begin();
 
-        labelB.setText("Your score was " +(int)score);
+        labelB.setText("Your score was " + (int) score);
 
         labelA.draw(spriteBatch, 1);
         labelB.draw(spriteBatch, 1);
@@ -86,7 +84,7 @@ public class GameOverState extends State{
     @Override
     public void handleInput() {
 
-        if (Gdx.input.justTouched()){
+        if (Gdx.input.justTouched()) {
             gameStateManager.setState(GameStateManager.GAME);
         }
     }
@@ -99,7 +97,7 @@ public class GameOverState extends State{
     }
 
     @Override
-    public void resize(int width, int height){
+    public void resize(int width, int height) {
         viewport.update(width, height);
         cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
     }

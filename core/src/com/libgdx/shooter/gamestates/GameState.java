@@ -6,26 +6,23 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import com.libgdx.shooter.Context;
 import com.libgdx.shooter.entities.Particle;
+import com.libgdx.shooter.entities.Player;
 import com.libgdx.shooter.entities.bullets.Bullet;
 import com.libgdx.shooter.entities.bullets.Laser;
 import com.libgdx.shooter.entities.bullets.Missile;
 import com.libgdx.shooter.entities.enemies.BossEnemy;
-import com.libgdx.shooter.entities.items.Item;
 import com.libgdx.shooter.entities.enemies.ParachuteBomber;
-import com.libgdx.shooter.entities.Player;
 import com.libgdx.shooter.entities.enemies.ShooterEnemy;
+import com.libgdx.shooter.entities.items.Item;
 import com.libgdx.shooter.entities.items.ItemFactory;
 import com.libgdx.shooter.entities.weapons.Weapon;
 import com.libgdx.shooter.entities.weapons.WeaponType;
@@ -36,60 +33,51 @@ import com.libgdx.shooter.managers.GameStateManager;
 
 import java.util.ArrayList;
 
-import static com.libgdx.shooter.game.ShooterGame.*;
+import static com.libgdx.shooter.game.ShooterGame.SCREEN_ASPECT_RATIO;
+import static com.libgdx.shooter.game.ShooterGame.WORLD_HEIGHT;
+import static com.libgdx.shooter.game.ShooterGame.WORLD_WIDTH;
 
 /**
  * Created by Conal on 30/09/2015.
  */
-public class GameState extends State implements InputProcessor{
+public class GameState extends State implements InputProcessor {
+
 
     public static AssetManager assetManager;
-    private SpriteBatch spriteBatch;
-    private ShapeRenderer shapeRenderer;
-    private Player player;
-    private float nextLevelTimer, gameOverTimer;
-    private ArrayList<Level> levels;
-    private int numberOfLevels = 2;
-    private int level = ShooterGame.getCurrentContext().level, wave = 0;
-    private Level currentLevel;
-    private boolean levelSuccessFlag = false;
-
-    private ItemFactory itemFactory;
-    private ArrayList<Item> pickups;
-
-    private ArrayList<Particle> particles;
-
-    /** Array and pool containing the bullets **/
+    private final int TIME_UNTIL_NEXT_LEVEL = 4;
+    /**
+     * Array and pool containing the bullets
+     **/
     private final Array<Bullet> activeBullets = new Array<Bullet>();
-    private final Pool<Bullet> bulletPool = new Pool<Bullet>(){
+    private final Pool<Bullet> bulletPool = new Pool<Bullet>() {
         @Override
-        protected Bullet newObject(){
+        protected Bullet newObject() {
             return new Bullet();
         }
     };
-
     /**
-     * TODO: refactor the shooting mechanics to a potential new handler class?
-     */
-    /** Array and pool containing the missiles **/
+     * Array and pool containing the missiles
+     **/
     private final Array<Missile> activeMissiles = new Array<Missile>();
-    private final Pool<Missile> missilePool = new Pool<Missile>(){
+    private final Pool<Missile> missilePool = new Pool<Missile>() {
         @Override
-        protected Missile newObject(){
+        protected Missile newObject() {
             return new Missile();
         }
     };
-
-    /** Array and pool containing the lasers **/
+    /**
+     * Array and pool containing the lasers
+     **/
     private final Array<Laser> activeLasers = new Array<Laser>();
-    private final Pool<Laser> laserPool = new Pool<Laser>(){
+    private final Pool<Laser> laserPool = new Pool<Laser>() {
         @Override
-        protected Laser newObject(){
+        protected Laser newObject() {
             return new Laser();
         }
     };
-
-    /** Array and pool containing the parachute bombers **/
+    /**
+     * Array and pool containing the parachute bombers
+     **/
     private final Array<ParachuteBomber> activeParachuteBombers = new Array<ParachuteBomber>();
     private final Pool<ParachuteBomber> parachuteBomberPool = new Pool<ParachuteBomber>() {
         @Override
@@ -97,25 +85,45 @@ public class GameState extends State implements InputProcessor{
             return new ParachuteBomber();
         }
     };
-
-    /** Array and pool containing the shooter enemies **/
+    /**
+     * Array and pool containing the shooter enemies
+     **/
     private final Array<ShooterEnemy> activeShooterEnemies = new Array<ShooterEnemy>();
-    private final Pool<ShooterEnemy> shooterEnemyPool = new Pool<ShooterEnemy>(){
+    private final Pool<ShooterEnemy> shooterEnemyPool = new Pool<ShooterEnemy>() {
         @Override
-        protected ShooterEnemy newObject(){
+        protected ShooterEnemy newObject() {
             return new ShooterEnemy();
         }
     };
-
-    /** Array and pool containing the shooter enemies **/
+    /**
+     * Array and pool containing the shooter enemies
+     **/
     private final Array<Animator> activeExplosions = new Array<Animator>();
-    private final Pool<Animator> explosionPool = new Pool<Animator>(){
+    private final Pool<Animator> explosionPool = new Pool<Animator>() {
         @Override
-        protected Animator newObject(){
+        protected Animator newObject() {
             return new Animator("data/explosionBlue.png", 12, 1, false);
         }
     };
+    private SpriteBatch spriteBatch;
+    private ShapeRenderer shapeRenderer;
+    private Player player;
+    private float nextLevelTimer, gameOverTimer;
+    private ArrayList<Level> levels;
 
+    /**
+     * TODO: refactor the shooting mechanics to a potential new handler class?
+     */
+    private int numberOfLevels = 2;
+    private int level = ShooterGame.getCurrentContext().level, wave = 0;
+    private Level currentLevel;
+    private boolean levelSuccessFlag = false;
+    private int NUM_WAVES_PER_LEVEL = (7 + level);
+    private int NUM_LEVELS_UNTIL_BOSS = (6 + level);
+    private int NUM_BUILD_UP_WAVES = (5 + level);
+    private ItemFactory itemFactory;
+    private ArrayList<Item> pickups;
+    private ArrayList<Particle> particles;
     //touchpad and stage declaration
     private Stage stage;
     private BitmapFont font;
@@ -127,7 +135,7 @@ public class GameState extends State implements InputProcessor{
     private BossEnemy boss;
 
 
-    public GameState(GameStateManager gsm){
+    public GameState(GameStateManager gsm) {
         super(gsm);
 
     }
@@ -146,8 +154,8 @@ public class GameState extends State implements InputProcessor{
         /** create the levels and set currentlevel, then create it. **/
         levels = new ArrayList<Level>();
         String bgfilepath = "data/bgelements/bg";
-        for(int i=0; i< numberOfLevels; i++){
-            Level l = new Level(bgfilepath+"back"+i+".png", bgfilepath+"middle"+i+".png", bgfilepath+"front"+i+".png");
+        for (int i = 0; i < numberOfLevels; i++) {
+            Level l = new Level(bgfilepath + "back" + i + ".png", bgfilepath + "middle" + i + ".png", bgfilepath + "front" + i + ".png");
             l.create();
             levels.add(l);
         }
@@ -272,7 +280,7 @@ public class GameState extends State implements InputProcessor{
                 Missile mItem = activeMissiles.get(i);
                 if (mItem.isAlive()) {
                     mItem.update(dt);
-                } else{
+                } else {
                     activeMissiles.removeIndex(i);
                     missilePool.free(mItem);
                 }
@@ -284,7 +292,7 @@ public class GameState extends State implements InputProcessor{
                 Laser lItem = activeLasers.get(i);
                 if (lItem.isAlive()) {
                     lItem.update(dt);
-                }else {
+                } else {
                     activeLasers.removeIndex(i);
                     laserPool.free(lItem);
                 }
@@ -316,13 +324,13 @@ public class GameState extends State implements InputProcessor{
             }
 
             /** Update the boss **/
-            if(boss.isAlive()) {
+            if (boss.isAlive()) {
                 boss.update(dt, player.getX(), player.getY());
                 if (boss.isShooting()) {
                     shoot(boss.getWeapon(), boss.getX() + boss.getxOffset(), boss.getY() + boss.getyOffset(),
                             boss.getDirX(), boss.getDirY(), true);
                 }
-                if(boss.isReleaseBomb()){
+                if (boss.isReleaseBomb()) {
                     releaseBomb();
                 }
             }
@@ -334,8 +342,8 @@ public class GameState extends State implements InputProcessor{
                 nextLevelTimer += dt;
                 autoShoot = false;
                 levelSuccessFlag = true;
-                if (nextLevelTimer > 4) {
-                    nextLevelTimer -= 4;
+                if (nextLevelTimer > TIME_UNTIL_NEXT_LEVEL) {
+                    nextLevelTimer -= TIME_UNTIL_NEXT_LEVEL;
                     wave++;
 //                    if(7%wave==0) {
 //                        //nextlevel
@@ -343,23 +351,23 @@ public class GameState extends State implements InputProcessor{
 //                        currentLevel = levels.get(level);
 //                        wave = 1;
 //                    }
-//                    if(wave<=5+level) {
-                    if(wave<=0+level) {
+                    if (wave <= NUM_BUILD_UP_WAVES) {
+//                    if(wave<=0+level) {
                         levelSuccessFlag = false;
                         spawnParachuteBombers();
                         spawnShooterEnemies();
                         spawnPickups();
                         player.addPoints(100 * (wave - 1));
                         autoShoot = true;
-                    } else if(wave == 6+level){
+                    } else if (wave == NUM_LEVELS_UNTIL_BOSS) {
 //                    } else if(wave == 1+level){
                         levelSuccessFlag = false;
                         spawnBoss();
                         player.addPoints(100 * (wave - 1));
                         autoShoot = true;
-                    } else if(wave%(7+level)==0){ //level is complete!
+                    } else if (wave % (NUM_WAVES_PER_LEVEL) == 0) { //level is complete!
 //                    } else if(wave%(2+level)==0){
-                        currentLevel=levels.get(level%2);//level starts at 0 therefore get curlevel-1
+                        currentLevel = levels.get(level % 2);//level starts at 0 therefore get curlevel-1
                         level++;
                         ShooterGame.getCurrentContext().level = level;
                         ShooterGame.getCurrentContext().score = player.getScore();
@@ -369,10 +377,10 @@ public class GameState extends State implements InputProcessor{
                 }
             }
 
-            for(int i=0; i<particles.size(); i++){
-                if(particles.get(i).isAlive()){
+            for (int i = 0; i < particles.size(); i++) {
+                if (particles.get(i).isAlive()) {
                     particles.get(i).update(dt);
-                }else{
+                } else {
                     particles.remove(i);
                     i--;
                 }
@@ -425,15 +433,15 @@ public class GameState extends State implements InputProcessor{
         }
 
 
-        for(int i = activeExplosions.size; --i >= 0; ){
+        for (int i = activeExplosions.size; --i >= 0; ) {
             activeExplosions.get(i).render(spriteBatch);
         }
 
-        if(boss.isAlive()) {
+        if (boss.isAlive()) {
             boss.render(spriteBatch);
         }
 
-        for(int i=0; i<particles.size(); i++){
+        for (int i = 0; i < particles.size(); i++) {
             particles.get(i).render(shapeRenderer);
         }
 
@@ -449,7 +457,7 @@ public class GameState extends State implements InputProcessor{
             activeLasers.get(i).render(spriteBatch);
         }
 
-        for(int i=0; i< player.getItems().size(); i++){
+        for (int i = 0; i < player.getItems().size(); i++) {
             spriteBatch.draw(player.getItems().get(i).getTexture(), 100 + (100 * i), 100f);
         }
         /** Draw all text on screen **/
@@ -490,13 +498,13 @@ public class GameState extends State implements InputProcessor{
         spriteBatch.dispose();
         font.dispose();
         player.dispose();
-        for(Bullet b : activeBullets)
+        for (Bullet b : activeBullets)
             b.dispose();
-        for(ParachuteBomber pb : activeParachuteBombers)
+        for (ParachuteBomber pb : activeParachuteBombers)
             pb.dispose();
-        for(ShooterEnemy se : activeShooterEnemies)
-                se.dispose();
-        for(int i=0; i<pickups.size(); i++){
+        for (ShooterEnemy se : activeShooterEnemies)
+            se.dispose();
+        for (int i = 0; i < pickups.size(); i++) {
             pickups.get(i).dispose();
         }
         shapeRenderer.dispose();
@@ -504,22 +512,22 @@ public class GameState extends State implements InputProcessor{
     }
 
 
-    private void checkCollisions(){
+    private void checkCollisions() {
         /**
          * TODO: REFACTOR SO IT DOESNT RUN THROUGH ALL THESE FOR LOOPS
          * TODO: ADD EXPLOSION ANIMATION
          */
         /**Check collisions between bullets and player/enemies**/
-        for(int i=0; i<activeBullets.size; i++){
+        for (int i = 0; i < activeBullets.size; i++) {
             Bullet b = activeBullets.get(i);
-            if(!b.isShotFromEnemy()) {
+            if (!b.isShotFromEnemy()) {
                 for (int j = 0; j < activeParachuteBombers.size; j++) {
                     ParachuteBomber pb = activeParachuteBombers.get(j);
                     if (pb.collides(b.getBounds()) || b.collides(pb.getBounds())) {
                         b.setAlive(false);
                         pb.takeDamage(b.getDamage());
-                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
-                        if(!pb.isAlive()) {
+                        player.addPoints(b.getDamage() * player.getPointsMultiplier());
+                        if (!pb.isAlive()) {
                             pb.playExplosion();
                             spawnExplosion(pb.getX(), pb.getY());
 //                            createParticles(pb.getX(), pb.getY());
@@ -533,8 +541,8 @@ public class GameState extends State implements InputProcessor{
                     if (se.collides(b.getBounds()) || b.collides(se.getBounds())) {
                         b.setAlive(false);
                         se.takeDamage(b.getDamage());
-                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
-                        if(!se.isAlive()) {
+                        player.addPoints(b.getDamage() * player.getPointsMultiplier());
+                        if (!se.isAlive()) {
                             se.playExplosion();
                             spawnExplosion(se.getX(), se.getY());
                         } else {
@@ -542,12 +550,12 @@ public class GameState extends State implements InputProcessor{
                         }
                     }
                 }
-                if(boss.isAlive()){
-                    if(boss.collides(b.getBounds()) || b.collides(boss.getBounds())){
+                if (boss.isAlive()) {
+                    if (boss.collides(b.getBounds()) || b.collides(boss.getBounds())) {
                         b.setAlive(false);
                         boss.takeDamage(b.getDamage());
-                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
-                        if(!boss.isAlive()){
+                        player.addPoints(b.getDamage() * player.getPointsMultiplier());
+                        if (!boss.isAlive()) {
                             boss.playExplosion();
                             spawnExplosion(boss.getX(), boss.getY());
                         } else {
@@ -559,7 +567,7 @@ public class GameState extends State implements InputProcessor{
                 if (player.collides(b.getBounds()) || b.collides(player.getBounds())) {
                     b.setAlive(false);
                     player.takeDamage(b.getDamage());
-                    if(!player.isAlive()) {
+                    if (!player.isAlive()) {
                         player.playExplosion();
                     } else {
                         b.playHitSound();
@@ -569,16 +577,16 @@ public class GameState extends State implements InputProcessor{
         }
 
         /**Check collisions between lasers and player/enemies**/
-        for(int i=0; i<activeLasers.size; i++){
+        for (int i = 0; i < activeLasers.size; i++) {
             Laser b = activeLasers.get(i);
-            if(!b.isShotFromEnemy()) {
+            if (!b.isShotFromEnemy()) {
                 for (int j = 0; j < activeParachuteBombers.size; j++) {
                     ParachuteBomber pb = activeParachuteBombers.get(j);
                     if (pb.collides(b.getBounds()) || b.collides(pb.getBounds())) {
                         b.setAlive(false);
                         pb.takeDamage(b.getDamage());
-                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
-                        if(!pb.isAlive()) {
+                        player.addPoints(b.getDamage() * player.getPointsMultiplier());
+                        if (!pb.isAlive()) {
                             pb.playExplosion();
                             spawnExplosion(pb.getX(), pb.getY());
                         } else {
@@ -591,8 +599,8 @@ public class GameState extends State implements InputProcessor{
                     if (se.collides(b.getBounds()) || b.collides(se.getBounds())) {
                         b.setAlive(false);
                         se.takeDamage(b.getDamage());
-                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
-                        if(!se.isAlive()) {
+                        player.addPoints(b.getDamage() * player.getPointsMultiplier());
+                        if (!se.isAlive()) {
                             se.playExplosion();
                             spawnExplosion(se.getX(), se.getY());
                         } else {
@@ -600,12 +608,12 @@ public class GameState extends State implements InputProcessor{
                         }
                     }
                 }
-                if(boss.isAlive()){
-                    if(boss.collides(b.getBounds()) || b.collides(boss.getBounds())){
+                if (boss.isAlive()) {
+                    if (boss.collides(b.getBounds()) || b.collides(boss.getBounds())) {
                         b.setAlive(false);
                         boss.takeDamage(b.getDamage());
-                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
-                        if(!boss.isAlive()){
+                        player.addPoints(b.getDamage() * player.getPointsMultiplier());
+                        if (!boss.isAlive()) {
                             boss.playExplosion();
                             spawnExplosion(boss.getX(), boss.getY());
                         } else {
@@ -617,7 +625,7 @@ public class GameState extends State implements InputProcessor{
                 if (player.collides(b.getBounds()) || b.collides(player.getBounds())) {
                     b.setAlive(false);
                     player.takeDamage(b.getDamage());
-                    if(!player.isAlive()) {
+                    if (!player.isAlive()) {
                         player.playExplosion();
                     } else {
                         b.playHitSound();
@@ -627,16 +635,16 @@ public class GameState extends State implements InputProcessor{
         }
 
         /**Check collisions between missiles and player/enemies**/
-        for(int i=0; i<activeMissiles.size; i++){
+        for (int i = 0; i < activeMissiles.size; i++) {
             Missile b = activeMissiles.get(i);
-            if(!b.isShotFromEnemy()) {
+            if (!b.isShotFromEnemy()) {
                 for (int j = 0; j < activeParachuteBombers.size; j++) {
                     ParachuteBomber pb = activeParachuteBombers.get(j);
                     if (pb.collides(b.getBounds()) || b.collides(pb.getBounds())) {
                         b.setAlive(false);
                         pb.takeDamage(b.getDamage());
-                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
-                        if(!pb.isAlive()) {
+                        player.addPoints(b.getDamage() * player.getPointsMultiplier());
+                        if (!pb.isAlive()) {
                             pb.playExplosion();
                             spawnExplosion(pb.getX(), pb.getY());
                         } else {
@@ -649,8 +657,8 @@ public class GameState extends State implements InputProcessor{
                     if (se.collides(b.getBounds()) || b.collides(se.getBounds())) {
                         b.setAlive(false);
                         se.takeDamage(b.getDamage());
-                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
-                        if(!se.isAlive()) {
+                        player.addPoints(b.getDamage() * player.getPointsMultiplier());
+                        if (!se.isAlive()) {
                             se.playExplosion();
                             spawnExplosion(se.getX(), se.getY());
                         } else {
@@ -658,12 +666,12 @@ public class GameState extends State implements InputProcessor{
                         }
                     }
                 }
-                if(boss.isAlive()){
-                    if(boss.collides(b.getBounds()) || b.collides(boss.getBounds())){
+                if (boss.isAlive()) {
+                    if (boss.collides(b.getBounds()) || b.collides(boss.getBounds())) {
                         b.setAlive(false);
                         boss.takeDamage(b.getDamage());
-                        player.addPoints(b.getDamage()*player.getPointsMultiplier());
-                        if(!boss.isAlive()){
+                        player.addPoints(b.getDamage() * player.getPointsMultiplier());
+                        if (!boss.isAlive()) {
                             boss.playExplosion();
                             spawnExplosion(boss.getX(), boss.getY());
                         } else {
@@ -675,7 +683,7 @@ public class GameState extends State implements InputProcessor{
                 if (player.collides(b.getBounds()) || b.collides(player.getBounds())) {
                     b.setAlive(false);
                     player.takeDamage(b.getDamage());
-                    if(!player.isAlive()) {
+                    if (!player.isAlive()) {
                         player.playExplosion();
                     } else {
                         b.playHitSound();
@@ -685,12 +693,12 @@ public class GameState extends State implements InputProcessor{
         }
 
         /**check player with parachutebomber collisions**/
-        for(int i=0; i<activeParachuteBombers.size; i++){
-            ParachuteBomber pb=activeParachuteBombers.get(i);
-            if(player.collides(pb.getBounds()) || pb.collides(player.getBounds())){
+        for (int i = 0; i < activeParachuteBombers.size; i++) {
+            ParachuteBomber pb = activeParachuteBombers.get(i);
+            if (player.collides(pb.getBounds()) || pb.collides(player.getBounds())) {
                 player.takeDamage(pb.getDamage());
                 pb.setAlive(false);
-                if(!player.isAlive()) {
+                if (!player.isAlive()) {
                     player.playExplosion();
                     spawnExplosion(pb.getX(), pb.getY());
                 } else {
@@ -701,9 +709,9 @@ public class GameState extends State implements InputProcessor{
         }
 
         /**check player collisions with pickups**/
-        for(int i=0; i<pickups.size(); i++){
+        for (int i = 0; i < pickups.size(); i++) {
             Item pi = pickups.get(i);
-            if(player.collides(pi.getBounds()) || pi.collides(player.getBounds())){
+            if (player.collides(pi.getBounds()) || pi.collides(player.getBounds())) {
                 player.addItem(pi);
                 pi.playPickupSound();
                 pi.setAlive(false);
@@ -712,19 +720,19 @@ public class GameState extends State implements InputProcessor{
     }
 
 
-    private void releaseBomb(){
+    private void releaseBomb() {
         ParachuteBomber pb = parachuteBomberPool.obtain();
-        pb.create(level, boss.getX()+(boss.getWidth()/2), boss.getY(), player.getX()+player.getxOffset(), player.getY()+player.getyOffset());
+        pb.create(level, boss.getX() + (boss.getWidth() / 2), boss.getY(), player.getX() + player.getxOffset(), player.getY() + player.getyOffset());
         activeParachuteBombers.add(pb);
     }
 
-    private void spawnExplosion(float x, float y){
+    private void spawnExplosion(float x, float y) {
         Animator explosion = explosionPool.obtain();
-        explosion.create(x,y);
+        explosion.create(x, y);
         activeExplosions.add(explosion);
     }
 
-    private void initStage(){
+    private void initStage() {
         /** Create the font and relevant styles associated for labels **/
 //        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/Fonts/Montserrat-Regular.ttf"));
 //        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -754,7 +762,6 @@ public class GameState extends State implements InputProcessor{
         labelD.setPosition(350, 1000);
 
 
-
     }
 
 
@@ -776,10 +783,12 @@ public class GameState extends State implements InputProcessor{
 //    }
 
 
-    /** Methods to spawn enemies and pickups **/
+    /**
+     * Methods to spawn enemies and pickups
+     **/
     private void spawnParachuteBombers() {
 //        for(int i = 0; i<3+(5*wave/2); i++) {
-        for(int i = 0; i< wave + wave /2; i++) {
+        for (int i = 0; i < wave + wave / 2; i++) {
             ParachuteBomber pbItem = parachuteBomberPool.obtain();
             pbItem.create(wave);
             activeParachuteBombers.add(pbItem);
@@ -788,7 +797,7 @@ public class GameState extends State implements InputProcessor{
 
 
     private void spawnShooterEnemies() {
-        for(int i = 0; i< wave /2; i++) {
+        for (int i = 0; i < wave / 2; i++) {
             ShooterEnemy seItem = shooterEnemyPool.obtain();
             seItem.create(wave);
             activeShooterEnemies.add(seItem);
@@ -797,20 +806,20 @@ public class GameState extends State implements InputProcessor{
 
 
     private void spawnPickups() {
-        for(int j=0; j< level; j++) {
+        for (int j = 0; j < level; j++) {
             Item i = itemFactory.generateItemOrWeapon();
             pickups.add(i);
         }
     }
 
 
-    private void createParticles(float x, float y){
-        for(int i=0; i<6; i++){
-            particles.add(new Particle(x,y));
+    private void createParticles(float x, float y) {
+        for (int i = 0; i < 6; i++) {
+            particles.add(new Particle(x, y));
         }
     }
 
-    private void spawnBoss(){
+    private void spawnBoss() {
         boss.dispose();
         boss = new BossEnemy("data/bigboss1.png", level);
         boss.create();
@@ -821,6 +830,7 @@ public class GameState extends State implements InputProcessor{
      * out of the appropriate pool. It is also responsible for playing the correct weapon shoot sound.
      * It also need the starting positions of the bullets and the target position in the form of startX,
      * startY, dirX, dirY.
+     *
      * @param weapon
      * @param startX
      * @param startY
@@ -828,34 +838,34 @@ public class GameState extends State implements InputProcessor{
      * @param dirY
      * @param isShotFromEnemy
      */
-    private void shoot(Weapon weapon, float startX, float startY, float dirX, float dirY, boolean isShotFromEnemy){
-        if(weapon.getType() == WeaponType.LIGHT_LASER_CANNON) {
+    private void shoot(Weapon weapon, float startX, float startY, float dirX, float dirY, boolean isShotFromEnemy) {
+        if (weapon.getType() == WeaponType.LIGHT_LASER_CANNON) {
             Bullet bItem = bulletPool.obtain();
             bItem.init(startX, startY, dirX, dirY, isShotFromEnemy);
             activeBullets.add(bItem);
             weapon.playShootSound();
-        } else if(weapon.getType() == WeaponType.MISSILE_LAUNCHER) {
+        } else if (weapon.getType() == WeaponType.MISSILE_LAUNCHER) {
             Missile mItem = missilePool.obtain();
-            mItem.init(startX,startY,dirX,dirY,isShotFromEnemy);
+            mItem.init(startX, startY, dirX, dirY, isShotFromEnemy);
             activeMissiles.add(mItem);
             weapon.playShootSound();
-        } else if(weapon.getType() == WeaponType.HEAVY_LASER_CANNON){
+        } else if (weapon.getType() == WeaponType.HEAVY_LASER_CANNON) {
             Laser lItem = laserPool.obtain();
             lItem.init(startX, startY, dirX, dirY, isShotFromEnemy);
             activeLasers.add(lItem);
             weapon.playShootSound();
-        } else if(weapon.getType() == WeaponType.MINIGUN){
+        } else if (weapon.getType() == WeaponType.MINIGUN) {
             Bullet bItem = bulletPool.obtain();
             bItem.init(startX, startY, dirX, dirY, isShotFromEnemy);
             activeBullets.add(bItem);
             weapon.playShootSound();
-        }else if(weapon.getType() == WeaponType.SHOTGUN){
+        } else if (weapon.getType() == WeaponType.SHOTGUN) {
             Bullet bItem1 = bulletPool.obtain();
             Bullet bItem2 = bulletPool.obtain();
             Bullet bItem3 = bulletPool.obtain();
-            bItem1.init(startX, startY, dirX+0.1f, dirY+0.1f, isShotFromEnemy);
+            bItem1.init(startX, startY, dirX + 0.1f, dirY + 0.1f, isShotFromEnemy);
             bItem2.init(startX, startY, dirX, dirY, isShotFromEnemy);
-            bItem3.init(startX, startY, dirX-0.1f, dirY-0.1f, isShotFromEnemy);
+            bItem3.init(startX, startY, dirX - 0.1f, dirY - 0.1f, isShotFromEnemy);
             activeBullets.add(bItem1);
             activeBullets.add(bItem2);
             activeBullets.add(bItem3);
@@ -865,10 +875,10 @@ public class GameState extends State implements InputProcessor{
 
 
     @Override
-    public void resize(int width, int height){
+    public void resize(int width, int height) {
         viewport.update(width, height);
         cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
-        stage.getViewport().update(WORLD_WIDTH, (int)(WORLD_WIDTH * SCREEN_ASPECT_RATIO), false);
+        stage.getViewport().update(WORLD_WIDTH, (int) (WORLD_WIDTH * SCREEN_ASPECT_RATIO), false);
     }
 
 
@@ -887,10 +897,10 @@ public class GameState extends State implements InputProcessor{
     @Override
     public boolean keyDown(int keycode) {
 
-        if(keycode==Input.Keys.UP)
+        if (keycode == Input.Keys.UP)
             player.setUpPressed(true);
 
-        if(keycode==Input.Keys.DOWN)
+        if (keycode == Input.Keys.DOWN)
             player.setDownPressed(true);
 
         return true;
@@ -900,10 +910,10 @@ public class GameState extends State implements InputProcessor{
     @Override
     public boolean keyUp(int keycode) {
 
-        if(keycode==Input.Keys.UP)
+        if (keycode == Input.Keys.UP)
             player.setUpPressed(false);
 
-        if(keycode==Input.Keys.DOWN)
+        if (keycode == Input.Keys.DOWN)
             player.setDownPressed(false);
 
         return true;
@@ -918,10 +928,10 @@ public class GameState extends State implements InputProcessor{
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        cam.unproject(touchPoint.set(screenX,screenY,0));
-        if(touchPoint.x > WORLD_WIDTH/2)
+        cam.unproject(touchPoint.set(screenX, screenY, 0));
+        if (touchPoint.x > WORLD_WIDTH / 2)
             player.setUpPressed(true);
-        else if(touchPoint.x < WORLD_WIDTH/2)
+        else if (touchPoint.x < WORLD_WIDTH / 2)
             player.setDownPressed(true);
         return true;
     }
@@ -930,9 +940,9 @@ public class GameState extends State implements InputProcessor{
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         cam.unproject(touchPoint.set(screenX, screenY, 0));
-        if(touchPoint.x > WORLD_WIDTH/2)
+        if (touchPoint.x > WORLD_WIDTH / 2)
             player.setUpPressed(false);
-        else if(touchPoint.x < WORLD_WIDTH/2)
+        else if (touchPoint.x < WORLD_WIDTH / 2)
             player.setDownPressed(false);
         return true;
     }

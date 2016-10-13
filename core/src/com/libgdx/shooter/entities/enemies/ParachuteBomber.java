@@ -3,15 +3,11 @@ package com.libgdx.shooter.entities.enemies;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
 import com.libgdx.shooter.entities.SpaceObject;
-import com.libgdx.shooter.game.ShooterGame;
 import com.libgdx.shooter.gamestates.GameState;
-import com.libgdx.shooter.managers.Animator;
 
 import java.util.Random;
 
@@ -32,14 +28,14 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
     private float dirLength;
 
 
-    public ParachuteBomber(){
+    public ParachuteBomber() {
         this.alive = false;
         rand = new Random();
         texture = new Texture(Gdx.files.internal("data/newmine.png"));
         health = 50;
         width = texture.getWidth();
         height = texture.getHeight();
-        bounds = new Rectangle(x,y,width,height);
+        bounds = new Rectangle(x, y, width, height);
         damage = 200;
         maxSpeed = 500f;
 
@@ -47,20 +43,20 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
     }
 
 
-    public void create(int level){
+    public void create(int level) {
         //((max - min) + 1) + min
-        x = rand.nextInt(3000-2000+1)+2000;
-        y = rand.nextInt(1000-250+1)+250;
-        xSpeed = (rand.nextInt(800-400+1)+400)*-1;
-        ySpeed = rand.nextInt(100)-50;
+        x = rand.nextInt(3000 - 2000 + 1) + 2000;
+        y = rand.nextInt(1000 - 250 + 1) + 250;
+        xSpeed = (rand.nextInt(800 - 400 + 1) + 400) * -1;
+        ySpeed = rand.nextInt(100) - 50;
         alive = true;
         dy = 0;
         dx = 0;
-        health = 25 + (10*level);
+        health = 25 + (10 * level);
         damage = 200;
     }
 
-    public void create(int level, float startX, float startY, float targetX, float targetY){
+    public void create(int level, float startX, float startY, float targetX, float targetY) {
         //((max - min) + 1) + min
         x = startX;
         y = startY;
@@ -68,18 +64,18 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         alive = true;
 
         /** normalise dx and dy to be a unit vector to multiply by maxSpeed **/
-        dx = targetX-x;
-        dy = targetY-y;
+        dx = targetX - x;
+        dy = targetY - y;
         dirLength = (float) Math.sqrt(dx * dx + dy * dy);
-        dx = dx/dirLength;
-        dy = dy/dirLength;
+        dx = dx / dirLength;
+        dy = dy / dirLength;
 
-        health = 25 + (10*level);
+        health = 25 + (10 * level);
         damage = 200;
     }
 
 
-    public void update(float dt, float targetX, float targetY){
+    public void update(float dt, float targetX, float targetY) {
         /**
          * todo: make this algorithm for moving toward the player better
          */
@@ -108,7 +104,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
     }
 
 
-    public void render(SpriteBatch sb){
+    public void render(SpriteBatch sb) {
         sb.draw(texture, x, y);
     }
 
@@ -136,7 +132,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
     }
 
 
-    public void playExplosion(){
+    public void playExplosion() {
         explosionSound.play();
     }
 
