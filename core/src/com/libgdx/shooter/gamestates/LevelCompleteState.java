@@ -35,8 +35,8 @@ public class LevelCompleteState extends State {
 
     @Override
     public void create() {
-        score = ShooterGame.getCurrentContext().score;
-        level = ShooterGame.getCurrentContext().level;
+        score = ShooterGame.context.score;
+        level = ShooterGame.context.level;
 
         cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
 

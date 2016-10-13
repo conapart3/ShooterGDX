@@ -115,7 +115,7 @@ public class GameState extends State implements InputProcessor {
      * TODO: refactor the shooting mechanics to a potential new handler class?
      */
     private int numberOfLevels = 2;
-    private int level = ShooterGame.getCurrentContext().level, wave = 0;
+    private int level = ShooterGame.context.level, wave = 0;
     private Level currentLevel;
     private boolean levelSuccessFlag = false;
     private int NUM_WAVES_PER_LEVEL = (7 + level);
@@ -154,7 +154,7 @@ public class GameState extends State implements InputProcessor {
         /** create the levels and set currentlevel, then create it. **/
         levels = new ArrayList<Level>();
         String bgfilepath = "data/bgelements/bg";
-        for (int i = 0; i < numberOfLevels; i++) {
+        for (int i = (ShooterGame.context.level - 1); i < numberOfLevels; i++) {
             Level l = new Level(bgfilepath + "back" + i + ".png", bgfilepath + "middle" + i + ".png", bgfilepath + "front" + i + ".png");
             l.create();
             levels.add(l);
@@ -345,14 +345,7 @@ public class GameState extends State implements InputProcessor {
                 if (nextLevelTimer > TIME_UNTIL_NEXT_LEVEL) {
                     nextLevelTimer -= TIME_UNTIL_NEXT_LEVEL;
                     wave++;
-//                    if(7%wave==0) {
-//                        //nextlevel
-//                        level++;
-//                        currentLevel = levels.get(level);
-//                        wave = 1;
-//                    }
                     if (wave <= NUM_BUILD_UP_WAVES) {
-//                    if(wave<=0+level) {
                         levelSuccessFlag = false;
                         spawnParachuteBombers();
                         spawnShooterEnemies();
@@ -360,17 +353,15 @@ public class GameState extends State implements InputProcessor {
                         player.addPoints(100 * (wave - 1));
                         autoShoot = true;
                     } else if (wave == NUM_LEVELS_UNTIL_BOSS) {
-//                    } else if(wave == 1+level){
                         levelSuccessFlag = false;
                         spawnBoss();
                         player.addPoints(100 * (wave - 1));
                         autoShoot = true;
                     } else if (wave % (NUM_WAVES_PER_LEVEL) == 0) { //level is complete!
-//                    } else if(wave%(2+level)==0){
                         currentLevel = levels.get(level % 2);//level starts at 0 therefore get curlevel-1
                         level++;
-                        ShooterGame.getCurrentContext().level = level;
-                        ShooterGame.getCurrentContext().score = player.getScore();
+                        ShooterGame.context.level ++;
+                        ShooterGame.context.score = player.getScore();
                         wave = 0;
                         gameStateManager.setState(GameStateManager.LEVEL_COMPLETE_STATE);
                     }
@@ -399,7 +390,7 @@ public class GameState extends State implements InputProcessor {
             gameOverTimer += dt;
             if (gameOverTimer > 1) {
                 gameOverTimer -= 1;
-                ShooterGame.getCurrentContext().score = player.getScore();
+                ShooterGame.context.score = player.getScore();
                 gameStateManager.setState(GameStateManager.GAME_OVER);
             }
         }
@@ -788,7 +779,7 @@ public class GameState extends State implements InputProcessor {
      **/
     private void spawnParachuteBombers() {
 //        for(int i = 0; i<3+(5*wave/2); i++) {
-        for (int i = 0; i < wave + wave / 2; i++) {
+        for (int i = 0; i < (level * wave) + wave / 2; i++) {
             ParachuteBomber pbItem = parachuteBomberPool.obtain();
             pbItem.create(wave);
             activeParachuteBombers.add(pbItem);
@@ -797,7 +788,7 @@ public class GameState extends State implements InputProcessor {
 
 
     private void spawnShooterEnemies() {
-        for (int i = 0; i < wave / 2; i++) {
+        for (int i = 0; i < (level * wave) / 2; i++) {
             ShooterEnemy seItem = shooterEnemyPool.obtain();
             seItem.create(wave);
             activeShooterEnemies.add(seItem);

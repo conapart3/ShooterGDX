@@ -20,7 +20,7 @@ public class ShooterGame extends Game {
     public static int GROUND_OFFSET;
     public static int CEILING_OFFSET;
     public static int PLAYER_CEILING_OFFSET;
-    private static Context context;
+    public static Context context;
     public FPSLogger fpsLogger;
 
 //	public static OrthographicCamera cam;
