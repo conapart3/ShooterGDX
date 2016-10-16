@@ -23,6 +23,7 @@ public class Missile extends Bullet {
     @Override
     protected void setTexture() {
         texture = new Texture(Gdx.files.internal("data/missile.png"));
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
 

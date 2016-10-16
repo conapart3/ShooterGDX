@@ -34,9 +34,12 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable {
     public ShooterEnemy() {
         this.alive = false;
         rand = new Random();
+
 //        texture = new Texture(Gdx.files.internal("data/shooterEnemy.png"));
 //        texture = new Texture(Gdx.files.internal("data/crab3d.png"));
         texture = new Texture(Gdx.files.internal("data/pearlEnemyFinal.png"));
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
         health = 200;
         width = texture.getWidth();
         height = texture.getHeight();

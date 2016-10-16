@@ -34,6 +34,9 @@ public class Level {
         bgMiddle = GameState.assetManager.get(bgMiddleFilePath, Texture.class);
         bgFront = GameState.assetManager.get(bgFrontFilePath, Texture.class);
 
+        bgBack.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        bgMiddle.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        bgFront.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
     public void update(float dt) {

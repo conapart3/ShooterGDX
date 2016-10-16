@@ -47,6 +47,7 @@ public class Bullet extends SpaceObject implements Pool.Poolable {
 //        texture = new Texture(Gdx.files.internal("data/laser.png"));
 //        texture = new Texture(Gdx.files.internal("data/laserRed.png"));
         texture = new Texture(Gdx.files.internal("data/bullet.png"));
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
     }
 

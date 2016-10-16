@@ -24,6 +24,7 @@ public class ShieldPickup extends com.libgdx.shooter.entities.items.Item {
     @Override
     protected void setTexture() {
         texture = new Texture(Gdx.files.internal("data/pickupShield.png"));
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
     @Override

@@ -41,6 +41,7 @@ public class Item extends SpaceObject {
 
     protected void setTexture() {
         texture = new Texture(Gdx.files.internal("data/sprite_mirror_0.png"));
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
 

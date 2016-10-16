@@ -46,6 +46,8 @@ public class Player extends SpaceObject {
         int FRAME_ROWS = 1;
 
         texture = new Texture(Gdx.files.internal("data/shipAnimation.png"));
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
         explosionSound = GameState.assetManager.get("data/Sound/explosionPlayer.wav");
         TextureRegion[][] textureRegions = TextureRegion.split(texture, texture.getWidth() / FRAME_COLS, texture.getHeight() / FRAME_ROWS);
         playerFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];

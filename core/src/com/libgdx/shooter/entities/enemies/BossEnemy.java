@@ -37,7 +37,10 @@ public class BossEnemy extends SpaceObject {
 
     public BossEnemy(String filePath, int level) {
         this.alive = false;
+
         texture = new Texture(Gdx.files.internal(filePath));
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
 //        texture = GameState.assetManager.get("data/boss1.png");
         width = texture.getWidth();
         height = texture.getHeight();

@@ -24,6 +24,7 @@ public class OneHitKillPickup extends Item {
     @Override
     protected void setTexture() {
         texture = new Texture(Gdx.files.internal("data/pickupOneHitKill.png"));
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
 

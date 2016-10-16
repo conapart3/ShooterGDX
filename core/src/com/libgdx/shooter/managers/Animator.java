@@ -33,6 +33,7 @@ public class Animator implements Pool.Poolable {
         this.looping = looping;
 
         texture = new Texture(Gdx.files.internal(filePath));
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         TextureRegion[][] textureRegions = TextureRegion.split(texture, texture.getWidth() / FRAME_COLS, texture.getHeight() / FRAME_ROWS);
 
         numFrames = FRAME_COLS * FRAME_ROWS;
