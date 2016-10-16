@@ -6,12 +6,19 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.libgdx.shooter.entities.Particle;
@@ -34,13 +41,15 @@ import com.libgdx.shooter.managers.GameStateManager;
 import java.util.ArrayList;
 
 import static com.libgdx.shooter.game.ShooterGame.SCREEN_ASPECT_RATIO;
+import static com.libgdx.shooter.game.ShooterGame.SCREEN_HEIGHT;
+import static com.libgdx.shooter.game.ShooterGame.SCREEN_WIDTH;
 import static com.libgdx.shooter.game.ShooterGame.WORLD_HEIGHT;
 import static com.libgdx.shooter.game.ShooterGame.WORLD_WIDTH;
 
 /**
  * Created by Conal on 30/09/2015.
  */
-public class GameState extends State implements InputProcessor {
+public class GameState extends State {
 
 
     public static AssetManager assetManager;
@@ -126,6 +135,7 @@ public class GameState extends State implements InputProcessor {
     private ArrayList<Particle> particles;
     //touchpad and stage declaration
     private Stage stage;
+    private Touchpad touchpad;
     private BitmapFont font;
     private Label labelA, labelB, labelC, labelD;
 
@@ -134,6 +144,10 @@ public class GameState extends State implements InputProcessor {
 
     private BossEnemy boss;
 
+    private float lerp = 0.1f;
+    private float camDiffX = 0f, camDiffY = 0f;
+
+    private boolean pause = false;
 
     public GameState(GameStateManager gsm) {
         super(gsm);
@@ -143,8 +157,9 @@ public class GameState extends State implements InputProcessor {
 
     @Override
     public void create() {
-        /** Set camera default start position **/
-        cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
+        /** Set camera default start camPosition **/
+        cam.position.set(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0);
+
         assetManager = new AssetManager();
 
         /** One spritebatch used to draw all sprites **/
@@ -197,7 +212,8 @@ public class GameState extends State implements InputProcessor {
         /** Load in the stage **/
         initStage();
         stage = new Stage(viewport);
-        Gdx.input.setInputProcessor(this);
+        stage.addActor(touchpad);
+        Gdx.input.setInputProcessor(stage);
 
         /** Load in the sounds **/
         /**
@@ -222,6 +238,19 @@ public class GameState extends State implements InputProcessor {
 
     @Override
     public void update(float dt) {
+//        cam.position.set(player.getX(), player.getY(), 0);
+        camDiffX = (player.getX() - cam.position.x) * lerp * dt;
+        camDiffY = (player.getY() - cam.position.y) * lerp * dt;
+
+        cam.position.x += camDiffX;
+        cam.position.y += camDiffY;
+
+        if(cam.position.x < WORLD_WIDTH/2)
+            cam.position.x = WORLD_WIDTH/2;
+
+        if(cam.position.y < WORLD_HEIGHT/2)
+            cam.position.y = WORLD_HEIGHT/2;
+
         if (player.isAlive()) {
             handleInput();
 
@@ -377,7 +406,7 @@ public class GameState extends State implements InputProcessor {
                 }
             }
 
-            currentLevel.update(dt);
+            currentLevel.update(dt, camDiffX, camDiffY);
 
             /** update the stage and update camera. srcX is used to move the background **/
             stage.act(dt);
@@ -480,6 +509,7 @@ public class GameState extends State implements InputProcessor {
 
     @Override
     public void handleInput() {
+        player.setKnobPosition(touchpad.getKnobPercentX(), touchpad.getKnobPercentY());
     }
 
 
@@ -752,7 +782,33 @@ public class GameState extends State implements InputProcessor {
 //        labelD.setFontScale(8);
         labelD.setPosition(350, 1000);
 
+        initTouchpad();
 
+    }
+
+    private void initTouchpad(){
+        //touchpad and stage initialising
+        Skin touchpadSkin = new Skin();
+
+
+        Texture touchpadKnob = new Texture("data/touchKnob.png");
+        touchpadKnob.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        touchpadSkin.add("touchKnob", touchpadKnob);
+
+        Touchpad.TouchpadStyle touchpadStyle = new Touchpad.TouchpadStyle();
+
+        //pixmap background instead of png background? allows transparency
+        Pixmap bg = new Pixmap(200, 200, Pixmap.Format.RGBA8888);
+        bg.setBlending(Pixmap.Blending.None);
+        bg.setColor(1, 1, 1, 0.2f);
+        bg.fillCircle(100, 100, 100);
+        touchpadStyle.background = new TextureRegionDrawable(new TextureRegion(new Texture(bg)));
+
+        Drawable touchKnob = touchpadSkin.getDrawable("touchKnob");
+        touchpadStyle.knob = touchKnob;
+
+        touchpad = new Touchpad(2f, touchpadStyle);
+        touchpad.setBounds(1400f, 60f, 300f, 300f);
     }
 
 
@@ -819,7 +875,7 @@ public class GameState extends State implements InputProcessor {
     /**
      * Method to shoot. This method works out which bullet should be generated, and pulls the correct bullet
      * out of the appropriate pool. It is also responsible for playing the correct weapon shoot sound.
-     * It also need the starting positions of the bullets and the target position in the form of startX,
+     * It also need the starting positions of the bullets and the target camPosition in the form of startX,
      * startY, dirX, dirY.
      *
      * @param weapon
@@ -875,84 +931,13 @@ public class GameState extends State implements InputProcessor {
 
     @Override
     public void pause() {
-
+        pause = true;
     }
 
 
     @Override
     public void resume() {
-
+        pause = false;
     }
 
-
-    @Override
-    public boolean keyDown(int keycode) {
-
-        if (keycode == Input.Keys.UP)
-            player.setUpPressed(true);
-
-        if (keycode == Input.Keys.DOWN)
-            player.setDownPressed(true);
-
-        return true;
-    }
-
-
-    @Override
-    public boolean keyUp(int keycode) {
-
-        if (keycode == Input.Keys.UP)
-            player.setUpPressed(false);
-
-        if (keycode == Input.Keys.DOWN)
-            player.setDownPressed(false);
-
-        return true;
-    }
-
-
-    @Override
-    public boolean keyTyped(char character) {
-        return false;
-    }
-
-
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        cam.unproject(touchPoint.set(screenX, screenY, 0));
-        if (touchPoint.x > WORLD_WIDTH / 2)
-            player.setUpPressed(true);
-        else if (touchPoint.x < WORLD_WIDTH / 2)
-            player.setDownPressed(true);
-        return true;
-    }
-
-
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        cam.unproject(touchPoint.set(screenX, screenY, 0));
-        if (touchPoint.x > WORLD_WIDTH / 2)
-            player.setUpPressed(false);
-        else if (touchPoint.x < WORLD_WIDTH / 2)
-            player.setDownPressed(false);
-        return true;
-    }
-
-
-    @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
-    }
-
-
-    @Override
-    public boolean mouseMoved(int screenX, int screenY) {
-        return false;
-    }
-
-
-    @Override
-    public boolean scrolled(int amount) {
-        return false;
-    }
 }

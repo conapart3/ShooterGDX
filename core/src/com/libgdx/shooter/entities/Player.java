@@ -24,6 +24,8 @@ import static com.libgdx.shooter.game.ShooterGame.SCALE_RATIO_Y;
  */
 public class Player extends SpaceObject {
 
+    public static float STARTING_POINT_X, STARTING_POINT_Y;
+
     private TextureRegion[] playerFrames;
     private TextureRegion currentFrame;
     private Animation playerAnimation;
@@ -65,8 +67,10 @@ public class Player extends SpaceObject {
         bounds = new Rectangle(x, y, width, height);
 
         //starting position
-        x = 150 * SCALE_RATIO_X;
-        y = 800 * SCALE_RATIO_Y;
+        STARTING_POINT_X = 150 * SCALE_RATIO_X;
+        STARTING_POINT_Y = 800 * SCALE_RATIO_Y;
+        x = STARTING_POINT_X;
+        y = STARTING_POINT_Y;
 
         maxSpeed = 600f;
         health = 2000;
@@ -83,15 +87,18 @@ public class Player extends SpaceObject {
         if (health < 1)
             alive = false;
 
-        if (upPressed)
-            dy = 50;
-        else if (downPressed)
-            dy = -50;
-        else
-            dy = 0;
+//        if (upPressed)
+//            dy = 50;
+//        else if (downPressed)
+//            dy = -50;
+//        else
+//            dy = 0;
 
         ySpeed = maxSpeed * dy * dt;
         y += ySpeed * dt;
+
+        xSpeed = maxSpeed * dx * dt;
+        x += xSpeed * dt;
 
         if (y < GROUND_OFFSET)
             y = GROUND_OFFSET;
@@ -115,6 +122,11 @@ public class Player extends SpaceObject {
     @Override
     public void render(SpriteBatch spriteBatch) {
         spriteBatch.draw(currentFrame, x, y);
+    }
+
+    public void setKnobPosition(float percentX, float percentY) {
+        dx = percentX*50;
+        dy = percentY*50;
     }
 
     @Override

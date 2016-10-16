@@ -2,7 +2,9 @@ package com.libgdx.shooter.levels;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector3;
 import com.libgdx.shooter.gamestates.GameState;
+import com.libgdx.shooter.gamestates.State;
 
 /**
  * Created by Conal on 17/11/2015.
@@ -39,8 +41,9 @@ public class Level {
         bgFront.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
-    public void update(float dt) {
-        srcX += 1;
+    public void update(float dt, float camDiffX, float camDiffY) {
+//        srcX += 1;
+        srcX += camDiffX;
     }
 
     public void render(SpriteBatch spriteBatch) {
