@@ -1,8 +1,6 @@
 package com.libgdx.shooter.gamestates;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
@@ -34,9 +32,11 @@ import com.libgdx.shooter.entities.items.ItemFactory;
 import com.libgdx.shooter.entities.weapons.Weapon;
 import com.libgdx.shooter.entities.weapons.WeaponType;
 import com.libgdx.shooter.game.ShooterGame;
+import com.libgdx.shooter.levels.Background;
 import com.libgdx.shooter.levels.Level;
 import com.libgdx.shooter.managers.Animator;
 import com.libgdx.shooter.managers.GameStateManager;
+import com.libgdx.shooter.utils.Constants;
 
 import java.util.ArrayList;
 
@@ -105,7 +105,7 @@ public class GameState extends State {
         }
     };
     /**
-     * Array and pool containing the shooter enemies
+     * Array and pool containing the explosions
      **/
     private final Array<Animator> activeExplosions = new Array<Animator>();
     private final Pool<Animator> explosionPool = new Pool<Animator>() {
@@ -118,18 +118,20 @@ public class GameState extends State {
     private ShapeRenderer shapeRenderer;
     private Player player;
     private float nextLevelTimer, gameOverTimer;
-    private ArrayList<Level> levels;
+    private ArrayList<Background> backgrounds;
 
     /**
      * TODO: refactor the shooting mechanics to a potential new handler class?
      */
     private int numberOfLevels = 2;
-    private int level = ShooterGame.context.level, wave = 0;
-    private Level currentLevel;
+    private int currentLevel = ShooterGame.context.level, wave = 0;
+    private Level level;
+
+    private Background currentBackground;
     private boolean levelSuccessFlag = false;
-    private int NUM_WAVES_PER_LEVEL = (7 + level);
-    private int NUM_LEVELS_UNTIL_BOSS = (6 + level);
-    private int NUM_BUILD_UP_WAVES = (5 + level);
+    private int NUM_WAVES_PER_LEVEL = (7 + currentLevel);
+    private int NUM_LEVELS_UNTIL_BOSS = (6 + currentLevel);
+    private int NUM_BUILD_UP_WAVES = (5 + currentLevel);
     private ItemFactory itemFactory;
     private ArrayList<Item> pickups;
     private ArrayList<Particle> particles;
@@ -166,16 +168,16 @@ public class GameState extends State {
         spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
-        /** create the levels and set currentlevel, then create it. **/
-        levels = new ArrayList<Level>();
+        /** create the backgrounds and set currentlevel, then create it. **/
+        backgrounds = new ArrayList<Background>();
         String bgfilepath = "data/bgelements/bg";
         for (int i = (ShooterGame.context.level - 1); i < numberOfLevels; i++) {
-            Level l = new Level(bgfilepath + "back" + i + ".png", bgfilepath + "middle" + i + ".png", bgfilepath + "front" + i + ".png");
+            Background l = new Background(bgfilepath + "back" + i + ".png", bgfilepath + "middle" + i + ".png", bgfilepath + "front" + i + ".png");
             l.create();
-            levels.add(l);
+            backgrounds.add(l);
         }
-        currentLevel = levels.get(0);
-//        currentLevel.create();
+        currentBackground = backgrounds.get(0);
+//        currentBackground.create();
 
         /** Load in the shoot sounds into AssetManager **/
         assetManager.load("data/Sound/shootSoundMinigun.wav", Sound.class);
@@ -234,6 +236,8 @@ public class GameState extends State {
 
         particles = new ArrayList<Particle>();
         boss = new BossEnemy();
+
+        initLevel();
     }
 
     @Override
@@ -386,9 +390,9 @@ public class GameState extends State {
                         spawnBoss();
                         player.addPoints(100 * (wave - 1));
                         autoShoot = true;
-                    } else if (wave % (NUM_WAVES_PER_LEVEL) == 0) { //level is complete!
-                        currentLevel = levels.get(level % 2);//level starts at 0 therefore get curlevel-1
-                        level++;
+                    } else if (wave % (NUM_WAVES_PER_LEVEL) == 0) { //currentLevel is complete!
+                        currentBackground = backgrounds.get(currentLevel % 2);//currentLevel starts at 0 therefore get curlevel-1
+                        currentLevel++;
                         ShooterGame.context.level ++;
                         ShooterGame.context.score = player.getScore();
                         wave = 0;
@@ -406,7 +410,7 @@ public class GameState extends State {
                 }
             }
 
-            currentLevel.update(dt, camDiffX, camDiffY);
+            currentBackground.update(dt, camDiffX, camDiffY);
 
             /** update the stage and update camera. srcX is used to move the background **/
             stage.act(dt);
@@ -435,7 +439,7 @@ public class GameState extends State {
         spriteBatch.begin();
 
         /** Draw the backgrounds and have them scroll within themselves based on srcX **/
-        currentLevel.render(spriteBatch);
+        currentBackground.render(spriteBatch);
 
         player.render(spriteBatch);
 
@@ -481,8 +485,8 @@ public class GameState extends State {
             spriteBatch.draw(player.getItems().get(i).getTexture(), 100 + (100 * i), 100f);
         }
         /** Draw all text on screen **/
-//        font.draw(spriteBatch, "Level: "+level +". Lives Left: "+player.getLives(), 30, 30);
-        labelA.setText("Level: " + level);
+//        font.draw(spriteBatch, "Level: "+currentLevel +". Lives Left: "+player.getLives(), 30, 30);
+        labelA.setText("Level: " + currentLevel);
         labelA.draw(spriteBatch, 1);
 
         labelB.setText("Score: " + player.getScore());
@@ -494,7 +498,7 @@ public class GameState extends State {
         labelD.setText("Wave: " + wave);
         labelD.draw(spriteBatch, 1);
 //            if(levelSuccessFlag) {
-//                labelD.setText("Level " + level + " completed!");
+//                labelD.setText("Level " + currentLevel + " completed!");
 //                labelD.draw(spriteBatch, 1);
 //            }
 
@@ -512,6 +516,9 @@ public class GameState extends State {
         player.setKnobPosition(touchpad.getKnobPercentX(), touchpad.getKnobPercentY());
     }
 
+    private void initLevel(){
+        level = new Level(Constants.LEVEL_01);
+    }
 
     @Override
     public void dispose() {
@@ -743,7 +750,7 @@ public class GameState extends State {
 
     private void releaseBomb() {
         ParachuteBomber pb = parachuteBomberPool.obtain();
-        pb.create(level, boss.getX() + (boss.getWidth() / 2), boss.getY(), player.getX() + player.getxOffset(), player.getY() + player.getyOffset());
+        pb.create(currentLevel, boss.getX() + (boss.getWidth() / 2), boss.getY(), player.getX() + player.getxOffset(), player.getY() + player.getyOffset());
         activeParachuteBombers.add(pb);
     }
 
@@ -835,7 +842,7 @@ public class GameState extends State {
      **/
     private void spawnParachuteBombers() {
 //        for(int i = 0; i<3+(5*wave/2); i++) {
-        for (int i = 0; i < (level * wave) + wave / 2; i++) {
+        for (int i = 0; i < (currentLevel * wave) + wave / 2; i++) {
             ParachuteBomber pbItem = parachuteBomberPool.obtain();
             pbItem.create(wave);
             activeParachuteBombers.add(pbItem);
@@ -844,7 +851,7 @@ public class GameState extends State {
 
 
     private void spawnShooterEnemies() {
-        for (int i = 0; i < (level * wave) / 2; i++) {
+        for (int i = 0; i < (currentLevel * wave) / 2; i++) {
             ShooterEnemy seItem = shooterEnemyPool.obtain();
             seItem.create(wave);
             activeShooterEnemies.add(seItem);
@@ -853,7 +860,7 @@ public class GameState extends State {
 
 
     private void spawnPickups() {
-        for (int j = 0; j < level; j++) {
+        for (int j = 0; j < currentLevel; j++) {
             Item i = itemFactory.generateItemOrWeapon();
             pickups.add(i);
         }
@@ -868,7 +875,7 @@ public class GameState extends State {
 
     private void spawnBoss() {
         boss.dispose();
-        boss = new BossEnemy("data/bigboss1.png", level);
+        boss = new BossEnemy("data/bigboss1.png", currentLevel);
         boss.create();
     }
 
