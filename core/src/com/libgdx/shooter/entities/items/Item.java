@@ -1,13 +1,13 @@
 package com.libgdx.shooter.entities.items;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.libgdx.shooter.entities.Player;
+import com.libgdx.shooter.entities.SoundPicker;
+import com.libgdx.shooter.entities.SoundToPlay;
 import com.libgdx.shooter.entities.SpaceObject;
-import com.libgdx.shooter.gamestates.GameState;
 
 import java.util.Random;
 
@@ -17,33 +17,26 @@ import static com.libgdx.shooter.game.ShooterGame.GROUND_OFFSET;
 /**
  * Created by Conal on 08/11/2015.
  */
-public class Item extends SpaceObject {
+public class Item extends SpaceObject implements SoundPicker {
 
-
-    protected Sound pickupSound;//set default item pickupsound, and sub classes can use their own
     protected boolean isWeapon;
+    protected SoundToPlay soundToPlay;
 
     public Item() {
-        setPickupSound();
+//        setPickupSound();
         setTexture();
         width = texture.getWidth();
         height = texture.getHeight();
         bounds = new Rectangle(x, y, width, height);
         create();
         isWeapon = false;
+        soundToPlay = SoundToPlay.PICKUP_SOUND_ITEM;
     }
-
-
-    protected void setPickupSound() {
-        pickupSound = GameState.assetManager.get("data/Sound/pickupShotgun.wav");
-    }
-
 
     protected void setTexture() {
         texture = new Texture(Gdx.files.internal("data/sprite_mirror_0.png"));
         texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
-
 
     public void create() {
         //max-min +1 +min
@@ -58,7 +51,6 @@ public class Item extends SpaceObject {
         dirX = 0f;
         dirY = 0f;
     }
-
 
     public void update(float dt) {
         xSpeed += dx * dt;
@@ -76,20 +68,13 @@ public class Item extends SpaceObject {
             ySpeed *= -1;
     }
 
-
     public void render(SpriteBatch sb) {
         super.render(sb);
     }
 
-
-    public void playPickupSound() {
-        pickupSound.play();
-    }
-
-
     public void dispose() {
         super.dispose();
-        pickupSound.dispose();
+//        pickupSound.dispose();
     }
 
     public boolean isWeapon() {
@@ -98,5 +83,10 @@ public class Item extends SpaceObject {
 
     public void use(Player p) {
 
+    }
+
+    @Override
+    public SoundToPlay pickSound() {
+        return soundToPlay;
     }
 }

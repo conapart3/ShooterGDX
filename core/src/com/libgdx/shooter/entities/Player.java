@@ -16,8 +16,6 @@ import java.util.ArrayList;
 
 import static com.libgdx.shooter.game.ShooterGame.GROUND_OFFSET;
 import static com.libgdx.shooter.game.ShooterGame.PLAYER_CEILING_OFFSET;
-import static com.libgdx.shooter.game.ShooterGame.SCALE_RATIO_X;
-import static com.libgdx.shooter.game.ShooterGame.SCALE_RATIO_Y;
 
 /**
  * Created by Conal on 26/09/2015.
@@ -67,8 +65,8 @@ public class Player extends SpaceObject {
         bounds = new Rectangle(x, y, width, height);
 
         //starting position
-        STARTING_POINT_X = 150 * SCALE_RATIO_X;
-        STARTING_POINT_Y = 800 * SCALE_RATIO_Y;
+        STARTING_POINT_X = 150;
+        STARTING_POINT_Y = 800;
         x = STARTING_POINT_X;
         y = STARTING_POINT_Y;
 
@@ -104,8 +102,8 @@ public class Player extends SpaceObject {
             y = GROUND_OFFSET;
         if (x < 0)
             x = 0;
-        if (x > 1850)
-            x = 1850;
+//        if (x > 1850)
+//            x = 1850;
         if (y > PLAYER_CEILING_OFFSET)
             y = PLAYER_CEILING_OFFSET;
 

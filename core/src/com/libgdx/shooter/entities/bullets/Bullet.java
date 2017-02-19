@@ -1,33 +1,31 @@
 package com.libgdx.shooter.entities.bullets;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
+import com.libgdx.shooter.entities.SoundPicker;
+import com.libgdx.shooter.entities.SoundToPlay;
 import com.libgdx.shooter.entities.SpaceObject;
 import com.libgdx.shooter.game.ShooterGame;
-import com.libgdx.shooter.gamestates.GameState;
 
 
 /**
  * Created by Conal on 22/10/2015.
  */
-public class Bullet extends SpaceObject implements Pool.Poolable {
+public class Bullet extends SpaceObject implements Pool.Poolable, SoundPicker {
 
     protected int damage;
     private float xOffset, yOffset;
     protected float maxSpeed;
     private boolean isShotFromEnemy;
-    protected Sound hitSound;
 //    private Texture texture2;
-
+    protected SoundToPlay soundToPlay;
 
     public Bullet() {
         this.alive = false;
         setTexture();
-        setHitSound();
         xSpeed = 0;
         ySpeed = 0;
         width = texture.getWidth();
@@ -35,13 +33,9 @@ public class Bullet extends SpaceObject implements Pool.Poolable {
         bounds = new Rectangle(x, y, width, height);
         damage = 50;
         maxSpeed = 900f;
+        // The default sound to play is the Bullet Hit Sound.
+        soundToPlay = SoundToPlay.HIT_SOUND_BULLET;
     }
-
-
-    protected void setHitSound() {
-        hitSound = GameState.assetManager.get("data/Sound/hitSoundBullet.wav");
-    }
-
 
     protected void setTexture() {
 //        texture = new Texture(Gdx.files.internal("data/laser.png"));
@@ -50,7 +44,6 @@ public class Bullet extends SpaceObject implements Pool.Poolable {
         texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
     }
-
 
     public void init(float startXPosition, float startYPosition, float dirX, float dirY, boolean isShotFromEnemy) {
         this.x = startXPosition;
@@ -62,7 +55,6 @@ public class Bullet extends SpaceObject implements Pool.Poolable {
         this.ySpeed = dirY * maxSpeed;
         this.isShotFromEnemy = isShotFromEnemy;
     }
-
 
     public void update(float dt) {
         rotation = (Math.atan2(dirY, dirX) * 180.0d / Math.PI) - 180.0f;
@@ -77,12 +69,10 @@ public class Bullet extends SpaceObject implements Pool.Poolable {
             alive = false;
     }
 
-
     public void render(SpriteBatch sb) {
         sb.draw(texture, x, y, width / 2, height / 2, width, height, 1, 1, (float) rotation,
                 0, 0, width, height, false, false);
     }
-
 
     @Override
     public void reset() {
@@ -97,39 +87,31 @@ public class Bullet extends SpaceObject implements Pool.Poolable {
         dirY = 0;
     }
 
-
     @Override
     public void dispose() {
         super.dispose();
-        hitSound.dispose();
 //        texture2.dispose();
     }
-
-
-    public void playHitSound() {
-        hitSound.play(0.5f);
-    }
-
 
     public int getDamage() {
         return damage;
     }
 
-
     public void setDamage(int damage) {
         this.damage = damage;
     }
-
 
     public boolean isShotFromEnemy() {
         return isShotFromEnemy;
     }
 
-
     public void setIsShotFromEnemy(boolean isShotFromEnemy) {
         this.isShotFromEnemy = isShotFromEnemy;
     }
 
-
+    @Override
+    public SoundToPlay pickSound() {
+        return soundToPlay;
+    }
 }
 

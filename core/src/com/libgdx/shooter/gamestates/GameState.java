@@ -36,6 +36,7 @@ import com.libgdx.shooter.levels.Background;
 import com.libgdx.shooter.levels.Level;
 import com.libgdx.shooter.managers.Animator;
 import com.libgdx.shooter.managers.GameStateManager;
+import com.libgdx.shooter.managers.SoundManager;
 import com.libgdx.shooter.utils.Constants;
 
 import java.util.ArrayList;
@@ -51,9 +52,9 @@ import static com.libgdx.shooter.game.ShooterGame.WORLD_WIDTH;
  */
 public class GameState extends State {
 
-
     public static AssetManager assetManager;
-    private final int TIME_UNTIL_NEXT_LEVEL = 4;
+    private SoundManager soundManager;
+    private final int TIME_UNTIL_NEXT_WAVE = 4;
     /**
      * Array and pool containing the bullets
      **/
@@ -117,7 +118,7 @@ public class GameState extends State {
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
     private Player player;
-    private float nextLevelTimer, gameOverTimer;
+    private float nextWaveTimer, gameOverTimer;
     private ArrayList<Background> backgrounds;
 
     /**
@@ -160,9 +161,11 @@ public class GameState extends State {
     @Override
     public void create() {
         /** Set camera default start camPosition **/
-        cam.position.set(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0);
+        cam.position.set(0, 0, 0);
 
+        // We have a sound manager which stores all sounds in hash map and plays
         assetManager = new AssetManager();
+        soundManager = new SoundManager(assetManager);
 
         /** One spritebatch used to draw all sprites **/
         spriteBatch = new SpriteBatch();
@@ -179,37 +182,7 @@ public class GameState extends State {
         currentBackground = backgrounds.get(0);
 //        currentBackground.create();
 
-        /** Load in the shoot sounds into AssetManager **/
-        assetManager.load("data/Sound/shootSoundMinigun.wav", Sound.class);
-        assetManager.load("data/Sound/shootSoundMissile.wav", Sound.class);
-        assetManager.load("data/Sound/shootSoundShotgun.wav", Sound.class);
-        assetManager.load("data/Sound/shootSoundHeavyLaserCannon.wav", Sound.class);
-        assetManager.load("data/Sound/shootSoundLightLaserCannon.wav", Sound.class);
-
-        /** Load in the pickup sounds into AssetManager **/
-        assetManager.load("data/Sound/pickupHeavyLaser.wav", Sound.class);
-        assetManager.load("data/Sound/pickupLightLaser.wav", Sound.class);
-        assetManager.load("data/Sound/pickupMinigun.wav", Sound.class);
-        assetManager.load("data/Sound/pickupShotgun.wav", Sound.class);
-        assetManager.load("data/Sound/pickupMissileLauncher.wav", Sound.class);
-        assetManager.load("data/Sound/pickupHealth.wav", Sound.class);
-        assetManager.load("data/Sound/pickupMedal.wav", Sound.class);
-        assetManager.load("data/Sound/pickupShield.wav", Sound.class);
-
-        /** load in the hit sounds for bullet types **/
-        assetManager.load("data/Sound/hitSoundLaser.wav", Sound.class);
-        assetManager.load("data/Sound/hitSoundBullet.wav", Sound.class);
-        assetManager.load("data/Sound/hitSoundMissile.wav", Sound.class);
-
-        /** Load in the explosion sounds into AssetManager **/
-        assetManager.load("data/Sound/explosionParachute.wav", Sound.class);
-        assetManager.load("data/Sound/explosionShooterEnemy.wav", Sound.class);
-        assetManager.load("data/Sound/explosionPlayer.wav", Sound.class);
-        assetManager.load("data/Sound/explosionBoss.wav", Sound.class);
-
 //        assetManager.load("data/boss1.png", Texture.class);
-
-        assetManager.finishLoading();
 
         /** Load in the stage **/
         initStage();
@@ -243,17 +216,17 @@ public class GameState extends State {
     @Override
     public void update(float dt) {
 //        cam.position.set(player.getX(), player.getY(), 0);
-        camDiffX = (player.getX() - cam.position.x) * lerp * dt;
-        camDiffY = (player.getY() - cam.position.y) * lerp * dt;
+//        if(player.getX() > player.STARTING_POINT_X + cam.position.x) {
+//            cam.position.x += (player.getX() - cam.position.x) * lerp * dt;
+//        }
+        cam.position.x += (player.getX() - cam.position.x) * lerp * dt;
+//        cam.position.y += (player.getY() - cam.position.y) * lerp * dt;
 
-        cam.position.x += camDiffX;
-        cam.position.y += camDiffY;
+        if(cam.position.x < SCREEN_WIDTH)
+            cam.position.x = SCREEN_WIDTH;
 
-        if(cam.position.x < WORLD_WIDTH/2)
-            cam.position.x = WORLD_WIDTH/2;
-
-        if(cam.position.y < WORLD_HEIGHT/2)
-            cam.position.y = WORLD_HEIGHT/2;
+        if(cam.position.y < 0)
+            cam.position.y = 0;
 
         if (player.isAlive()) {
             handleInput();
@@ -372,11 +345,11 @@ public class GameState extends State {
 
             /** Spawn new enemies, stop player shooting flag, start timer until next level starts **/
             if (activeParachuteBombers.size == 0 && activeShooterEnemies.size == 0 && !boss.isAlive()) {
-                nextLevelTimer += dt;
+                nextWaveTimer += dt;
                 autoShoot = false;
                 levelSuccessFlag = true;
-                if (nextLevelTimer > TIME_UNTIL_NEXT_LEVEL) {
-                    nextLevelTimer -= TIME_UNTIL_NEXT_LEVEL;
+                if (nextWaveTimer > TIME_UNTIL_NEXT_WAVE) {
+                    nextWaveTimer -= TIME_UNTIL_NEXT_WAVE;
                     wave++;
                     if (wave <= NUM_BUILD_UP_WAVES) {
                         levelSuccessFlag = false;
@@ -556,11 +529,11 @@ public class GameState extends State {
                         pb.takeDamage(b.getDamage());
                         player.addPoints(b.getDamage() * player.getPointsMultiplier());
                         if (!pb.isAlive()) {
-                            pb.playExplosion();
+                            soundManager.play(pb.pickSound().getWavFilePath());
                             spawnExplosion(pb.getX(), pb.getY());
 //                            createParticles(pb.getX(), pb.getY());
                         } else {
-                            b.playHitSound();
+                            soundManager.play(b.pickSound().getWavFilePath());
                         }
                     }
                 }
@@ -571,10 +544,10 @@ public class GameState extends State {
                         se.takeDamage(b.getDamage());
                         player.addPoints(b.getDamage() * player.getPointsMultiplier());
                         if (!se.isAlive()) {
-                            se.playExplosion();
+                            soundManager.play(se.pickSound().getWavFilePath());
                             spawnExplosion(se.getX(), se.getY());
                         } else {
-                            b.playHitSound();
+                            soundManager.play(b.pickSound().getWavFilePath());
                         }
                     }
                 }
@@ -584,10 +557,10 @@ public class GameState extends State {
                         boss.takeDamage(b.getDamage());
                         player.addPoints(b.getDamage() * player.getPointsMultiplier());
                         if (!boss.isAlive()) {
-                            boss.playExplosion();
+                            soundManager.play(boss.pickSound().getWavFilePath());
                             spawnExplosion(boss.getX(), boss.getY());
                         } else {
-                            b.playHitSound();
+                            soundManager.play(b.pickSound().getWavFilePath());
                         }
                     }
                 }
@@ -598,7 +571,7 @@ public class GameState extends State {
                     if (!player.isAlive()) {
                         player.playExplosion();
                     } else {
-                        b.playHitSound();
+                        soundManager.play(b.pickSound().getWavFilePath());
                     }
                 }
             }
@@ -615,10 +588,10 @@ public class GameState extends State {
                         pb.takeDamage(b.getDamage());
                         player.addPoints(b.getDamage() * player.getPointsMultiplier());
                         if (!pb.isAlive()) {
-                            pb.playExplosion();
+                            soundManager.play(pb.pickSound().getWavFilePath());
                             spawnExplosion(pb.getX(), pb.getY());
                         } else {
-                            b.playHitSound();
+                            soundManager.play(b.pickSound().getWavFilePath());
                         }
                     }
                 }
@@ -629,10 +602,10 @@ public class GameState extends State {
                         se.takeDamage(b.getDamage());
                         player.addPoints(b.getDamage() * player.getPointsMultiplier());
                         if (!se.isAlive()) {
-                            se.playExplosion();
+                            soundManager.play(se.pickSound().getWavFilePath());
                             spawnExplosion(se.getX(), se.getY());
                         } else {
-                            b.playHitSound();
+                            soundManager.play(b.pickSound().getWavFilePath());
                         }
                     }
                 }
@@ -642,10 +615,10 @@ public class GameState extends State {
                         boss.takeDamage(b.getDamage());
                         player.addPoints(b.getDamage() * player.getPointsMultiplier());
                         if (!boss.isAlive()) {
-                            boss.playExplosion();
+                            soundManager.play(boss.pickSound().getWavFilePath());
                             spawnExplosion(boss.getX(), boss.getY());
                         } else {
-                            b.playHitSound();
+                            soundManager.play(b.pickSound().getWavFilePath());
                         }
                     }
                 }
@@ -656,7 +629,7 @@ public class GameState extends State {
                     if (!player.isAlive()) {
                         player.playExplosion();
                     } else {
-                        b.playHitSound();
+                        soundManager.play(b.pickSound().getWavFilePath());
                     }
                 }
             }
@@ -673,10 +646,10 @@ public class GameState extends State {
                         pb.takeDamage(b.getDamage());
                         player.addPoints(b.getDamage() * player.getPointsMultiplier());
                         if (!pb.isAlive()) {
-                            pb.playExplosion();
+                            soundManager.play(pb.pickSound().getWavFilePath());
                             spawnExplosion(pb.getX(), pb.getY());
                         } else {
-                            b.playHitSound();
+                            soundManager.play(b.pickSound().getWavFilePath());
                         }
                     }
                 }
@@ -687,10 +660,10 @@ public class GameState extends State {
                         se.takeDamage(b.getDamage());
                         player.addPoints(b.getDamage() * player.getPointsMultiplier());
                         if (!se.isAlive()) {
-                            se.playExplosion();
+                            soundManager.play(se.pickSound().getWavFilePath());
                             spawnExplosion(se.getX(), se.getY());
                         } else {
-                            b.playHitSound();
+                            soundManager.play(b.pickSound().getWavFilePath());
                         }
                     }
                 }
@@ -700,10 +673,10 @@ public class GameState extends State {
                         boss.takeDamage(b.getDamage());
                         player.addPoints(b.getDamage() * player.getPointsMultiplier());
                         if (!boss.isAlive()) {
-                            boss.playExplosion();
+                            soundManager.play(boss.pickSound().getWavFilePath());
                             spawnExplosion(boss.getX(), boss.getY());
                         } else {
-                            b.playHitSound();
+                            soundManager.play(b.pickSound().getWavFilePath());
                         }
                     }
                 }
@@ -714,7 +687,7 @@ public class GameState extends State {
                     if (!player.isAlive()) {
                         player.playExplosion();
                     } else {
-                        b.playHitSound();
+                        soundManager.play(b.pickSound().getWavFilePath());
                     }
                 }
             }
@@ -730,7 +703,7 @@ public class GameState extends State {
                     player.playExplosion();
                     spawnExplosion(pb.getX(), pb.getY());
                 } else {
-                    pb.playExplosion();
+                    soundManager.play(pb.pickSound().getWavFilePath());
                     spawnExplosion(pb.getX(), pb.getY());
                 }
             }
@@ -741,7 +714,7 @@ public class GameState extends State {
             Item pi = pickups.get(i);
             if (player.collides(pi.getBounds()) || pi.collides(player.getBounds())) {
                 player.addItem(pi);
-                pi.playPickupSound();
+                soundManager.play(pi.pickSound().getWavFilePath());
                 pi.setAlive(false);
             }
         }
@@ -897,22 +870,22 @@ public class GameState extends State {
             Bullet bItem = bulletPool.obtain();
             bItem.init(startX, startY, dirX, dirY, isShotFromEnemy);
             activeBullets.add(bItem);
-            weapon.playShootSound();
+            soundManager.play(weapon.pickSound().getWavFilePath());
         } else if (weapon.getType() == WeaponType.MISSILE_LAUNCHER) {
             Missile mItem = missilePool.obtain();
             mItem.init(startX, startY, dirX, dirY, isShotFromEnemy);
             activeMissiles.add(mItem);
-            weapon.playShootSound();
+            soundManager.play(weapon.pickSound().getWavFilePath());
         } else if (weapon.getType() == WeaponType.HEAVY_LASER_CANNON) {
             Laser lItem = laserPool.obtain();
             lItem.init(startX, startY, dirX, dirY, isShotFromEnemy);
             activeLasers.add(lItem);
-            weapon.playShootSound();
+            soundManager.play(weapon.pickSound().getWavFilePath());
         } else if (weapon.getType() == WeaponType.MINIGUN) {
             Bullet bItem = bulletPool.obtain();
             bItem.init(startX, startY, dirX, dirY, isShotFromEnemy);
             activeBullets.add(bItem);
-            weapon.playShootSound();
+            soundManager.play(weapon.pickSound().getWavFilePath());
         } else if (weapon.getType() == WeaponType.SHOTGUN) {
             Bullet bItem1 = bulletPool.obtain();
             Bullet bItem2 = bulletPool.obtain();
@@ -923,7 +896,7 @@ public class GameState extends State {
             activeBullets.add(bItem1);
             activeBullets.add(bItem2);
             activeBullets.add(bItem3);
-            weapon.playShootSound();
+            soundManager.play(weapon.pickSound().getWavFilePath());
         }
     }
 
@@ -931,8 +904,8 @@ public class GameState extends State {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height);
-        cam.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
-        stage.getViewport().update(WORLD_WIDTH, (int) (WORLD_WIDTH * SCREEN_ASPECT_RATIO), false);
+//        cam.position.set(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0);
+//        stage.getViewport().update(SCREEN_WIDTH, SCREEN_HEIGHT, false);
     }
 
 

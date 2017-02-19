@@ -13,7 +13,6 @@ public class BlackHole extends SpaceObject {
         super();
     }
 
-
     public void update(float dt) {
 
     }

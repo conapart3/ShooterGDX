@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.libgdx.shooter.entities.SpaceObject;
 import com.libgdx.shooter.entities.enemies.ParachuteBomber;
+import com.libgdx.shooter.game.ShooterGame;
 
 /**
  * Created by Conal on 16/10/2016.
@@ -14,6 +15,7 @@ import com.libgdx.shooter.entities.enemies.ParachuteBomber;
 public class Level {
 
     public static final String TAG = Level.class.getName();
+    private float pixmapToWorldTranslationX;
 
     public enum BLOCK_TYPE {
         EMPTY(0, 0, 0), //black
@@ -61,7 +63,7 @@ public class Level {
                 float offsetHeight = 0;
 
                 // Height grows from the bottom to the top
-                float baseHeight = pixmap.getHeight() - pixelY;
+//                float baseHeight = pixmap.getHeight() - pixelY;
 
                 // Get colour of current pixel as 32-bit RGBA value
                 int currentPixel = pixmap.getPixel(pixelX, pixelY);
@@ -77,9 +79,12 @@ public class Level {
                 else if(BLOCK_TYPE.ENEMY_BOMBER.sameColour(currentPixel)){
 //                    if(lastpixel != currentPixel){
                     obj = new ParachuteBomber();
-                    float heightIncreaseFactor = 0.25f;
-                    offsetHeight = -2.5f;
-                    obj.setPosition(pixelX, baseHeight * obj.getHeight() * heightIncreaseFactor + offsetHeight);
+//                    float heightIncreaseFactor = 0.25f;
+//                    offsetHeight = -2.5f;
+                    float worldX = pixelX * (ShooterGame.WORLD_WIDTH/pixmap.getWidth());
+                    float worldY = pixelY * (ShooterGame.WORLD_HEIGHT/pixmap.getHeight());
+
+                    obj.setPosition(worldX, worldY);
                     bombers.add((ParachuteBomber)obj);
 //                    }
                 }

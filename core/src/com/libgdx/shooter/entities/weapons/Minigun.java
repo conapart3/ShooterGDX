@@ -3,13 +3,12 @@ package com.libgdx.shooter.entities.weapons;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-import com.libgdx.shooter.gamestates.GameState;
+import com.libgdx.shooter.entities.SoundToPlay;
 
 /**
  * Created by Conal on 08/11/2015.
  */
 public class Minigun extends Weapon {
-
 
     public final WeaponType type = WeaponType.MINIGUN;
 
@@ -17,26 +16,25 @@ public class Minigun extends Weapon {
         super();
         damage = 25;
         rateOfFire = 0.1f;
+        soundToPlay = SoundToPlay.SHOOT_SOUND_MINIGUN;
     }
-
 
     @Override
     protected void setTexture() {
         texture = new Texture(Gdx.files.internal("data/pickupMinigun.png"));
     }
 
-    @Override
-    protected void setShootSound() {
-//        shootSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/shootSoundMinigun.wav"));
-        shootSound = GameState.assetManager.get("data/Sound/shootSoundMinigun.wav");
-    }
-
-    @Override
-    protected void setPickupSound() {
-//        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupMinigun.wav"));
-        pickupSound = GameState.assetManager.get("data/Sound/pickupMinigun.wav");
-    }
-
+//    @Override
+//    protected void setShootSound() {
+////        shootSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/shootSoundMinigun.wav"));
+//        shootSound = GameState.assetManager.get("data/Sound/shootSoundMinigun.wav");
+//    }
+//
+//    @Override
+//    protected void setPickupSound() {
+////        pickupSound = Gdx.audio.newSound(Gdx.files.internal("data/Sound/pickupMinigun.wav"));
+//        pickupSound = GameState.assetManager.get("data/Sound/pickupMinigun.wav");
+//    }
 
     @Override
     public WeaponType getType() {
@@ -47,5 +45,4 @@ public class Minigun extends Weapon {
     public void useWeapon(Vector2 target) {
 
     }
-
 }

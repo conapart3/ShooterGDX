@@ -2,22 +2,19 @@ package com.libgdx.shooter.entities.bullets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.libgdx.shooter.gamestates.GameState;
+import com.libgdx.shooter.entities.SoundPicker;
+import com.libgdx.shooter.entities.SoundToPlay;
 
 /**
  * Created by Conal on 12/11/2015.
  */
-public class Laser extends Bullet {
+public class Laser extends Bullet implements SoundPicker{
 
     public Laser() {
         super();
         damage = 100;
         maxSpeed = 700f;
-    }
-
-    @Override
-    protected void setHitSound() {
-        hitSound = GameState.assetManager.get("data/Sound/hitSoundLaser.wav");
+        soundToPlay = SoundToPlay.HIT_SOUND_LASER;
     }
 
     @Override

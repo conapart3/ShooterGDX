@@ -1,16 +1,16 @@
 package com.libgdx.shooter.entities.enemies;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
+import com.libgdx.shooter.entities.SoundPicker;
+import com.libgdx.shooter.entities.SoundToPlay;
 import com.libgdx.shooter.entities.SpaceObject;
 import com.libgdx.shooter.entities.weapons.HeavyLaserCannon;
 import com.libgdx.shooter.entities.weapons.Weapon;
-import com.libgdx.shooter.gamestates.GameState;
 
 import java.util.Random;
 
@@ -20,16 +20,15 @@ import static com.libgdx.shooter.game.ShooterGame.GROUND_OFFSET;
 /**
  * Created by Conal on 28/10/2015.
  */
-public class ShooterEnemy extends SpaceObject implements Pool.Poolable {
+public class ShooterEnemy extends SpaceObject implements Pool.Poolable, SoundPicker {
 
     private Random rand;
     private boolean isShooting;
     private float dirX, dirY, dirLength;
     private double rotation;
     private Weapon weapon;
-    private Sound explosionSound;
     private float strafeChangeTime = 4f, strafeTimer = 0f;
-
+    protected SoundToPlay soundToPlay;
 
     public ShooterEnemy() {
         this.alive = false;
@@ -48,12 +47,10 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable {
         dirX = 0f;
         dirY = 0f;
         weapon = new HeavyLaserCannon();
-        //randomize the weapon.
-        explosionSound = GameState.assetManager.get("data/Sound/explosionShooterEnemy.wav");
         maxSpeed = 400;
         strafe = false;
+        soundToPlay = SoundToPlay.EXPLOSION_SOUND_SHOOTERENEMY;
     }
-
 
     //pass in the level - health = 200 + (200*level/2)
     public void create(int level) {
@@ -73,7 +70,6 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable {
         strafe = false;
     }
 
-
     public void update(float dt, float targetX, float targetY) {
         //this could be the problem why some bullets shot at player from behind player.
         if (alive)
@@ -92,7 +88,6 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable {
         rotation = (Math.atan2(dirY, dirX) * 180.0d / Math.PI) - 180.0f;
         xOffset = width / 2 + dirX * 30;
         yOffset = height / 2 + dirY * 30;
-
 
         strafeTimer += dt;
 
@@ -134,7 +129,6 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable {
         if (y >= CEILING_OFFSET || y <= GROUND_OFFSET)
             ySpeed = 0;
 
-
         super.speedLimit();
         super.move(dt);
 
@@ -153,7 +147,6 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable {
         sb.draw(texture, x, y, width / 2, height / 2, width, height, 1, 1, (float) rotation, 0, 0, width, height, false, false);
     }
 
-
     @Override
     public void reset() {
         alive = false;
@@ -166,55 +159,45 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable {
         dy = 0;
     }
 
-
     @Override
     public void dispose() {
         super.dispose();
     }
 
-
     public boolean isShooting() {
         return isShooting;
     }
-
 
     public void setIsShooting(boolean isShooting) {
         this.isShooting = isShooting;
     }
 
-
     public float getDirX() {
         return dirX;
     }
-
 
     public void setDirX(float dirX) {
         this.dirX = dirX;
     }
 
-
     public float getDirY() {
         return dirY;
     }
-
 
     public void setDirY(float dirY) {
         this.dirY = dirY;
     }
 
-
     public Weapon getWeapon() {
         return weapon;
     }
-
 
     public void setWeapon(Weapon weapon) {
         this.weapon = weapon;
     }
 
-
-    public void playExplosion() {
-        explosionSound.play();
+    @Override
+    public SoundToPlay pickSound() {
+        return soundToPlay;
     }
-
 }

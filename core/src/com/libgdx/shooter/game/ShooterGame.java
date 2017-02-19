@@ -11,19 +11,16 @@ import com.libgdx.shooter.managers.StyleManager;
 
 public class ShooterGame extends Game {
 
-    public static int SCREEN_WIDTH;
-    public static int SCREEN_HEIGHT;
+    public static int SCREEN_WIDTH, SCREEN_HEIGHT;
     public static int WORLD_WIDTH, WORLD_HEIGHT;
-    public static float SCALE_RATIO_X, SCALE_RATIO_Y;
-    public static float SCREEN_ASPECT_RATIO;
-    public static float WORLD_ASPECT_RATIO;
-    public static int GROUND_OFFSET;
-    public static int CEILING_OFFSET;
-    public static int PLAYER_CEILING_OFFSET;
+    public static int TARGET_WIDTH = 1920, TARGET_HEIGHT = 1080; // Target display todo: sort out camera and viewport
+//    public static float SCALE_RATIO_X, SCALE_RATIO_Y;
+    public static float SCREEN_ASPECT_RATIO, WORLD_ASPECT_RATIO;
+    public static int GROUND_OFFSET, CEILING_OFFSET, PLAYER_CEILING_OFFSET;
     public static Context context;
     public FPSLogger fpsLogger;
 
-//	public static OrthographicCamera cam;
+    //	public static OrthographicCamera cam;
 //	public Viewport viewport;
     private GameStateManager gsm;
     private float dt;
@@ -51,7 +48,7 @@ public class ShooterGame extends Game {
         //this sets the size of the world. Changing this will change how much fits in the screen and
         // will enlarge size of objects. This should be set to 1920 x 1080 which is the maximum
         // resolution, it will be scaled down on smaller screens
-        WORLD_WIDTH = 1920;
+        WORLD_WIDTH = 256000;
         WORLD_HEIGHT = 1080;
 
         //this is the actual screen width.
@@ -60,11 +57,12 @@ public class ShooterGame extends Game {
 
         //this calculates the ratio between actual screen and world width/height. Use as a multiplier
         //for onscreen displays to show in the correct positions?
-        SCALE_RATIO_X = (float) SCREEN_WIDTH / (float) WORLD_WIDTH;
-        SCALE_RATIO_Y = (float) SCREEN_HEIGHT / (float) WORLD_HEIGHT;
+        // i.e. in enemy class enemy_spawn_position_X = pixmap_dot_position * WORLD_WIDTH
+//        SCALE_RATIO_X = (float) SCREEN_WIDTH / (float) WORLD_WIDTH;
+//        SCALE_RATIO_Y = (float) SCREEN_HEIGHT / (float) WORLD_HEIGHT;
 
-        SCREEN_ASPECT_RATIO = (float) SCREEN_HEIGHT / (float) SCREEN_WIDTH;
-        WORLD_ASPECT_RATIO = (float) WORLD_HEIGHT / (float) WORLD_WIDTH;
+//        SCREEN_ASPECT_RATIO = (float) SCREEN_HEIGHT / (float) SCREEN_WIDTH;
+//        WORLD_ASPECT_RATIO = (float) WORLD_HEIGHT / (float) WORLD_WIDTH;
 
         GROUND_OFFSET = 145;
         CEILING_OFFSET = 900;
@@ -107,6 +105,7 @@ public class ShooterGame extends Game {
 
     @Override
     public void resize(int width, int height) {
+        // todo: make the viewport instantiation in the ShooterGame class?
 //		viewport.update(width,height);
 //		cam.position.set(cam.viewportWidth/2,cam.viewportHeight/2,0);
 //		gsm.resize(width, height);

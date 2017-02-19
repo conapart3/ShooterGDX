@@ -1,13 +1,13 @@
 package com.libgdx.shooter.entities.enemies;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
+import com.libgdx.shooter.entities.SoundPicker;
+import com.libgdx.shooter.entities.SoundToPlay;
 import com.libgdx.shooter.entities.SpaceObject;
-import com.libgdx.shooter.gamestates.GameState;
 
 import java.util.Random;
 
@@ -17,16 +17,15 @@ import static com.libgdx.shooter.game.ShooterGame.GROUND_OFFSET;
 /**
  * Created by Conal on 22/10/2015.
  */
-public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
+public class ParachuteBomber extends SpaceObject implements Pool.Poolable, SoundPicker {
 
     private Random rand;
     private int points = 100;
     private int damage;
-    private Sound explosionSound;
     private float lerp = 0.5f;
     private boolean fromBoss;
     private float dirLength;
-
+    protected SoundToPlay soundToPlay;
 
     public ParachuteBomber() {
         this.alive = false;
@@ -42,9 +41,9 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         damage = 200;
         maxSpeed = 500f;
 
-        explosionSound = GameState.assetManager.get("data/Sound/explosionParachute.wav");
+//        explosionSound = GameState.assetManager.get("data/Sound/explosionParachute.wav");
+        soundToPlay = SoundToPlay.EXPLOSION_SOUND_PARACHUTEBOMBER;
     }
-
 
     public void create(int level) {
         //((max - min) + 1) + min
@@ -77,7 +76,6 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         damage = 200;
     }
 
-
     public void update(float dt, float targetX, float targetY) {
         /**
          * todo: make this algorithm for moving toward the player better
@@ -106,11 +104,9 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
 
     }
 
-
     public void render(SpriteBatch sb) {
         sb.draw(texture, x, y);
     }
-
 
     @Override
     public void reset() {
@@ -124,7 +120,6 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         health = 0;
     }
 
-
     public int getDamage() {
         return damage;
     }
@@ -134,16 +129,16 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable {
         this.damage = damage;
     }
 
-
-    public void playExplosion() {
-        explosionSound.play();
-    }
-
     public boolean isFromBoss() {
         return fromBoss;
     }
 
     public void setFromBoss(boolean fromBoss) {
         this.fromBoss = fromBoss;
+    }
+
+    @Override
+    public SoundToPlay pickSound() {
+        return soundToPlay;
     }
 }

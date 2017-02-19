@@ -6,8 +6,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.libgdx.shooter.Context;
 import com.libgdx.shooter.managers.GameStateManager;
 
-import static com.libgdx.shooter.game.ShooterGame.WORLD_HEIGHT;
-import static com.libgdx.shooter.game.ShooterGame.WORLD_WIDTH;
+import static com.libgdx.shooter.game.ShooterGame.TARGET_HEIGHT;
+import static com.libgdx.shooter.game.ShooterGame.TARGET_WIDTH;
 
 /**
  * Created by Conal on 30/09/2015.
@@ -26,8 +26,8 @@ public abstract class State {
 
 //        cam = new OrthographicCamera(ShooterGame.WORLD_WIDTH, ShooterGame.WORLD_WIDTH * ShooterGame.SCREEN_ASPECT_RATIO);
 //        cam = new OrthographicCamera(); //this is in the parent class
-//        viewport = new FitViewport(SCREEN_WIDTH, SCREEN_HEIGHT, cam);
-        viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, cam);
+        viewport = new FitViewport(TARGET_WIDTH, TARGET_HEIGHT, cam);
+//        viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, cam);
 //        viewport = new FitViewport(WORLD_WIDTH, WORLD_WIDTH * SCREEN_ASPECT_RATIO, cam);
 //        viewport = new StretchViewport(WORLD_WIDTH, WORLD_HEIGHT, cam);
         viewport.apply();

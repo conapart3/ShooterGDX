@@ -3,24 +3,17 @@ package com.libgdx.shooter.entities.items;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.libgdx.shooter.entities.Player;
-import com.libgdx.shooter.gamestates.GameState;
+import com.libgdx.shooter.entities.SoundToPlay;
 
 /**
  * Created by Conal on 29/10/2015.
  */
 public class HealthPickup extends com.libgdx.shooter.entities.items.Item {
 
-
     public HealthPickup() {
         super();
+        soundToPlay = SoundToPlay.PICKUP_SOUND_HEALTH;
     }
-
-
-    @Override
-    protected void setPickupSound() {
-        pickupSound = GameState.assetManager.get("data/Sound/pickupHealth.wav");
-    }
-
 
     @Override
     protected void setTexture() {
