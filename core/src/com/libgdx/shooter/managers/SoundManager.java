@@ -58,6 +58,7 @@ public class SoundManager {
      * @param soundToPlayKey the soundMap key of the sound to play
      */
     public void play(String soundToPlayKey) {
+        System.out.println(soundToPlayKey);
         if(!soundMap.containsKey(soundToPlayKey)) {
             soundMap.put(soundToPlayKey, (Sound) assetManager.get(soundToPlayKey));
         }

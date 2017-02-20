@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
-import com.libgdx.shooter.entities.SoundPicker;
+import com.libgdx.shooter.entities.Soundable;
 import com.libgdx.shooter.entities.SoundToPlay;
 import com.libgdx.shooter.entities.SpaceObject;
 import com.libgdx.shooter.game.ShooterGame;
@@ -14,7 +14,7 @@ import com.libgdx.shooter.game.ShooterGame;
 /**
  * Created by Conal on 22/10/2015.
  */
-public class Bullet extends SpaceObject implements Pool.Poolable, SoundPicker {
+public class Bullet extends SpaceObject implements Pool.Poolable, Soundable {
 
     protected int damage;
     private float xOffset, yOffset;
@@ -110,7 +110,7 @@ public class Bullet extends SpaceObject implements Pool.Poolable, SoundPicker {
     }
 
     @Override
-    public SoundToPlay pickSound() {
+    public SoundToPlay getSound() {
         return soundToPlay;
     }
 }

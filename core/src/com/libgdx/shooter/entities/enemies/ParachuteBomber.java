@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
-import com.libgdx.shooter.entities.SoundPicker;
+import com.libgdx.shooter.entities.Soundable;
 import com.libgdx.shooter.entities.SoundToPlay;
 import com.libgdx.shooter.entities.SpaceObject;
 
@@ -17,7 +17,7 @@ import static com.libgdx.shooter.game.ShooterGame.GROUND_OFFSET;
 /**
  * Created by Conal on 22/10/2015.
  */
-public class ParachuteBomber extends SpaceObject implements Pool.Poolable, SoundPicker {
+public class ParachuteBomber extends SpaceObject implements Pool.Poolable, Soundable {
 
     private Random rand;
     private int points = 100;
@@ -138,7 +138,7 @@ public class ParachuteBomber extends SpaceObject implements Pool.Poolable, Sound
     }
 
     @Override
-    public SoundToPlay pickSound() {
+    public SoundToPlay getSound() {
         return soundToPlay;
     }
 }

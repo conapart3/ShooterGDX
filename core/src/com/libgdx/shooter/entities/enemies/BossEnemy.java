@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.libgdx.shooter.entities.SoundPicker;
+import com.libgdx.shooter.entities.Soundable;
 import com.libgdx.shooter.entities.SoundToPlay;
 import com.libgdx.shooter.entities.SpaceObject;
 import com.libgdx.shooter.entities.weapons.MissileLauncher;
@@ -19,7 +19,7 @@ import static com.libgdx.shooter.game.ShooterGame.GROUND_OFFSET;
 /**
  * Created by Conal on 08/11/2015.
  */
-public class BossEnemy extends SpaceObject implements SoundPicker {
+public class BossEnemy extends SpaceObject implements Soundable {
 
     private ArrayList<com.libgdx.shooter.entities.weapons.Weapon> weaponList;
     private int level;
@@ -180,7 +180,7 @@ public class BossEnemy extends SpaceObject implements SoundPicker {
     }
 
     @Override
-    public SoundToPlay pickSound() {
+    public SoundToPlay getSound() {
         return soundToPlay;
     }
 }

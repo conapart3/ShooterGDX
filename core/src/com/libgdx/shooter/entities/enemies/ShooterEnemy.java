@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Pool;
-import com.libgdx.shooter.entities.SoundPicker;
+import com.libgdx.shooter.entities.Soundable;
 import com.libgdx.shooter.entities.SoundToPlay;
 import com.libgdx.shooter.entities.SpaceObject;
 import com.libgdx.shooter.entities.weapons.HeavyLaserCannon;
@@ -20,7 +20,7 @@ import static com.libgdx.shooter.game.ShooterGame.GROUND_OFFSET;
 /**
  * Created by Conal on 28/10/2015.
  */
-public class ShooterEnemy extends SpaceObject implements Pool.Poolable, SoundPicker {
+public class ShooterEnemy extends SpaceObject implements Pool.Poolable, Soundable {
 
     private Random rand;
     private boolean isShooting;
@@ -197,7 +197,7 @@ public class ShooterEnemy extends SpaceObject implements Pool.Poolable, SoundPic
     }
 
     @Override
-    public SoundToPlay pickSound() {
+    public SoundToPlay getSound() {
         return soundToPlay;
     }
 }

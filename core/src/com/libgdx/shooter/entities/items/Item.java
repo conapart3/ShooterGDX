@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.libgdx.shooter.entities.Player;
-import com.libgdx.shooter.entities.SoundPicker;
+import com.libgdx.shooter.entities.Soundable;
 import com.libgdx.shooter.entities.SoundToPlay;
 import com.libgdx.shooter.entities.SpaceObject;
 
@@ -17,7 +17,7 @@ import static com.libgdx.shooter.game.ShooterGame.GROUND_OFFSET;
 /**
  * Created by Conal on 08/11/2015.
  */
-public class Item extends SpaceObject implements SoundPicker {
+public class Item extends SpaceObject implements Soundable {
 
     protected boolean isWeapon;
     protected SoundToPlay soundToPlay;
@@ -86,7 +86,7 @@ public class Item extends SpaceObject implements SoundPicker {
     }
 
     @Override
-    public SoundToPlay pickSound() {
+    public SoundToPlay getSound() {
         return soundToPlay;
     }
 }
