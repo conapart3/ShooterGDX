@@ -5,5 +5,5 @@ package com.libgdx.shooter.entities;
  */
 
 public interface Soundable {
-    public SoundToPlay getSound();
+    SoundToPlay getSound();
 }

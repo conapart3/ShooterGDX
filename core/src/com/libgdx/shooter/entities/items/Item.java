@@ -23,7 +23,6 @@ public class Item extends SpaceObject implements Soundable {
     protected SoundToPlay soundToPlay;
 
     public Item() {
-//        setPickupSound();
         setTexture();
         width = texture.getWidth();
         height = texture.getHeight();
@@ -74,7 +73,6 @@ public class Item extends SpaceObject implements Soundable {
 
     public void dispose() {
         super.dispose();
-//        pickupSound.dispose();
     }
 
     public boolean isWeapon() {

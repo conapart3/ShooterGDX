@@ -13,7 +13,6 @@ public abstract class Weapon extends Item {
     protected float timeSinceLastFire;
     protected float rateOfFire;
     protected float damage;
-    protected SoundToPlay soundToPlay;
 
     public Weapon() {
         super();
